@@ -5,15 +5,15 @@ branding:
   icon: "upload-cloud"
   color: "blue"
 inputs:
-  source-repo:
+  source_repo:
     description: 'SSH URL of the source repo.'
     required: true
     default: ''
-  destination-repo:
+  destination_repo:
     description: 'SSH URL of the destination repo.'
     required: true
     default: ''
-  cache-path:
+  cache_path:
     description: "The path to cache the source repos code."
     default: '/github/workspace/mirror-repo-cache'
 runs:
