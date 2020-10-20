@@ -37,6 +37,6 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
       with:
         # 需要被同步的源端仓库
-        source-repo: "git@github.com:wearerequired/git-mirror-action.git"
+        source_repo: "git@github.com:wearerequired/git-mirror-action.git"
         # 需要同步到的目的仓库
-        destination-repo: "git@gitee.com:kuxiade/git-mirror-action.git"
+        destination_repo: "git@gitee.com:kuxiade/git-mirror-action.git"
