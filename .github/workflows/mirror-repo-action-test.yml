@@ -25,7 +25,7 @@ on:
 
 jobs:
   run:
-    name: Run
+    name: Run test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source codes
