@@ -20,6 +20,6 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.source-repo }}
-    - ${{ inputs.destination-repo }}
-    - ${{ inputs.cache-path }}
+    - ${{ inputs.source_repo }}
+    - ${{ inputs.destination_repo }}
+    - ${{ inputs.cache_path }}
