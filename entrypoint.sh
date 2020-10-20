@@ -2,6 +2,9 @@
 
 set -e
 
+
+SSH_PRIVATE_KEY="${INPUT_SSH_PRIVATE_KEY}"
+
 if [ -n "$SSH_PRIVATE_KEY" ]; then
     echo "Setting ssh key"
     mkdir -p /root/.ssh

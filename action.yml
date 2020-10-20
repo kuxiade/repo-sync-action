@@ -5,6 +5,9 @@ branding:
   icon: "upload-cloud"
   color: "blue"
 inputs:
+  ssh_private_key:
+    description: "The private SSH key which is used to to push code in destination hub."
+    required: true
   source_repo:
     description: 'SSH URL of the source repo.'
     required: true
@@ -20,6 +23,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.ssh_private_key }}
     - ${{ inputs.source_repo }}
     - ${{ inputs.destination_repo }}
     - ${{ inputs.cache_path }}
