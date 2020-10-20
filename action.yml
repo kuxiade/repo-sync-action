@@ -1,0 +1,25 @@
+name: "Mirror Repo Action."
+description: "Mirror the organization repos between hub (github/gitee)."
+author: "kuxia"
+branding:
+  icon: "upload-cloud"
+  color: "blue"
+inputs:
+  source-repo:
+    description: 'SSH URL of the source repo.'
+    required: true
+    default: ''
+  destination-repo:
+    description: 'SSH URL of the destination repo.'
+    required: true
+    default: ''
+  cache-path:
+    description: "The path to cache the source repos code."
+    default: '/github/workspace/mirror-repo-cache'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.source-repo }}
+    - ${{ inputs.destination-repo }}
+    - ${{ inputs.cache-path }}
