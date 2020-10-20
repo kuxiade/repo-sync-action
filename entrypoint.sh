@@ -2,11 +2,11 @@
 
 set -e
 
-if [[ -n "$SSH_PRIVATE_KEY" ]]; then
-  echo "Setting ssh key"
-  mkdir -p /root/.ssh
-  echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
-  chmod 600 /root/.ssh/id_rsa
+if [ -n "$SSH_PRIVATE_KEY" ]; then
+    echo "Setting ssh key"
+    mkdir -p /root/.ssh
+    echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
+    chmod 600 /root/.ssh/id_rsa
 fi
 
 mkdir -p ~/.ssh
@@ -21,7 +21,7 @@ echo "SOURCE=$SOURCE_REPO"
 echo "DESTINATION=$DESTINATION_REPO"
 
 if [ ! -d "$CACHE_PATH" ]; then
-  mkdir -p "$CACHE_PATH"
+    mkdir -p "$CACHE_PATH"
 fi
 cd "$CACHE_PATH"
 
