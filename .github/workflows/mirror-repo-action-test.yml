@@ -38,9 +38,12 @@ jobs:
         uses: actions/checkout@v1
       - name: Mirror Github to Gitee with mirror-repo-action
         uses: ./.
-        with:
+        env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+        with:
+          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
           # 需要被同步的源端仓库
           source_repo: "git@github.com:wearerequired/git-mirror-action.git"
           # 需要同步到的目的仓库
