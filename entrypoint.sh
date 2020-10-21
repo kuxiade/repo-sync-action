@@ -22,6 +22,8 @@ SOURCE_REPO="${INPUT_SOURCE_REPO}"
 DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 
+SOURCE_REPO_DIR="$(basename "$SOURCE_REPO")"
+
 echo "SOURCE=$SOURCE_REPO"
 echo "DESTINATION=$DESTINATION_REPO"
 
@@ -30,7 +32,19 @@ if [ ! -d "$CACHE_PATH" ]; then
 fi
 cd "$CACHE_PATH"
 
-git clone --mirror "$SOURCE_REPO" && cd "$(basename "$SOURCE_REPO")"
+if [ -d "$SOURCE_REPO_DIR" ] ; then
+    cd "$SOURCE_REPO_DIR"
+    if [ "$(git rev-parse --is-inside-work-tree)" = "true" ]; then
+        echo "$SOURCE_REPO_DIR is a git repo!"
+    else
+        echo "$SOURCE_REPO_DIR is not a git repo!"
+        cd .. && rm -rf "$SOURCE_REPO_DIR"
+        git clone --mirror "$SOURCE_REPO" && cd "$SOURCE_REPO_DIR"
+    fi
+else
+    git clone --mirror "$SOURCE_REPO" && cd "$SOURCE_REPO_DIR"
+fi
+
 git remote set-url --push origin "$DESTINATION_REPO"
 git fetch -p origin
 # Exclude refs created by GitHub for pull request.
