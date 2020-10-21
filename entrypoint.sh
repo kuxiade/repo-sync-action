@@ -34,6 +34,7 @@ cd "$CACHE_PATH"
 
 if [ -d "$SOURCE_REPO_DIR" ] ; then
     cd "$SOURCE_REPO_DIR"
+    # 判断当前目录（此处为"$SOURCE_REPO_DIR"）是否为有效的 git 仓库。
     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ]; then
         echo "$SOURCE_REPO_DIR is a git repo!"
     else

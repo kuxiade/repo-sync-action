@@ -33,7 +33,7 @@ jobs:
         run: |
           pwd
           ls -la
-            ls -la ${{ github.workspace }}
+          ls -la ${{ github.workspace }}
       - name: Checkout source codes
         uses: actions/checkout@v1
       - name: Mirror Github to Gitee with mirror-repo-action
