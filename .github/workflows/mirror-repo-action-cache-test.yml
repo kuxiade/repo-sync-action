@@ -1,4 +1,4 @@
-name: Test mirror-repo-action
+name: Test mirror-repo-action with cache
 
 on:
   # push推送时触发

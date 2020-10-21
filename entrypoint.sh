@@ -37,7 +37,7 @@ if [ -d "$SOURCE_REPO_DIR" ] ; then
     # 判断当前目录（此处为"$SOURCE_REPO_DIR"）是否为有效的 git 仓库。
     # git clone --mirror 克隆下来的为纯仓库。
     # git rev-parse --is-inside-work-tree 判断是否为非纯的普通仓库。
-    # git rev-parse --is-bare-repository 判断是否为纯仓库。
+    # git rev-parse --is-bare-repository 判断是否为纯仓库（或者叫裸仓库）。
     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ] || [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
         echo "$SOURCE_REPO_DIR is a git repo!"
     else
