@@ -34,7 +34,7 @@ jobs:
           pwd
           ls -la
           ls -la ${{ github.workspace }}
-          
+
       - name: Checkout source codes
         uses: actions/checkout@v1
 
@@ -42,7 +42,6 @@ jobs:
         id: someInfo
         uses: actions/github-script@v3
         with:
-          github-token: ${{secrets.GITEE_PRIVATE_TOKEN}}
           result-encoding: string
           script: |
             core.setOutput('ownerRepoInfo', `${context.repo.owner}-${context.repo.repo}`);
