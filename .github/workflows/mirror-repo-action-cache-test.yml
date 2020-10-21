@@ -50,7 +50,7 @@ jobs:
       
       - name: Cache src repos with actions/cache
         uses: actions/cache@v2
-        id: cache-src-repos
+        id: cacheSrcRepos
         with:
           # 运行时 path 展开为: /home/runner/work/git-mirror-sync/git-mirror-sync/hub-mirror-cache
           path: ${{ github.workspace }}/mirror-repo-cache
@@ -62,7 +62,7 @@ jobs:
           # restore-keys: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-
 
       - name: Print the cache status
-        if: steps.cache-src-repos.outputs.cache-hit == 'true'
+        if: steps.cacheSrcRepos.outputs.cache-hit == 'true'
         run: echo "Cached successfully."
 
       - name: Mirror Github to Gitee with mirror-repo-action
