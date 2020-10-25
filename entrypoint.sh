@@ -2,16 +2,33 @@
 
 set -e
 
+# 提示语句字体颜色设置
+echo_color() {
+    case $1 in
+    red)
+        echo -e "\033[31m$2\033[0m"
+        ;;
+    green)
+        echo -e "\033[32m$2\033[0m"
+        ;;
+    yellow)
+        echo -e "\033[33m$2\033[0m"
+        ;;
+    blue)
+        echo -e "\033[34m$2\033[0m"
+        ;;
+    esac
+}
 
 #SSH_PRIVATE_KEY="${INPUT_SSH_PRIVATE_KEY}"
 
 if [ -n "$SSH_PRIVATE_KEY" ]; then
-    echo "Setting ssh key"
+    echo_color green "Setting SSH key"
     mkdir -p /root/.ssh
     echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
     chmod 600 /root/.ssh/id_rsa
 else
-    echo "SSH_PRIVATE_KEY is empty!"
+    echo_color red "SSH_PRIVATE_KEY is empty!"
 fi
 
 mkdir -p ~/.ssh
@@ -28,6 +45,79 @@ echo "SOURCE_REPO=$SOURCE_REPO"
 echo "DESTINATION_REPO=$DESTINATION_REPO"
 echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR"
 
+# 判断字符串中是否含有空格
+find_space_in_string() {
+    if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
+    then
+        echo_color red "error: there are spaces in the repo url."
+        exit 0
+    else
+        echo_color green "there are not spaces in the repo url."
+    fi
+}
+
+# 删除字符串前后空格
+trim_string() {
+    # Usage: trim_string "   example   string    "
+    : "${1#"${1%%[![:space:]]*}"}"
+    : "${_%"${_##*[![:space:]]}"}"
+    printf '%s\n' "$_"
+}
+
+# 判断是否为合法的 hub url。
+is_legal_hub_url() {
+    local repo_type
+    # 检查传入的仓库的 url 是否是 GitHub 或者 Gitee 链接，不是则退出。
+    if [[ "$1" == https://gitee.com/* ]]; then
+        echo_color green "$1 is a gitee url."
+        repo_type="gitee"
+        #ownername_reponame_in_repourl="${repo_url#https://gitee.com/}"
+    elif [[ "$1" == git@gitee.com:* ]]; then
+        echo_color green "$1 is a gitee url."
+        repo_type="gitee"
+        #ownername_reponame_in_repourl="${repo_url#git@gitee.com:}"
+    elif [[ "$1" == https://github.com/* ]]; then
+        echo_color green "$1 is a github url."
+        repo_type="github"
+        #ownername_reponame_in_repourl="${repo_url#https://github.com/}"
+    elif [[ "$1" == git@github.com:* ]]; then
+        echo_color green "$1 is a github url."
+        repo_type="github"
+        #ownername_reponame_in_repourl="${repo_url#git@github.com:}"
+    else
+        echo_color red "$1 is unknow the type."
+        exit 0
+    fi
+
+    # 判断传入的仓库的 url 中最后的仓库名称格式是否正确，不正确则退出。
+    if [[ "$repo_type" == "gitee" ]]; then
+        # 必须以字母或数字或点号或下划线开头：[a-zA-Z0-9._]*
+        # gitee 仓库路径只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符
+        if echo "${1##*/}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
+            echo_color green "gitee repo: The format of the repoName:${1##*/} is right."
+        else
+            echo_color red "gitee repo: The format of the repoName:${1##*/} is wrong."
+            exit 0
+        fi
+    elif [[ "$repo_type" == "github" ]]; then
+        # github 仓库必须以点号或者字母开头
+        if echo "${1##*/}" | grep -Eq "^[.a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
+            echo_color green "github repo: The format of the repoName:${1##*/} is right."
+        else
+            echo_color red "github repo: The format of the repoName:${1##*/} is wrong."
+            exit 0
+        fi
+    fi
+}
+
+# 检查传入的仓库的 url 中是否存在空格，存在则退出。
+find_space_in_string "$SOURCE_REPO"
+find_space_in_string "$DESTINATION_REPO"
+
+is_legal_hub_url "$SOURCE_REPO"
+is_legal_hub_url "$DESTINATION_REPO"
+
+
 if [ ! -d "$CACHE_PATH" ]; then
     mkdir -p "$CACHE_PATH"
 fi
@@ -40,9 +130,20 @@ if [ -d "$SOURCE_REPO_DIR" ] ; then
     # git rev-parse --is-inside-work-tree 判断是否为非纯的普通仓库。
     # git rev-parse --is-bare-repository 判断是否为纯仓库（或者叫裸仓库）。
     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ] || [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
-        echo "$SOURCE_REPO_DIR is a git repo!"
+        echo_color green "$SOURCE_REPO_DIR is a git repo!"
+        # 模糊匹配，获取到的字符串前后可能有空格。
+        get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Po "(?<=origin).*(?=\(fetch\))")
+        # 精确匹配，删除字符串前后空格。
+        get_repo_remote_url_for_fetch_with_exact_match=$(trim_string "$get_repo_remote_url_for_fetch_with_fuzzy_match")
+        if [[ "$get_repo_remote_url_for_fetch_with_exact_match" == "$SOURCE_REPO" ]]; then
+            echo_color green "The repo url of pre-fetch matches the src repo url."
+        else
+            echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+            cd .. && rm -rf "$SOURCE_REPO_DIR"
+            git clone --mirror "$SOURCE_REPO" && cd "$SOURCE_REPO_DIR"
+        fi
     else
-        echo "$SOURCE_REPO_DIR is not a git repo!"
+        echo_color yellow "$SOURCE_REPO_DIR is not a git repo!"
         cd .. && rm -rf "$SOURCE_REPO_DIR"
         git clone --mirror "$SOURCE_REPO" && cd "$SOURCE_REPO_DIR"
     fi
