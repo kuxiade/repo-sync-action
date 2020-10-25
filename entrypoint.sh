@@ -132,7 +132,7 @@ if [ -d "$SOURCE_REPO_DIR" ] ; then
     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ] || [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
         echo_color green "$SOURCE_REPO_DIR is a git repo!"
         # 模糊匹配，获取到的字符串前后可能有空格。
-        get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -o "(?<=origin).*(?=\(fetch\))")
+        get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Eo "(?<=origin).*(?=\(fetch\))")
         # 精确匹配，删除字符串前后空格。
         get_repo_remote_url_for_fetch_with_exact_match=$(trim_string "$get_repo_remote_url_for_fetch_with_fuzzy_match")
         if [[ "$get_repo_remote_url_for_fetch_with_exact_match" == "$SOURCE_REPO" ]]; then
