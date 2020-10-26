@@ -183,8 +183,8 @@ if [ -d "$SOURCE_REPO_DIR" ] ; then
         echo_color green "$SOURCE_REPO_DIR is a git repo!"
         # 模糊匹配，获取到的字符串前后可能有空格。
         # 此处有问题，GitHub action 使用的 ubuntu-latest 中的 grep 没有 -P 选项，而 -E 选项又不支持 (?<=origin).*(?=\(fetch\))，该问题待解决
-        get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Po "(?<=origin).*(?=\(fetch\))" || echo_color red "grep error")
-        #get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | awk -F '[ ]+' '{print $1}' || echo_color red "awk error")
+        #get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Po "(?<=origin).*(?=\(fetch\))")
+        get_repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | awk -F '[ ]+' '{print $1}')
         # 精确匹配，删除字符串前后空格。
         get_repo_remote_url_for_fetch_with_exact_match=$(trim_string "$get_repo_remote_url_for_fetch_with_fuzzy_match")
         if [[ "$get_repo_remote_url_for_fetch_with_exact_match" == "$SOURCE_REPO" ]]; then
