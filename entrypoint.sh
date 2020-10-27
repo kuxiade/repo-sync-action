@@ -170,6 +170,9 @@ is_legal_hub_url() {
 
     # 检查仓库是否存在
     repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
+    echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
+    echo "$repo_full_name_get_from_request_url"
+    echo "\"$ownername_reponame_in_repourl\""
     if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
         echo_color green "$repo_url_var: $repo_url_value is existed"
     else
