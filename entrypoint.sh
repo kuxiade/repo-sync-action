@@ -37,6 +37,7 @@ cp /root/.ssh/* ~/.ssh/ 2> /dev/null || true
 
 SOURCE_REPO="${INPUT_SOURCE_REPO}"
 DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
+FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 
 SOURCE_REPO_DIR="$(basename "$SOURCE_REPO")"
@@ -110,52 +111,91 @@ trim_string() {
 #     fi
 # }
 
+# 判断是否为合法的 hub url。
 is_legal_hub_url() {
     local repo_url_var="$1"
     local repo_url_value="${!repo_url_var}"
     local repo_type
+
     # 检查传入的仓库的 url 是否是 GitHub 或者 Gitee 链接，不是则退出。
     if [[ "$repo_url_value" == https://gitee.com/* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a gitee url."
         repo_type="gitee"
-        #ownername_reponame_in_repourl="${repo_url#https://gitee.com/}"
+        ownername_reponame_in_repourl="${repo_url_value#https://gitee.com/}"
     elif [[ "$repo_url_value" == git@gitee.com:* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a gitee url."
         repo_type="gitee"
-        #ownername_reponame_in_repourl="${repo_url#git@gitee.com:}"
+        ownername_reponame_in_repourl="${repo_url_value#git@gitee.com:}"
     elif [[ "$repo_url_value" == https://github.com/* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a github url."
         repo_type="github"
-        #ownername_reponame_in_repourl="${repo_url#https://github.com/}"
+        ownername_reponame_in_repourl="${repo_url_value#https://github.com/}"
     elif [[ "$repo_url_value" == git@github.com:* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a github url."
         repo_type="github"
-        #ownername_reponame_in_repourl="${repo_url#git@github.com:}"
+        ownername_reponame_in_repourl="${repo_url_value#git@github.com:}"
     else
         echo_color red "$repo_url_var: $repo_url_value is unknow the type."
         exit 0
     fi
 
-    # 判断传入的仓库的 url 中最后的仓库名称格式是否正确，不正确则退出。
+    # 判断传入的仓库的 url 中用户名和仓库名的格式是否正确，不正确则退出。
     if [[ "$repo_type" == "gitee" ]]; then
-        # 必须以字母或数字或点号或下划线开头：[a-zA-Z0-9._]*
-        # gitee 仓库路径只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符
-        if echo "${repo_url_value##*/}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
-            echo_color green "$repo_url_var with Gitee repo: The format of the repoName:${repo_url_value##*/} is right."
+        local request_url_prefix="https://gitee.com/api/v5/repos"
+        # gitee 账户名只允许字母、数字或者下划线（_）、中划线（-），至少 2 个字符，必须以字母开头，不能以特殊字符结尾。
+        if echo "${ownername_reponame_in_repourl%/*}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
+            echo_color green "$repo_url_var with Gitee repo: The format of the userName:${ownername_reponame_in_repourl%/*} is right."
         else
-            echo_color red "$repo_url_var with Gitee repo: The format of the repoName:${repo_url_value##*/} is wrong."
+            echo_color red "$repo_url_var with Gitee repo: The format of the userName:${ownername_reponame_in_repourl%/*} is wrong."
+            exit 0
+        fi
+        # gitee 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符。
+        if echo "${ownername_reponame_in_repourl#*/}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
+            echo_color green "$repo_url_var with Gitee repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is right."
+        else
+            echo_color red "$repo_url_var with Gitee repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is wrong."
             exit 0
         fi
     elif [[ "$repo_type" == "github" ]]; then
-        # github 仓库必须以点号或者字母开头
-        if echo "${repo_url_value##*/}" | grep -Eq "^[.a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
+        local request_url_prefix="https://api.github.com/repos"
+        # github 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，开头符合前面条件即可，长度至少为1个字符。
+        # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
+        if echo "${repo_url_value##*/}" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
             echo_color green "$repo_url_var with Github repo: The format of the repoName:${repo_url_value##*/} is right."
         else
             echo_color red "$repo_url_var with Github repo: The format of the repoName:${repo_url_value##*/} is wrong."
             exit 0
         fi
     fi
+
+    # 检查仓库是否存在
+    repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
+    if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
+        echo_color green "$repo_url_var: $repo_url_value is existed"
+    else
+        echo_color yellow "$repo_url_var: $repo_url_value is not existed"
+        # 创建仓库或者直接退出
+        if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
+            if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
+                # 创建仓库
+                echo_color green "Creat $repo_url_var: $repo_url_value..."
+            elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
+                echo_color red "Please make sure the repo name is correct or create it manually"
+                exit 0
+            else
+                echo_color red "The parameter passed in must be 'true' or 'false'"
+                exit 0
+            fi
+        elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
+            echo_color red "Please make sure the repo name is correct or create it manually"
+            exit 0
+        else
+            echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
+            exit 0
+        fi
+    fi
 }
+
 
 # 检查传入的仓库的 url 中是否存在空格，存在则退出。
 find_space_in_string "$SOURCE_REPO"
@@ -164,6 +204,7 @@ find_space_in_string "$DESTINATION_REPO"
 # is_legal_hub_url "$SOURCE_REPO"
 # is_legal_hub_url "$DESTINATION_REPO"
 
+# 判断是否为合法的 hub url。
 is_legal_hub_url SOURCE_REPO
 is_legal_hub_url DESTINATION_REPO
 

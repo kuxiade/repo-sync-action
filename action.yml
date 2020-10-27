@@ -16,6 +16,9 @@ inputs:
     description: 'SSH URL of the destination repo.'
     required: true
     default: ''
+  force_creat_destination_repo:
+    description: "If destination repo does not exist, force to create it."
+    default: false
   cache_path:
     description: "The path to cache the source repos code."
     default: '/github/workspace/mirror-repo-cache'
@@ -26,4 +29,5 @@ runs:
     - ${{ inputs.ssh_private_key }}
     - ${{ inputs.source_repo }}
     - ${{ inputs.destination_repo }}
+    - ${{ inputs.force_creat_destination_repo}}
     - ${{ inputs.cache_path }}
