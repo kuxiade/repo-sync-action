@@ -46,16 +46,16 @@ echo "SOURCE_REPO=$SOURCE_REPO"
 echo "DESTINATION_REPO=$DESTINATION_REPO"
 echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR"
 
-# 判断字符串中是否含有空格
-find_space_in_string() {
-    if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
-    then
-        echo_color red "There are spaces in the repo url: $1."
-        exit 0
-    else
-        echo_color green "There are not spaces in the repo url: $1."
-    fi
-}
+# # 判断字符串中是否含有空格
+# find_space_in_string() {
+#     if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
+#     then
+#         echo_color red "There are spaces in the repo url: $1."
+#         exit 0
+#     else
+#         echo_color green "There are not spaces in the repo url: $1."
+#     fi
+# }
 
 # 删除字符串前后空格
 trim_string() {
@@ -66,56 +66,19 @@ trim_string() {
 }
 
 # 判断是否为合法的 hub url。
-# is_legal_hub_url() {
-#     local repo_type
-#     # 检查传入的仓库的 url 是否是 GitHub 或者 Gitee 链接，不是则退出。
-#     if [[ "$1" == https://gitee.com/* ]]; then
-#         echo_color green "$1 is a gitee url."
-#         repo_type="gitee"
-#         #ownername_reponame_in_repourl="${repo_url#https://gitee.com/}"
-#     elif [[ "$1" == git@gitee.com:* ]]; then
-#         echo_color green "$1 is a gitee url."
-#         repo_type="gitee"
-#         #ownername_reponame_in_repourl="${repo_url#git@gitee.com:}"
-#     elif [[ "$1" == https://github.com/* ]]; then
-#         echo_color green "$1 is a github url."
-#         repo_type="github"
-#         #ownername_reponame_in_repourl="${repo_url#https://github.com/}"
-#     elif [[ "$1" == git@github.com:* ]]; then
-#         echo_color green "$1 is a github url."
-#         repo_type="github"
-#         #ownername_reponame_in_repourl="${repo_url#git@github.com:}"
-#     else
-#         echo_color red "$1 is unknow the type."
-#         exit 0
-#     fi
-
-#     # 判断传入的仓库的 url 中最后的仓库名称格式是否正确，不正确则退出。
-#     if [[ "$repo_type" == "gitee" ]]; then
-#         # 必须以字母或数字或点号或下划线开头：[a-zA-Z0-9._]*
-#         # gitee 仓库路径只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符
-#         if echo "${1##*/}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
-#             echo_color green "gitee repo: The format of the repoName:${1##*/} is right."
-#         else
-#             echo_color red "gitee repo: The format of the repoName:${1##*/} is wrong."
-#             exit 0
-#         fi
-#     elif [[ "$repo_type" == "github" ]]; then
-#         # github 仓库必须以点号或者字母开头
-#         if echo "${1##*/}" | grep -Eq "^[.a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
-#             echo_color green "github repo: The format of the repoName:${1##*/} is right."
-#         else
-#             echo_color red "github repo: The format of the repoName:${1##*/} is wrong."
-#             exit 0
-#         fi
-#     fi
-# }
-
-# 判断是否为合法的 hub url。
 is_legal_hub_url() {
     local repo_url_var="$1"
     local repo_url_value="${!repo_url_var}"
     local repo_type
+
+    # 判断字符串中是否含有空格
+    if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
+    then
+        echo_color red "There are spaces in the $repo_url_var repo url: $repo_url_value."
+        exit 0
+    else
+        echo_color green "There are not spaces in the $repo_url_var repo url: $repo_url_value."
+    fi
 
     # 检查传入的仓库的 url 是否是 GitHub 或者 Gitee 链接，不是则退出。
     if [[ "$repo_url_value" == https://gitee.com/* ]]; then
@@ -206,8 +169,8 @@ is_legal_hub_url() {
 
 
 # 检查传入的仓库的 url 中是否存在空格，存在则退出。
-find_space_in_string "$SOURCE_REPO"
-find_space_in_string "$DESTINATION_REPO"
+# find_space_in_string "$SOURCE_REPO"
+# find_space_in_string "$DESTINATION_REPO"
 
 # is_legal_hub_url "$SOURCE_REPO"
 # is_legal_hub_url "$DESTINATION_REPO"
