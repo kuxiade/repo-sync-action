@@ -42,9 +42,12 @@ CACHE_PATH="${INPUT_CACHE_PATH}"
 
 SOURCE_REPO_DIR="$(basename "$SOURCE_REPO")"
 
+echo_color yellow "<-------------------parameter info BEGIN------------------->"
 echo "SOURCE_REPO=$SOURCE_REPO"
 echo "DESTINATION_REPO=$DESTINATION_REPO"
 echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR"
+echo "CACHE_PATH=$CACHE_PATH"
+echo_color yellow "<-------------------parameter info END------------------->\n"
 
 # # 判断字符串中是否含有空格
 # find_space_in_string() {
@@ -175,10 +178,13 @@ is_legal_hub_url() {
 
 
 # 判断是否为合法的 hub url。
-echo_color yellow "-------------------SOURCE_REPO------------------->"
+echo_color yellow "<-------------------SOURCE_REPO is_legal_hub_url BEGIN------------------->"
 is_legal_hub_url SOURCE_REPO
-echo_color yellow "-------------------DESTINATION_REPO------------------->"
+echo_color yellow "<-------------------SOURCE_REPO is_legal_hub_url END------------------->\n"
+
+echo_color yellow "<-------------------DESTINATION_REPO is_legal_hub_url BEGIN------------------->"
 is_legal_hub_url DESTINATION_REPO
+echo_color yellow "<-------------------DESTINATION_REPO is_legal_hub_url END------------------->\n"
 
 
 if [ ! -d "$CACHE_PATH" ]; then
