@@ -84,19 +84,19 @@ is_legal_hub_url() {
     if [[ "$repo_url_value" == https://gitee.com/* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a gitee url."
         repo_type="gitee"
-        ownername_reponame_in_repourl="${repo_url_value#https://gitee.com/}"
+        ownername_reponame_dotgit_in_repourl="${repo_url_value#https://gitee.com/}"
     elif [[ "$repo_url_value" == git@gitee.com:* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a gitee url."
         repo_type="gitee"
-        ownername_reponame_in_repourl="${repo_url_value#git@gitee.com:}"
+        ownername_reponame_dotgit_in_repourl="${repo_url_value#git@gitee.com:}"
     elif [[ "$repo_url_value" == https://github.com/* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a github url."
         repo_type="github"
-        ownername_reponame_in_repourl="${repo_url_value#https://github.com/}"
+        ownername_reponame_dotgit_in_repourl="${repo_url_value#https://github.com/}"
     elif [[ "$repo_url_value" == git@github.com:* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a github url."
         repo_type="github"
-        ownername_reponame_in_repourl="${repo_url_value#git@github.com:}"
+        ownername_reponame_dotgit_in_repourl="${repo_url_value#git@github.com:}"
     else
         echo_color red "$repo_url_var: $repo_url_value is unknow the type."
         exit 0
@@ -106,65 +106,70 @@ is_legal_hub_url() {
     if [[ "$repo_type" == "gitee" ]]; then
         local request_url_prefix="https://gitee.com/api/v5/repos"
         # gitee 账户名只允许字母、数字或者下划线（_）、中划线（-），至少 2 个字符，必须以字母开头，不能以特殊字符结尾。
-        if echo "${ownername_reponame_in_repourl%/*}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
-            echo_color green "$repo_url_var with Gitee repo: The format of the userName:${ownername_reponame_in_repourl%/*} is right."
+        if echo "${ownername_reponame_dotgit_in_repourl%/*}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
+            echo_color green "$repo_url_var with Gitee repo: The format of the userName:${ownername_reponame_dotgit_in_repourl%/*} is right."
         else
-            echo_color red "$repo_url_var with Gitee repo: The format of the userName:${ownername_reponame_in_repourl%/*} is wrong."
+            echo_color red "$repo_url_var with Gitee repo: The format of the userName:${ownername_reponame_dotgit_in_repourl%/*} is wrong."
             exit 0
         fi
         # gitee 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符。
-        if echo "${ownername_reponame_in_repourl#*/}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
-            echo_color green "$repo_url_var with Gitee repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is right."
+        if echo "${ownername_reponame_dotgit_in_repourl#*/}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}\.git$"; then
+            echo_color green "$repo_url_var with Gitee repo: The format of the repoName.git:${ownername_reponame_dotgit_in_repourl#*/} is right."
+            ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%*.git}"
+            echo "ownername_reponame_in_repourl= $ownername_reponame_in_repourl"
         else
-            echo_color red "$repo_url_var with Gitee repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is wrong."
+            echo_color red "$repo_url_var with Gitee repo: The format of the repoName.git:${ownername_reponame_dotgit_in_repourl#*/} is wrong."
             exit 0
         fi
     elif [[ "$repo_type" == "github" ]]; then
         local request_url_prefix="https://api.github.com/repos"
         # github 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，开头符合前面条件即可，长度至少为1个字符。
         # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
-        if [[ "${ownername_reponame_in_repourl#*/}" == "." ]] || [[ "${ownername_reponame_in_repourl#*/}" == ".." ]]; then
-            echo_color red "$repo_url_var with Github repo: The format of the repoName:${repo_url_value##*/} is wrong."
+        if [[ "${ownername_reponame_dotgit_in_repourl#*/}" == "." ]] || [[ "${ownername_reponame_dotgit_in_repourl#*/}" == ".." ]]; then
+            echo_color red "$repo_url_var with Github repo: The format of the repoName.git:${repo_url_value##*/} is wrong."
+            exit 0
         else
-            if echo "${ownername_reponame_in_repourl#*/}" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
-                echo_color green "$repo_url_var with Github repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is right."
+            if echo "${ownername_reponame_dotgit_in_repourl#*/}" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*\.git$"; then
+                echo_color green "$repo_url_var with Github repo: The format of the repoName.git:${ownername_reponame_dotgit_in_repourl#*/} is right."
+                ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%*.git}"
+                echo "ownername_reponame_in_repourl= $ownername_reponame_in_repourl"
             else
-                echo_color red "$repo_url_var with Github repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is wrong."
+                echo_color red "$repo_url_var with Github repo: The format of the repoName.git:${ownername_reponame_dotgit_in_repourl#*/} is wrong."
                 exit 0
             fi
         fi
     fi
 
-    # # 检查仓库是否存在
-    # repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
-    # echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
-    # echo "$repo_full_name_get_from_request_url"
-    # echo "\"$ownername_reponame_in_repourl\""
-    # if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
-    #     echo_color green "$repo_url_var: $repo_url_value is existed"
-    # else
-    #     # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
-    #     echo_color yellow "$repo_url_var: $repo_url_value is not existed"
-    #     # 创建仓库或者直接退出
-    #     if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
-    #         if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
-    #             # 创建仓库
-    #             echo_color green "Creat $repo_url_var: $repo_url_value..."
-    #         elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
-    #             echo_color red "Please make sure the repo name is correct or create it manually"
-    #             exit 0
-    #         else
-    #             echo_color red "The parameter passed in must be 'true' or 'false'"
-    #             exit 0
-    #         fi
-    #     elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
-    #         echo_color red "Please make sure the repo name is correct or create it manually"
-    #         exit 0
-    #     else
-    #         echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
-    #         exit 0
-    #     fi
-    # fi
+    # 检查仓库是否存在
+    repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
+    echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
+    echo "repo_full_name_get_from_request_url= $repo_full_name_get_from_request_url"
+    echo "\"$ownername_reponame_in_repourl\""
+    if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
+        echo_color green "$repo_url_var: $repo_url_value is existed"
+    else
+        # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
+        echo_color yellow "$repo_url_var: $repo_url_value is not existed"
+        # 创建仓库或者直接退出
+        if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
+            if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
+                # 创建仓库
+                echo_color green "Creat $repo_url_var: $repo_url_value..."
+            elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
+                echo_color red "Please make sure the repo name is correct or create it manually"
+                exit 0
+            else
+                echo_color red "The parameter passed in must be 'true' or 'false'"
+                exit 0
+            fi
+        elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
+            echo_color red "Please make sure the repo name is correct or create it manually"
+            exit 0
+        else
+            echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
+            exit 0
+        fi
+    fi
 }
 
 
