@@ -140,48 +140,44 @@ is_legal_hub_url() {
         fi
     fi
 
-    # 检查仓库是否存在
-    repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
-    echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
-    echo "repo_full_name_get_from_request_url= $repo_full_name_get_from_request_url"
-    echo "\"$ownername_reponame_in_repourl\""
-    if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
-        echo_color green "$repo_url_var: $repo_url_value is existed"
-    else
-        # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
-        echo_color yellow "$repo_url_var: $repo_url_value is not existed"
-        # 创建仓库或者直接退出
-        if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
-            if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
-                # 创建仓库
-                echo_color green "Creat $repo_url_var: $repo_url_value..."
-            elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
-                echo_color red "Please make sure the repo name is correct or create it manually"
-                exit 0
-            else
-                echo_color red "The parameter passed in must be 'true' or 'false'"
-                exit 0
-            fi
-        elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
-            echo_color red "Please make sure the repo name is correct or create it manually"
-            exit 0
-        else
-            echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
-            exit 0
-        fi
-    fi
+    # # 检查仓库是否存在
+    # # 比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
+    # repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
+    # echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
+    # echo "repo_full_name_get_from_request_url= $repo_full_name_get_from_request_url"
+    # echo "\"$ownername_reponame_in_repourl\""
+    # if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
+    #     echo_color green "$repo_url_var: $repo_url_value is existed"
+    # else
+    #     # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
+    #     echo_color yellow "$repo_url_var: $repo_url_value is not existed"
+    #     # 创建仓库或者直接退出
+    #     if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
+    #         if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
+    #             # 创建仓库
+    #             echo_color green "Creat $repo_url_var: $repo_url_value..."
+    #         elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
+    #             echo_color red "Please make sure the repo name is correct or create it manually"
+    #             exit 0
+    #         else
+    #             echo_color red "The parameter passed in must be 'true' or 'false'"
+    #             exit 0
+    #         fi
+    #     elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
+    #         echo_color red "Please make sure the repo name is correct or create it manually"
+    #         exit 0
+    #     else
+    #         echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
+    #         exit 0
+    #     fi
+    # fi
 }
 
 
-# 检查传入的仓库的 url 中是否存在空格，存在则退出。
-# find_space_in_string "$SOURCE_REPO"
-# find_space_in_string "$DESTINATION_REPO"
-
-# is_legal_hub_url "$SOURCE_REPO"
-# is_legal_hub_url "$DESTINATION_REPO"
-
 # 判断是否为合法的 hub url。
+echo_color yellow "-------------------SOURCE_REPO------------------->"
 is_legal_hub_url SOURCE_REPO
+echo_color yellow "-------------------DESTINATION_REPO------------------->"
 is_legal_hub_url DESTINATION_REPO
 
 
