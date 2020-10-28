@@ -160,11 +160,15 @@ is_legal_hub_url() {
         local request_url_prefix="https://api.github.com/repos"
         # github 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，开头符合前面条件即可，长度至少为1个字符。
         # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
-        if echo "${repo_url_value##*/}" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
-            echo_color green "$repo_url_var with Github repo: The format of the repoName:${repo_url_value##*/} is right."
-        else
+        if [[ "${ownername_reponame_in_repourl#*/}" == "." ]] || [[ "${ownername_reponame_in_repourl#*/}" == ".." ]]; then
             echo_color red "$repo_url_var with Github repo: The format of the repoName:${repo_url_value##*/} is wrong."
-            exit 0
+        else
+            if echo "${ownername_reponame_in_repourl#*/}" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
+                echo_color green "$repo_url_var with Github repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is right."
+            else
+                echo_color red "$repo_url_var with Github repo: The format of the repoName:${ownername_reponame_in_repourl#*/} is wrong."
+                exit 0
+            fi
         fi
     fi
 
@@ -176,6 +180,7 @@ is_legal_hub_url() {
     if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
         echo_color green "$repo_url_var: $repo_url_value is existed"
     else
+        # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
         echo_color yellow "$repo_url_var: $repo_url_value is not existed"
         # 创建仓库或者直接退出
         if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
