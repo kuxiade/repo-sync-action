@@ -160,14 +160,83 @@ is_legal_hub_url() {
     #             # 创建仓库
     #             echo_color green "Creat $repo_url_var: $repo_url_value..."
     #         elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
-    #             echo_color red "Please make sure the repo name is correct or create it manually"
+    #             echo_color red "Please make sure the $repo_url_var repo name is correct or create it manually"
     #             exit 0
     #         else
-    #             echo_color red "The parameter passed in must be 'true' or 'false'"
+    #             echo_color red "The FORCE_CREAT_DESTINATION_REPO parameter passed in must be 'true' or 'false'"
     #             exit 0
     #         fi
     #     elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
-    #         echo_color red "Please make sure the repo name is correct or create it manually"
+    #         echo_color red "Please make sure the $repo_url_var repo name is correct"
+    #         exit 0
+    #     else
+    #         echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
+    #         exit 0
+    #     fi
+    # fi
+
+
+    # 检查仓库是否存在
+    # 比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
+    local request_url="$request_url_prefix"/"$ownername_reponame_in_repourl"
+    echo "request_url = $request_url"
+    if content_get_from_request_url=$(curl -f "$request_url"); then
+        exit_status_code_flag=$?
+        echo $exit_status_code_flag
+        echo "Success"
+        #echo "$content_get_from_request_url"
+        repo_full_name_get_from_request_url=$(echo "$content_get_from_request_url" | jq '.full_name')
+        echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
+        echo "\"$ownername_reponame_in_repourl\""
+        if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
+            echo_color green "$repo_url_var: $repo_url_value is existed"
+        else
+            :
+        fi
+    else
+        exit_status_code_flag=$?
+        echo "exit_status_code_flag = $exit_status_code_flag"
+        echo "Fail"
+        #echo "$content_get_from_request_url"
+        if [[ $exit_status_code_flag -eq 22 ]]; then
+            echo "HTTP 找不到网页，url可能是私有仓库或者不存在该仓库。"
+        elif [[ $exit_status_code_flag -eq 7 ]]; then
+            echo "url拒接连接，被目标服务器限流。"
+        else
+            echo "Curl: exit_status_code_flag = $exit_status_code_flag"
+        fi
+
+        # if (( exit_status_code_flag == 22 )); then
+        #     echo "HTTP 找不到网页，url可能是私有仓库或者不存在该仓库。"
+        # elif (( exit_status_code_flag == 7 )); then
+        #     echo "url拒接连接，被目标服务器限流。"
+        # fi
+    fi
+
+
+    # repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
+    # echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
+    # echo "repo_full_name_get_from_request_url= $repo_full_name_get_from_request_url"
+    # echo "\"$ownername_reponame_in_repourl\""
+    # if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
+    #     echo_color green "$repo_url_var: $repo_url_value is existed"
+    # else
+    #     # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
+    #     echo_color yellow "$repo_url_var: $repo_url_value is not existed"
+    #     # 创建仓库或者直接退出
+    #     if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
+    #         if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
+    #             # 创建仓库
+    #             echo_color green "Creat $repo_url_var: $repo_url_value..."
+    #         elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
+    #             echo_color red "Please make sure the $repo_url_var repo name is correct or create it manually"
+    #             exit 0
+    #         else
+    #             echo_color red "The FORCE_CREAT_DESTINATION_REPO parameter passed in must be 'true' or 'false'"
+    #             exit 0
+    #         fi
+    #     elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
+    #         echo_color red "Please make sure the $repo_url_var repo name is correct"
     #         exit 0
     #     else
     #         echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
