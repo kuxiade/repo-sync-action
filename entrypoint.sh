@@ -204,6 +204,7 @@ echo "============ ls -la BEGIN ================"
 echo "ls -la CACHE_PATH"
 ls -la
 echo "============ ls -la END ================"
+rm -rf "$SOURCE_REPO_DIR"
 if [ -d "$SOURCE_REPO_DIR" ] ; then
     cd "$SOURCE_REPO_DIR"
     # 判断当前目录（此处为"$SOURCE_REPO_DIR"）是否为有效的 git 仓库。
