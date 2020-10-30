@@ -200,7 +200,10 @@ if [ ! -d "$CACHE_PATH" ]; then
     mkdir -p "$CACHE_PATH"
 fi
 cd "$CACHE_PATH"
-
+echo "============ ls -la BEGIN ================"
+echo "ls -la CACHE_PATH"
+ls -la
+echo "============ ls -la END ================"
 if [ -d "$SOURCE_REPO_DIR" ] ; then
     cd "$SOURCE_REPO_DIR"
     # 判断当前目录（此处为"$SOURCE_REPO_DIR"）是否为有效的 git 仓库。
@@ -236,5 +239,5 @@ fi
 git remote set-url --push origin "$DESTINATION_REPO"
 git fetch -p origin
 # Exclude refs created by GitHub for pull request.
-git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
+#git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
 git push --mirror
