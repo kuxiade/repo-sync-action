@@ -49,16 +49,6 @@ echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR"
 echo "CACHE_PATH=$CACHE_PATH"
 echo_color yellow "<-------------------parameter info END------------------->\n"
 
-# # 判断字符串中是否含有空格
-# find_space_in_string() {
-#     if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
-#     then
-#         echo_color red "There are spaces in the repo url: $1."
-#         exit 0
-#     else
-#         echo_color green "There are not spaces in the repo url: $1."
-#     fi
-# }
 
 # 删除字符串前后空格
 trim_string() {
@@ -72,7 +62,9 @@ trim_string() {
 is_legal_hub_url() {
     local repo_url_var="$1"
     local repo_url_value="${!repo_url_var}"
-    local repo_type
+    local hub_type
+    local protocol_type
+    local repo_url_with_ssh
 
     # 判断字符串中是否含有空格
     if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
@@ -86,27 +78,35 @@ is_legal_hub_url() {
     # 检查传入的仓库的 url 是否是 GitHub 或者 Gitee 链接，不是则退出。
     if [[ "$repo_url_value" == https://gitee.com/* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a gitee url."
-        repo_type="gitee"
+        hub_type="gitee"
+        protocol_type="HTTPS"
         ownername_reponame_dotgit_in_repourl="${repo_url_value#https://gitee.com/}"
+        repo_url_with_ssh="git@gitee.com:$ownername_reponame_dotgit_in_repourl"
     elif [[ "$repo_url_value" == git@gitee.com:* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a gitee url."
-        repo_type="gitee"
+        hub_type="gitee"
+        protocol_type="SSH"
         ownername_reponame_dotgit_in_repourl="${repo_url_value#git@gitee.com:}"
+        repo_url_with_ssh="$repo_url_value"
     elif [[ "$repo_url_value" == https://github.com/* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a github url."
-        repo_type="github"
+        hub_type="github"
+        protocol_type="HTTPS"
         ownername_reponame_dotgit_in_repourl="${repo_url_value#https://github.com/}"
+        repo_url_with_ssh="git@github.com:$ownername_reponame_dotgit_in_repourl"
     elif [[ "$repo_url_value" == git@github.com:* ]]; then
         echo_color green "$repo_url_var: $repo_url_value is a github url."
-        repo_type="github"
+        hub_type="github"
+        protocol_type="SSH"
         ownername_reponame_dotgit_in_repourl="${repo_url_value#git@github.com:}"
+        repo_url_with_ssh="$repo_url_value"
     else
         echo_color red "$repo_url_var: $repo_url_value is unknow the type."
         exit 0
     fi
 
     # 判断传入的仓库的 url 中用户名和仓库名的格式是否正确，不正确则退出。
-    if [[ "$repo_type" == "gitee" ]]; then
+    if [[ "$hub_type" == "gitee" ]]; then
         local request_url_prefix="https://gitee.com/api/v5/repos"
         # gitee 账户名只允许字母、数字或者下划线（_）、中划线（-），至少 2 个字符，必须以字母开头，不能以特殊字符结尾。
         if echo "${ownername_reponame_dotgit_in_repourl%/*}" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
@@ -124,7 +124,7 @@ is_legal_hub_url() {
             echo_color red "$repo_url_var with Gitee repo: The format of the repoName.git:${ownername_reponame_dotgit_in_repourl#*/} is wrong."
             exit 0
         fi
-    elif [[ "$repo_type" == "github" ]]; then
+    elif [[ "$hub_type" == "github" ]]; then
         local request_url_prefix="https://api.github.com/repos"
         # github 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，开头符合前面条件即可，长度至少为1个字符。
         # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
@@ -143,104 +143,44 @@ is_legal_hub_url() {
         fi
     fi
 
-    # # 检查仓库是否存在
-    # # 比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
-    # repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
-    # echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
-    # echo "repo_full_name_get_from_request_url= $repo_full_name_get_from_request_url"
-    # echo "\"$ownername_reponame_in_repourl\""
-    # if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
-    #     echo_color green "$repo_url_var: $repo_url_value is existed"
-    # else
-    #     # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
-    #     echo_color yellow "$repo_url_var: $repo_url_value is not existed"
-    #     # 创建仓库或者直接退出
-    #     if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
-    #         if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
-    #             # 创建仓库
-    #             echo_color green "Creat $repo_url_var: $repo_url_value..."
-    #         elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
-    #             echo_color red "Please make sure the $repo_url_var repo name is correct or create it manually"
-    #             exit 0
-    #         else
-    #             echo_color red "The FORCE_CREAT_DESTINATION_REPO parameter passed in must be 'true' or 'false'"
-    #             exit 0
-    #         fi
-    #     elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
-    #         echo_color red "Please make sure the $repo_url_var repo name is correct"
-    #         exit 0
-    #     else
-    #         echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
-    #         exit 0
-    #     fi
-    # fi
-
-
-    # 检查仓库是否存在
-    # 比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
-    local request_url="$request_url_prefix"/"$ownername_reponame_in_repourl"
-    echo "request_url = $request_url"
-    if content_get_from_request_url=$(curl -f "$request_url"); then
-        exit_status_code_flag=$?
-        echo $exit_status_code_flag
-        echo "Success"
-        #echo "$content_get_from_request_url"
-        repo_full_name_get_from_request_url=$(echo "$content_get_from_request_url" | jq '.full_name')
-        echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
-        echo "\"$ownername_reponame_in_repourl\""
-        if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
-            echo_color green "$repo_url_var: $repo_url_value is existed"
-        else
-            :
-        fi
+    # 使用 `git ls-remote <repo_url>` 来检查仓库是否存在，repo_url 使用 SSH 方式
+    # 该方法需要使用到 SSH 密钥对，比较方便。
+    if { git ls-remote "$repo_url_with_ssh" > /dev/null; } 2>&1; then
+        echo_color green "$repo_url_var: $repo_url_with_ssh is existed"
     else
-        exit_status_code_flag=$?
-        echo "exit_status_code_flag = $exit_status_code_flag"
-        echo "Fail"
-        #echo "$content_get_from_request_url"
-        if [[ $exit_status_code_flag -eq 22 ]]; then
-            echo "HTTP 找不到网页，url可能是私有仓库或者不存在该仓库。"
-        elif [[ $exit_status_code_flag -eq 7 ]]; then
-            echo "url拒接连接，被目标服务器限流。"
-        else
-            echo "Curl: exit_status_code_flag = $exit_status_code_flag"
-        fi
-
-        # if (( exit_status_code_flag == 22 )); then
-        #     echo "HTTP 找不到网页，url可能是私有仓库或者不存在该仓库。"
-        # elif (( exit_status_code_flag == 7 )); then
-        #     echo "url拒接连接，被目标服务器限流。"
-        # fi
+        echo_color red "$repo_url_var: $repo_url_with_ssh is not existed"
+        exit 0
     fi
 
-
-    # repo_full_name_get_from_request_url=$(curl "$request_url_prefix"/"$ownername_reponame_in_repourl" | jq '.full_name')
-    # echo "$request_url_prefix"/"$ownername_reponame_in_repourl"
-    # echo "repo_full_name_get_from_request_url= $repo_full_name_get_from_request_url"
-    # echo "\"$ownername_reponame_in_repourl\""
-    # if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
-    #     echo_color green "$repo_url_var: $repo_url_value is existed"
-    # else
-    #     # 仓库不存在或者拒绝连接，可能由于网络问题导致无法连接到仓库的 request url，这样会导致误判，待解决。
-    #     echo_color yellow "$repo_url_var: $repo_url_value is not existed"
-    #     # 创建仓库或者直接退出
-    #     if [[ "$repo_url_var" == "DESTINATION_REPO" ]]; then
-    #         if [[ "$FORCE_CREAT_DESTINATION_REPO" == "tree" ]]; then
-    #             # 创建仓库
-    #             echo_color green "Creat $repo_url_var: $repo_url_value..."
-    #         elif [[ "$FORCE_CREAT_DESTINATION_REPO" == "false" ]]; then
-    #             echo_color red "Please make sure the $repo_url_var repo name is correct or create it manually"
-    #             exit 0
-    #         else
-    #             echo_color red "The FORCE_CREAT_DESTINATION_REPO parameter passed in must be 'true' or 'false'"
-    #             exit 0
-    #         fi
-    #     elif [[ "$repo_url_var" == "SOURCE_REPO" ]]; then
-    #         echo_color red "Please make sure the $repo_url_var repo name is correct"
-    #         exit 0
+    # # 使用 `curl [-f | --fail] <request_url>` 来检查仓库是否存在
+    # # 该方法比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
+    # local request_url="$request_url_prefix"/"$ownername_reponame_in_repourl"
+    # echo "request_url = $request_url"
+    # if content_get_from_request_url=$(curl -f "$request_url"); then
+    #     exit_status_code_flag=$?
+    #     echo $exit_status_code_flag
+    #     echo "Success"
+    #     #echo "$content_get_from_request_url"
+    #     repo_full_name_get_from_request_url=$(echo "$content_get_from_request_url" | jq '.full_name')
+    #     echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
+    #     echo "\"$ownername_reponame_in_repourl\""
+    #     if [[ "$repo_full_name_get_from_request_url" == "\"$ownername_reponame_in_repourl\"" ]]; then
+    #         echo_color green "$repo_url_var: $repo_url_value is existed"
     #     else
-    #         echo_color red "The parameter passed in must be 'SOURCE_REPO' or 'DESTINATION_REPO'!"
-    #         exit 0
+    #         # 占位，除非GitHub服务器鬼畜了，不然不会出现从 url 获取的 $repo_full_name_get_from_request_url 和 url 中的 "$ownername_reponame_in_repourl" 不一致
+    #         :
+    #     fi
+    # else
+    #     exit_status_code_flag=$?
+    #     echo "exit_status_code_flag = $exit_status_code_flag"
+    #     echo "Fail"
+    #     #echo "$content_get_from_request_url"
+    #     if [[ $exit_status_code_flag -eq 22 ]]; then
+    #         echo "HTTP 找不到网页，url可能是私有仓库或者不存在该仓库。"
+    #     elif [[ $exit_status_code_flag -eq 7 ]]; then
+    #         echo "url拒接连接，被目标服务器限流。"
+    #     else
+    #         echo "Curl: exit_status_code_flag = $exit_status_code_flag"
     #     fi
     # fi
 }
