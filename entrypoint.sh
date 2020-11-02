@@ -187,7 +187,7 @@ check_validity_for_reponame_adapt_github() {
         echo_color red "Github repo: The format of the repoName:$1 is wrong."
         exit 0
     else
-        if echo "$1" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*\.git$"; then
+        if echo "$1" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*"; then
             echo_color green "Github repo: The format of the repoName:$1 is right."
         else
             echo_color red "Github repo: The format of the repoName:$1 is wrong."
@@ -199,7 +199,7 @@ check_validity_for_reponame_adapt_github() {
 # 判断 gitee 上的仓库名是否合法
 check_validity_for_reponame_adapt_gitee() {
     # gitee 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符。
-    if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}\.git$"; then
+    if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
         echo_color green "Gitee repo: The format of the repoName:$1 is right."
     else
         echo_color red "Gitee repo: The format of the repoName:$1 is wrong."
