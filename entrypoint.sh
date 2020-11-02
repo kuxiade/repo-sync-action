@@ -134,22 +134,22 @@ get_reponame_from_url() {
     local ownername_reponame_dotgit_in_repourl
     local ownername_reponame_in_repourl
     local hub_reponame
-    if [[ "$1" == https://gitee.com/*.git ]]; then
+    if [[ "$1" == ^https://gitee.com/.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://gitee.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == https://gitee.com/* ]]; then
         ownername_reponame_in_repourl="${1#https://gitee.com/}"
-    elif [[ "$1" == git@gitee.com:*.git ]]; then
+    elif [[ "$1" == ^git@gitee.com:.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@gitee.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == git@gitee.com:* ]]; then
         ownername_reponame_in_repourl="${1#git@gitee.com:}"
-    elif [[ "$1" == https://github.com/*.git ]]; then
+    elif [[ "$1" == ^https://github.com/.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://github.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == https://github.com/* ]]; then
         ownername_reponame_in_repourl="${1#https://github.com/}"
-    elif [[ "$1" == git@github.com:*.git ]]; then
+    elif [[ "$1" == ^git@github.com:.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@github.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == git@github.com:* ]]; then
@@ -187,7 +187,7 @@ check_validity_for_reponame_adapt_github() {
         echo_color red "Github repo: The format of the repoName:$1 is wrong."
         exit 0
     else
-        if echo "$1" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*"; then
+        if echo "$1" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
             echo_color green "Github repo: The format of the repoName:$1 is right."
         else
             echo_color red "Github repo: The format of the repoName:$1 is wrong."
