@@ -7,7 +7,7 @@ DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
 #FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 
-SOURCE_REPO_DIR__MAYBE_DOTGIT="$(basename "$SOURCE_REPO")"
+SOURCE_REPO_DIR_MAYBE_DOTGIT="$(basename "$SOURCE_REPO")"
 
 # 提示语句字体颜色设置
 echo_color() {
@@ -29,7 +29,7 @@ echo_color() {
 
 ssh_config() {
     if [ -n "$SSH_PRIVATE_KEY" ]; then
-        echo_color green "Setting SSH key\n"
+        echo_color blue "Setting SSH key\n"
         mkdir -p /root/.ssh
         echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
         chmod 600 /root/.ssh/id_rsa
@@ -45,7 +45,7 @@ ssh_config() {
 print_var_info() {
     echo "SOURCE_REPO=$SOURCE_REPO"
     echo "DESTINATION_REPO=$DESTINATION_REPO"
-    echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR"
+    echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR_MAYBE_DOTGIT"
     echo "CACHE_PATH=$CACHE_PATH"
 }
 
@@ -227,9 +227,9 @@ check_overall_validity_for_url() {
     #url_protocol_type="$(check_protocol_type_for_url "$1")"
     url_username="$(get_username_from_url "$1")"
     url_reponame="$(get_reponame_from_url "$1")"
-    echo "$url_hub_type"
-    echo "$url_username"
-    echo "$url_reponame"
+    echo "url_hub_type=$url_hub_type"
+    echo "url_username=$url_username"
+    echo "url_reponame=$url_reponame"
 
     check_spaces_in_string "$1"
 
@@ -274,28 +274,28 @@ check_validity_for_current_dir_as_git_repo() {
 
 # main 函数
 entrypoint_main() {
-    echo -e "go in entrypoint_main func\n"
-    echo_color yellow "<-------------------parameter info BEGIN------------------->"
+    echo_color blue "go in entrypoint_main func\n"
+    echo_color blue "<-------------------parameter info BEGIN------------------->"
     print_var_info
-    echo_color yellow "<-------------------parameter info END------------------->\n"
+    echo_color blue "<-------------------parameter info END------------------->\n"
     
     ssh_config
 
-    echo_color yellow "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
+    echo_color blue "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$SOURCE_REPO"
     echo_color yellow "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
 
-    echo_color yellow "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
+    echo_color blue "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$DESTINATION_REPO"
-    echo_color yellow "<-------------------DESTINATION_REPO check_overall_validity_for_url END------------------->\n"
+    echo_color blue "<-------------------DESTINATION_REPO check_overall_validity_for_url END------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
     fi
     cd "$CACHE_PATH"
     
-    if [ -d "$SOURCE_REPO_DIR" ] ; then
-        cd "$SOURCE_REPO_DIR"
+    if [ -d "$SOURCE_REPO_DIR_MAYBE_DOTGIT" ] ; then
+        cd "$SOURCE_REPO_DIR_MAYBE_DOTGIT"
         check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
     else
         echo_color red "no SOURCE_REPO:$SOURCE_REPO cache\n"
