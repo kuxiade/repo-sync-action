@@ -170,7 +170,7 @@ get_reponame_from_url() {
         exit 0
     fi
 
-    hub_reponame="${ownername_reponame_in_repourl#/*}"
+    hub_reponame="${ownername_reponame_in_repourl##*/}"
     echo "$hub_reponame"
 }
 
