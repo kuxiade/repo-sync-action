@@ -73,13 +73,13 @@ trim_spaces_around_string() {
 # 判断 url 是哪个 hub(github or gitee) 类型的
 check_hub_type_for_url() {
     local url_hub_type
-    if [[ "$1" == https://gitee.com/* ]]; then
+    if [[ "$1" =~ ^https://gitee.com/.+ ]]; then
         url_hub_type="gitee"
-    elif [[ "$1" == git@gitee.com:* ]]; then
+    elif [[ "$1" =~ ^git@gitee.com:.+ ]]; then
         url_hub_type="gitee"
-    elif [[ "$1" == https://github.com/* ]]; then
+    elif [[ "$1" =~ ^https://github.com/.+ ]]; then
         url_hub_type="github"
-    elif [[ "$1" == git@github.com:* ]]; then
+    elif [[ "$1" =~ ^git@github.com:.+ ]]; then
         url_hub_type="github"
     else
         echo_color red "$1 is unknow the hub type."
@@ -92,13 +92,13 @@ check_hub_type_for_url() {
 # 判断 url 是哪个协议认证(HTTPS or SSH) 类型
 check_protocol_type_for_url() {
     local url_protocol_type
-    if [[ "$1" == https://gitee.com/* ]]; then
+    if [[ "$1" =~ ^https://gitee.com/.+ ]]; then
         url_protocol_type="HTTPS"
-    elif [[ "$1" == git@gitee.com:* ]]; then
+    elif [[ "$1" =~ ^git@gitee.com:.+ ]]; then
         url_protocol_type="SSH"
-    elif [[ "$1" == https://github.com/* ]]; then
+    elif [[ "$1" =~ ^https://github.com/.+ ]]; then
         url_protocol_type="HTTPS"
-    elif [[ "$1" == git@github.com:* ]]; then
+    elif [[ "$1" =~ ^git@github.com:.+ ]]; then
         url_protocol_type="SSH"
     else
         echo_color red "$1 is unknow the protocol type."
@@ -112,13 +112,13 @@ check_protocol_type_for_url() {
 get_username_from_url() {
     local ownername_reponame_maybe_dotgit_in_repourl
     local hub_username
-    if [[ "$1" == https://gitee.com/* ]]; then
+    if [[ "$1" =~ ^https://gitee.com/.+ ]]; then
         ownername_reponame_maybe_dotgit_in_repourl="${1#https://gitee.com/}"
-    elif [[ "$1" == git@gitee.com:* ]]; then
+    elif [[ "$1" =~ ^git@gitee.com:.+ ]]; then
         ownername_reponame_maybe_dotgit_in_repourl="${1#git@gitee.com:}"
-    elif [[ "$1" == https://github.com/* ]]; then
+    elif [[ "$1" =~ ^https://github.com/.+ ]]; then
         ownername_reponame_maybe_dotgit_in_repourl="${1#https://github.com/}"
-    elif [[ "$1" == git@github.com:* ]]; then
+    elif [[ "$1" =~ ^git@github.com:.+ ]]; then
         ownername_reponame_maybe_dotgit_in_repourl="${1#git@github.com:}"
     else
         echo_color red "$1 is unknow the protocol type."
@@ -135,34 +135,34 @@ get_reponame_from_url() {
     local ownername_reponame_in_repourl
     local hub_reponame
     # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
-    if [[ "$1" =~ ^https://gitee.com/.*\.git$ ]]; then
+    if [[ "$1" =~ ^https://gitee.com/.+\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://gitee.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
         echo "111111"
-    elif [[ "$1" == https://gitee.com/* ]]; then
+    elif [[ "$1" =~ ^https://gitee.com/.+ ]]; then
         ownername_reponame_in_repourl="${1#https://gitee.com/}"
         echo "2222222"
-    elif [[ "$1" =~ ^git@gitee.com:.*\.git$ ]]; then
+    elif [[ "$1" =~ ^git@gitee.com:.+\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@gitee.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
         echo "333333333"
-    elif [[ "$1" == git@gitee.com:* ]]; then
+    elif [[ "$1" =~ ^git@gitee.com:.+ ]]; then
         ownername_reponame_in_repourl="${1#git@gitee.com:}"
         echo "4444444444444"
-    elif [[ "$1" =~ ^https://github.com/.*\.git$ ]]; then
+    elif [[ "$1" =~ ^https://github.com/.+\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://github.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
         echo "555555555555555555555"
-    elif [[ "$1" == https://github.com/* ]]; then
+    elif [[ "$1" =~ ^https://github.com/.+ ]]; then
         ownername_reponame_in_repourl="${1#https://github.com/}"
         echo "6666666666666666666666666666"
-    elif [[ "$1" =~ ^git@github.com:.*\.git$ ]]; then
+    elif [[ "$1" =~ ^git@github.com:.+\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@github.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
         echo "777777777777777777777777777777777777"
         echo "ownername_reponame_dotgit_in_repourl=$ownername_reponame_dotgit_in_repourl"
         echo "ownername_reponame_in_repourl=$ownername_reponame_in_repourl"
-    elif [[ "$1" == git@github.com:* ]]; then
+    elif [[ "$1" =~ ^git@github.com:.+ ]]; then
         ownername_reponame_in_repourl="${1#git@github.com:}"
         echo "88888888888888888888888888888888888888888"
     else
