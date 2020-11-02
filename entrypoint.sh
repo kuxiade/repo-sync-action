@@ -138,23 +138,33 @@ get_reponame_from_url() {
     if [[ "$1" =~ ^https://gitee.com/.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://gitee.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
+        echo "111111"
     elif [[ "$1" == https://gitee.com/* ]]; then
         ownername_reponame_in_repourl="${1#https://gitee.com/}"
+        echo "2222222"
     elif [[ "$1" =~ ^git@gitee.com:.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@gitee.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
+        echo "333333333"
     elif [[ "$1" == git@gitee.com:* ]]; then
         ownername_reponame_in_repourl="${1#git@gitee.com:}"
+        echo "4444444444444"
     elif [[ "$1" =~ ^https://github.com/.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://github.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
+        echo "555555555555555555555"
     elif [[ "$1" == https://github.com/* ]]; then
         ownername_reponame_in_repourl="${1#https://github.com/}"
+        echo "6666666666666666666666666666"
     elif [[ "$1" =~ ^git@github.com:.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@github.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
+        echo "777777777777777777777777777777777777"
+        echo "ownername_reponame_dotgit_in_repourl=$ownername_reponame_dotgit_in_repourl"
+        echo "ownername_reponame_in_repourl=$ownername_reponame_in_repourl"
     elif [[ "$1" == git@github.com:* ]]; then
         ownername_reponame_in_repourl="${1#git@github.com:}"
+        echo "88888888888888888888888888888888888888888"
     else
         echo_color red "$1 is unknow the protocol type."
         exit 0
@@ -221,28 +231,30 @@ check_existence_for_url_on_hub() {
 }
 
 check_overall_validity_for_url() {
-    local url_hub_type
-    #local url_protocol_type
-    local url_username
-    local url_reponame
-    url_hub_type="$(check_hub_type_for_url "$1")"
-    #url_protocol_type="$(check_protocol_type_for_url "$1")"
-    url_username="$(get_username_from_url "$1")"
-    url_reponame="$(get_reponame_from_url "$1")"
-    echo "$url_hub_type"
-    echo "$url_username"
-    echo "$url_reponame"
+    get_reponame_from_url "$1"
 
-    check_spaces_in_string "$1"
+    # local url_hub_type
+    # #local url_protocol_type
+    # local url_username
+    # local url_reponame
+    # url_hub_type="$(check_hub_type_for_url "$1")"
+    # #url_protocol_type="$(check_protocol_type_for_url "$1")"
+    # url_username="$(get_username_from_url "$1")"
+    # url_reponame="$(get_reponame_from_url "$1")"
+    # echo "$url_hub_type"
+    # echo "$url_username"
+    # echo "$url_reponame"
 
-    if [[ "$url_hub_type" == "gitee" ]]; then
-        check_validity_for_username_adapt_gitee "$url_username"
-        check_validity_for_reponame_adapt_gitee "$url_reponame"
-    elif [[ "$url_hub_type" == "github" ]]; then
-        check_validity_for_reponame_adapt_github "$url_reponame"
-    fi
+    # check_spaces_in_string "$1"
 
-    check_existence_for_url_on_hub "$1"
+    # if [[ "$url_hub_type" == "gitee" ]]; then
+    #     check_validity_for_username_adapt_gitee "$url_username"
+    #     check_validity_for_reponame_adapt_gitee "$url_reponame"
+    # elif [[ "$url_hub_type" == "github" ]]; then
+    #     check_validity_for_reponame_adapt_github "$url_reponame"
+    # fi
+
+    # check_existence_for_url_on_hub "$1"
 }
 
 # 判断当前目录是否为有效的 git 仓库。
@@ -284,12 +296,12 @@ entrypoint_main() {
     check_overall_validity_for_url "$SOURCE_REPO"
     check_overall_validity_for_url "$DESTINATION_REPO"
 
-    if [ ! -d "$CACHE_PATH" ]; then
-        mkdir -p "$CACHE_PATH"
-    fi
-    cd "$CACHE_PATH"
+    # if [ ! -d "$CACHE_PATH" ]; then
+    #     mkdir -p "$CACHE_PATH"
+    # fi
+    # cd "$CACHE_PATH"
     
-    check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
+    # check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
 }
 
 # 入口
