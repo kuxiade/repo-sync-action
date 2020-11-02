@@ -7,7 +7,7 @@ DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
 #FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 
-SOURCE_REPO_DIR="$(basename "$SOURCE_REPO")"
+SOURCE_REPO_DIR__MAYBE_DOTGIT="$(basename "$SOURCE_REPO")"
 
 # 提示语句字体颜色设置
 echo_color() {
@@ -289,7 +289,12 @@ entrypoint_main() {
     fi
     cd "$CACHE_PATH"
     
-    check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
+    if [ -d "$SOURCE_REPO_DIR" ] ; then
+        cd "$SOURCE_REPO_DIR"
+        check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
+    else
+        echo "no SOURCE_REPO cache"
+    fi
 }
 
 # 入口
