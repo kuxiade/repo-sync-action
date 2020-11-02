@@ -134,22 +134,23 @@ get_reponame_from_url() {
     local ownername_reponame_dotgit_in_repourl
     local ownername_reponame_in_repourl
     local hub_reponame
-    if [[ "$1" == ^https://gitee.com/.*\.git$ ]]; then
+    # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
+    if [[ "$1" =~ ^https://gitee.com/.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://gitee.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == https://gitee.com/* ]]; then
         ownername_reponame_in_repourl="${1#https://gitee.com/}"
-    elif [[ "$1" == ^git@gitee.com:.*\.git$ ]]; then
+    elif [[ "$1" =~ ^git@gitee.com:.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@gitee.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == git@gitee.com:* ]]; then
         ownername_reponame_in_repourl="${1#git@gitee.com:}"
-    elif [[ "$1" == ^https://github.com/.*\.git$ ]]; then
+    elif [[ "$1" =~ ^https://github.com/.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://github.com/}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == https://github.com/* ]]; then
         ownername_reponame_in_repourl="${1#https://github.com/}"
-    elif [[ "$1" == ^git@github.com:.*\.git$ ]]; then
+    elif [[ "$1" =~ ^git@github.com:.*\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#git@github.com:}"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" == git@github.com:* ]]; then
