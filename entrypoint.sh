@@ -113,13 +113,13 @@ get_username_from_url() {
     local ownername_reponame_maybe_dotgit_in_repourl
     local hub_username
     if [[ "$1" == https://gitee.com/* ]]; then
-        ownername_reponame_maybe_dotgit_in_repourl="${repo_url_value#https://gitee.com/}"
+        ownername_reponame_maybe_dotgit_in_repourl="${1#https://gitee.com/}"
     elif [[ "$1" == git@gitee.com:* ]]; then
-        ownername_reponame_maybe_dotgit_in_repourl="${repo_url_value#git@gitee.com:}"
+        ownername_reponame_maybe_dotgit_in_repourl="${1#git@gitee.com:}"
     elif [[ "$1" == https://github.com/* ]]; then
-        ownername_reponame_maybe_dotgit_in_repourl="${repo_url_value#https://github.com/}"
+        ownername_reponame_maybe_dotgit_in_repourl="${1#https://github.com/}"
     elif [[ "$1" == git@github.com:* ]]; then
-        ownername_reponame_maybe_dotgit_in_repourl="${repo_url_value#git@github.com:}"
+        ownername_reponame_maybe_dotgit_in_repourl="${1#git@github.com:}"
     else
         echo_color red "$1 is unknow the protocol type."
         exit 0
