@@ -29,7 +29,7 @@ echo_color() {
 
 ssh_config() {
     if [ -n "$SSH_PRIVATE_KEY" ]; then
-        echo_color green "Setting SSH key"
+        echo_color green "Setting SSH key\n"
         mkdir -p /root/.ssh
         echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
         chmod 600 /root/.ssh/id_rsa
@@ -274,7 +274,7 @@ check_validity_for_current_dir_as_git_repo() {
 
 # main 函数
 entrypoint_main() {
-    echo "go in entrypoint_main func"
+    echo -e "go in entrypoint_main func\n"
     echo_color yellow "<-------------------parameter info BEGIN------------------->"
     print_var_info
     echo_color yellow "<-------------------parameter info END------------------->\n"
@@ -298,7 +298,7 @@ entrypoint_main() {
         cd "$SOURCE_REPO_DIR"
         check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
     else
-        echo "no SOURCE_REPO:$SOURCE_REPO cache"
+        echo_color red "no SOURCE_REPO:$SOURCE_REPO cache\n"
     fi
 }
 
