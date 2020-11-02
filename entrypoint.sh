@@ -43,12 +43,10 @@ ssh_config() {
 
 # 打印传入参数的值
 print_var_info() {
-    echo_color yellow "<-------------------parameter info BEGIN------------------->"
     echo "SOURCE_REPO=$SOURCE_REPO"
     echo "DESTINATION_REPO=$DESTINATION_REPO"
     echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR"
     echo "CACHE_PATH=$CACHE_PATH"
-    echo_color yellow "<-------------------parameter info END------------------->\n"
 }
 
 # 判断字符串中是否含有空格
@@ -276,13 +274,20 @@ check_validity_for_current_dir_as_git_repo() {
 
 # main 函数
 entrypoint_main() {
-    echo "main"
+    echo "go in entrypoint_main func"
+    echo_color yellow "<-------------------parameter info BEGIN------------------->"
     print_var_info
+    echo_color yellow "<-------------------parameter info END------------------->\n"
     
     ssh_config
 
+    echo_color yellow "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$SOURCE_REPO"
+    echo_color yellow "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
+
+    echo_color yellow "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$DESTINATION_REPO"
+    echo_color yellow "<-------------------DESTINATION_REPO check_overall_validity_for_url END------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
@@ -293,7 +298,7 @@ entrypoint_main() {
         cd "$SOURCE_REPO_DIR"
         check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
     else
-        echo "no SOURCE_REPO cache"
+        echo "no SOURCE_REPO:$SOURCE_REPO cache"
     fi
 }
 
