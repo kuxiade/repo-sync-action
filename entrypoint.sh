@@ -159,7 +159,7 @@ get_reponame_from_url() {
         exit 0
     fi
 
-    hub_username="${ownername_reponame_in_repourl#/*}"
+    hub_reponame="${ownername_reponame_in_repourl#/*}"
     echo "$hub_reponame"
 }
 
@@ -228,6 +228,9 @@ check_overall_validity_for_url() {
     #url_protocol_type="$(check_protocol_type_for_url "$1")"
     url_username="$(get_username_from_url "$1")"
     url_reponame="$(get_reponame_from_url "$1")"
+    echo "$url_hub_type"
+    echo "$url_username"
+    echo "$url_reponame"
 
     check_spaces_in_string "$1"
 
