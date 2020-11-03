@@ -286,8 +286,8 @@ check_validity_for_current_dir_as_git_repo() {
 
 # main 函数
 entrypoint_main() {
-    #echo -e "\n"
-    echo_color cyan "\n------------------> go in entrypoint_main func\n"
+    echo -e ""
+    echo_color cyan "------------------> go in entrypoint_main func\n"
     echo_color purple "<-------------------parameter info BEGIN------------------->"
     print_var_info
     echo_color purple "<-------------------parameter info END--------------------->\n"
