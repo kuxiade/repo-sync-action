@@ -41,7 +41,7 @@ echo_color() {
 
 ssh_config() {
     if [ -n "$SSH_PRIVATE_KEY" ]; then
-        echo_color blue "Setting SSH key\n"
+        echo_color cyan "Setting SSH key\n"
         mkdir -p /root/.ssh
         echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
         chmod 600 /root/.ssh/id_rsa
@@ -286,20 +286,21 @@ check_validity_for_current_dir_as_git_repo() {
 
 # main 函数
 entrypoint_main() {
+    echo -e "\n"
     echo_color cyan "---------> go in entrypoint_main func\n"
     echo_color purple "<-------------------parameter info BEGIN------------------->"
     print_var_info
-    echo_color purple "<-------------------parameter info END------------------->\n"
+    echo_color purple "<-------------------parameter info END--------------------->\n"
     
     ssh_config
 
     echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$SOURCE_REPO"
-    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
+    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url END--------------------->\n"
 
     echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$DESTINATION_REPO"
-    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url END------------------->\n"
+    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url END--------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
@@ -308,7 +309,9 @@ entrypoint_main() {
     
     if [ -d "$SOURCE_REPO_DIR_MAYBE_DOTGIT" ] ; then
         cd "$SOURCE_REPO_DIR_MAYBE_DOTGIT"
+        echo_color purple "<-------------------SOURCE_REPO check_validity_for_current_dir_as_git_repo BEGIN------------------->"
         check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
+        echo_color purple "<-------------------SOURCE_REPO check_validity_for_current_dir_as_git_repo END--------------------->\n"
     else
         echo_color red "no SOURCE_REPO:$SOURCE_REPO cache\n"
     fi
