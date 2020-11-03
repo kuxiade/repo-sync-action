@@ -12,17 +12,29 @@ SOURCE_REPO_DIR_MAYBE_DOTGIT="$(basename "$SOURCE_REPO")"
 # 提示语句字体颜色设置
 echo_color() {
     case $1 in
-    red)
+    black)
+        echo -e "\033[30m$2\033[0m"
+        ;;
+    red)    # error
         echo -e "\033[31m$2\033[0m"
         ;;
-    green)
+    green)  # success
         echo -e "\033[32m$2\033[0m"
         ;;
-    yellow)
+    yellow) # warn
         echo -e "\033[33m$2\033[0m"
         ;;
-    blue)
+    blue)   # info
         echo -e "\033[34m$2\033[0m"
+        ;;
+    purple)
+        echo -e "\033[35m$2\033[0m"
+        ;;
+    cyan)   # highlight info
+        echo -e "\033[36m$2\033[0m"
+        ;;
+    white)
+        echo -e "\033[37m$2\033[0m"
         ;;
     esac
 }
@@ -275,15 +287,15 @@ check_validity_for_current_dir_as_git_repo() {
 # main 函数
 entrypoint_main() {
     echo_color blue "go in entrypoint_main func\n"
-    echo_color blue "<-------------------parameter info BEGIN------------------->"
+    echo_color cyan "<-------------------parameter info BEGIN------------------->"
     print_var_info
-    echo_color blue "<-------------------parameter info END------------------->\n"
+    echo_color purple "<-------------------parameter info END------------------->\n"
     
     ssh_config
 
     echo_color blue "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$SOURCE_REPO"
-    echo_color yellow "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
+    echo_color blue "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
 
     echo_color blue "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$DESTINATION_REPO"
