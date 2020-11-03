@@ -24,13 +24,13 @@ echo_color() {
     yellow) # warn
         echo -e "\033[33m$2\033[0m"
         ;;
-    blue)   # info
+    blue)   # highlight info，突出信息显示
         echo -e "\033[34m$2\033[0m"
         ;;
-    purple)
+    purple) # borderline，边界线
         echo -e "\033[35m$2\033[0m"
         ;;
-    cyan)   # highlight info
+    cyan)   # info，普通信息显示
         echo -e "\033[36m$2\033[0m"
         ;;
     white)
@@ -286,20 +286,20 @@ check_validity_for_current_dir_as_git_repo() {
 
 # main 函数
 entrypoint_main() {
-    echo_color blue "go in entrypoint_main func\n"
-    echo_color cyan "<-------------------parameter info BEGIN------------------->"
+    echo_color cyan "---------> go in entrypoint_main func\n"
+    echo_color purple "<-------------------parameter info BEGIN------------------->"
     print_var_info
     echo_color purple "<-------------------parameter info END------------------->\n"
     
     ssh_config
 
-    echo_color blue "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
+    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$SOURCE_REPO"
-    echo_color blue "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
+    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url END------------------->\n"
 
-    echo_color blue "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
+    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
     check_overall_validity_for_url "$DESTINATION_REPO"
-    echo_color blue "<-------------------DESTINATION_REPO check_overall_validity_for_url END------------------->\n"
+    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url END------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
