@@ -2,6 +2,7 @@
 
 set -e
 
+# ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
 SOURCE_REPO="${INPUT_SOURCE_REPO}"
 DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
 #FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
@@ -135,6 +136,8 @@ get_username_from_url() {
         exit 0
     fi
 
+    # 或许也可以考虑使用 dirname 命令来得到 username：
+    #hub_username="$(dirname "$ownername_reponame_maybe_dotgit_in_repourl")"
     hub_username="${ownername_reponame_maybe_dotgit_in_repourl%/*}"
     echo "$hub_username"
 }
@@ -147,6 +150,8 @@ get_reponame_from_url() {
     # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
     if [[ "$1" =~ ^https://gitee.com/.+\.git$ ]]; then
         ownername_reponame_dotgit_in_repourl="${1#https://gitee.com/}"
+        # 这里其实可以直接使用 basename 命令来得到 reponame：
+        #hub_reponame="$(basename "$ownername_reponame_dotgit_in_repourl" .git)"
         ownername_reponame_in_repourl="${ownername_reponame_dotgit_in_repourl%.git*}"
     elif [[ "$1" =~ ^https://gitee.com/.+ ]]; then
         ownername_reponame_in_repourl="${1#https://gitee.com/}"
@@ -170,17 +175,19 @@ get_reponame_from_url() {
         exit 0
     fi
 
+    # 这里其实可以使用 basename 命令来得到 reponame：
+    #hub_reponame="$(basename "$ownername_reponame_in_repourl")"
     hub_reponame="${ownername_reponame_in_repourl##*/}"
     echo "$hub_reponame"
 }
 
 # 判断 github 上的用户名是否合法
-check_validity_for_username_adapt_github() {
+check_validity_of_username_adapt_github() {
     :
 }
 
 # 判断 gitee 上的用户名是否合法
-check_validity_for_username_adapt_gitee() {
+check_validity_of_username_adapt_gitee() {
     # gitee 账户名只允许字母、数字或者下划线（_）、中划线（-），至少 2 个字符，必须以字母开头，不能以特殊字符结尾。
     if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
         echo_color green "Gitee repo: The format of the userName:$1 is right."
@@ -191,7 +198,7 @@ check_validity_for_username_adapt_gitee() {
 }
 
 # 判断 github 上的仓库名是否合法
-check_validity_for_reponame_adapt_github() {
+check_validity_of_reponame_adapt_github() {
     # github 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，开头符合前面条件即可，长度至少为1个字符。
     # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
     if [[ "$1" == "." ]] || [[ "$1" == ".." ]]; then
@@ -208,7 +215,7 @@ check_validity_for_reponame_adapt_github() {
 }
 
 # 判断 gitee 上的仓库名是否合法
-check_validity_for_reponame_adapt_gitee() {
+check_validity_of_reponame_adapt_gitee() {
     # gitee 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符。
     if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
         echo_color green "Gitee repo: The format of the repoName:$1 is right."
@@ -218,19 +225,108 @@ check_validity_for_reponame_adapt_gitee() {
     fi
 }
 
-# 判断 url 作为远程仓库是否存在于 hub 上
-check_existence_for_url_on_hub() {
-    # 使用 `git ls-remote <repo_url>` 来检查仓库是否存在，repo_url 使用 SSH 方式
-    # 该方法需要使用到 SSH 密钥对，比较方便。
-    if { git ls-remote "$1" > /dev/null; } 2>&1; then
-        echo_color green "$1 is existed as a remote repo on Hub"
+# 使用 curl 来判断 url 作为远程仓库是否存在于 hub 上
+# Example for Gitee:
+# Curl
+    # curl -X GET --header 'Content-Type: application/json;charset=UTF-8' 'https://gitee.com/api/v5/repos/kuxiade/docker-arch?access_token=abcdefghijklmnopqrstuvwxyz'
+# Request URL
+    # https://gitee.com/api/v5/repos/kuxiade/docker-arch?access_token=abcdefghijklmnopqrstuvwxyz
+# Example for Github:
+
+check_existence_of_url_for_hub_with_curl() {
+    local url_hub_type
+    #local url_protocol_type
+    local url_username
+    local url_reponame
+    url_hub_type="$(check_hub_type_for_url "$1")"
+    #url_protocol_type="$(check_protocol_type_for_url "$1")"
+    url_username="$(get_username_from_url "$1")"
+    url_reponame="$(get_reponame_from_url "$1")"
+    echo "url_hub_type=$url_hub_type"
+    echo "url_username=$url_username"
+    echo "url_reponame=$url_reponame"
+
+    if [[ "$url_hub_type" == "gitee" ]]; then
+        local request_url_prefix="https://gitee.com/api/v5/repos"
+        local access_token="$GITEE_ACCESS_TOKEN"
+    elif [[ "$url_hub_type" == "github" ]]; then
+        local request_url_prefix="https://api.github.com/repos"
+        local access_token="$GITHUB_ACCESS_TOKEN"
+    fi
+
+    local request_url="$request_url_prefix/$url_username/$url_reponame?access_token=$access_token"
+    echo "request_url = $request_url"
+
+    if type curl > /dev/null 2>&1; then
+        # 使用 `curl [-f | --fail] <request_url>` 来检查仓库是否存在
+        # 该方法比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
+        if content_get_from_request_url=$(curl -f "$request_url"); then
+            exit_status_code_flag=$?
+            echo $exit_status_code_flag
+            echo "Success"
+            #echo "$content_get_from_request_url"
+
+            if type jq > /dev/null 2>&1; then
+                repo_full_name_get_from_request_url=$(echo "$content_get_from_request_url" | jq '.full_name')
+            else
+                echo_color red "There is no 'jq' command, please install it"
+                exit 0
+            fi
+            
+            echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
+            echo "\"$url_username/$url_reponame\""
+            if [[ "$repo_full_name_get_from_request_url" == "\"$url_username/$url_reponame\"" ]]; then
+                echo_color green "$1 is existed as a remote repo on Hub"
+            else
+                # 占位，除非 Hub 服务器鬼畜了，不然不会出现从 url 获取的 $repo_full_name_get_from_request_url 和 url 中的 "$url_username/$url_reponame" 不一致。
+                :
+            fi
+        else
+            exit_status_code_flag=$?
+            echo "exit_status_code_flag = $exit_status_code_flag"
+            echo "Fail"
+            #echo "$content_get_from_request_url"
+            if [[ $exit_status_code_flag -eq 22 ]]; then
+                echo "HTTP 找不到网页，$1 可能是私有仓库或者不存在该仓库。"
+            elif [[ $exit_status_code_flag -eq 7 ]]; then
+                echo "$request_url 拒接连接，被目标服务器限流。"
+            else
+                echo "Curl: exit_status_code_flag = $exit_status_code_flag"
+            fi
+        fi
     else
-        echo_color red "$1 is not existed as a remote repo on Hub"
+        echo_color red "There is no 'curl' command, please install it"
         exit 0
     fi
 }
 
-check_overall_validity_for_url() {
+# 使用 git 来判断 url 作为远程仓库是否存在于 hub 上
+check_existence_of_url_for_hub_with_git() {
+    if type git > /dev/null 2>&1; then
+        # 使用 `git ls-remote <repo_url>` 来检查仓库是否存在，repo_url 使用 SSH 方式
+        # 该方法需要使用到 SSH 密钥对，比较方便。
+        if { git ls-remote "$1" > /dev/null; } 2>&1; then
+            echo_color green "$1 is existed as a remote repo on Hub"
+        else
+            echo_color red "$1 is not existed as a remote repo on Hub"
+            exit 0
+        fi
+    else
+        echo_color red "There is no 'git' command, please install it"
+        exit 0
+    fi
+}
+
+# 判断 url 作为远程仓库是否存在于 hub 上
+check_existence_of_url_for_hub() {
+    if [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
+        check_existence_of_url_for_hub_with_curl "$1"
+    else
+        check_existence_of_url_for_hub_with_git "$1"
+    fi
+}
+
+check_overall_validity_of_url() {
     local url_hub_type
     #local url_protocol_type
     local url_username
@@ -246,17 +342,17 @@ check_overall_validity_for_url() {
     check_spaces_in_string "$1"
 
     if [[ "$url_hub_type" == "gitee" ]]; then
-        check_validity_for_username_adapt_gitee "$url_username"
-        check_validity_for_reponame_adapt_gitee "$url_reponame"
+        check_validity_of_username_adapt_gitee "$url_username"
+        check_validity_of_reponame_adapt_gitee "$url_reponame"
     elif [[ "$url_hub_type" == "github" ]]; then
-        check_validity_for_reponame_adapt_github "$url_reponame"
+        check_validity_of_reponame_adapt_github "$url_reponame"
     fi
 
-    check_existence_for_url_on_hub "$1"
+    check_existence_of_url_for_hub "$1"
 }
 
 # 判断当前目录是否为有效的 git 仓库。
-check_validity_for_current_dir_as_git_repo() {
+check_validity_of_current_dir_as_git_repo() {
     local repo_remote_url_for_fetch_with_fuzzy_match
     local repo_remote_url_for_fetch_with_exact_match
 
@@ -294,13 +390,13 @@ entrypoint_main() {
     
     ssh_config
 
-    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url BEGIN------------------->"
-    check_overall_validity_for_url "$SOURCE_REPO"
-    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_for_url END--------------------->\n"
+    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_of_url BEGIN------------------->"
+    check_overall_validity_of_url "$SOURCE_REPO"
+    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_of_url END--------------------->\n"
 
-    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url BEGIN------------------->"
-    check_overall_validity_for_url "$DESTINATION_REPO"
-    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_for_url END--------------------->\n"
+    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_of_url BEGIN------------------->"
+    check_overall_validity_of_url "$DESTINATION_REPO"
+    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_of_url END--------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
@@ -309,9 +405,9 @@ entrypoint_main() {
     
     if [ -d "$SOURCE_REPO_DIR_MAYBE_DOTGIT" ] ; then
         cd "$SOURCE_REPO_DIR_MAYBE_DOTGIT"
-        echo_color purple "<-------------------SOURCE_REPO check_validity_for_current_dir_as_git_repo BEGIN------------------->"
-        check_validity_for_current_dir_as_git_repo "$SOURCE_REPO"
-        echo_color purple "<-------------------SOURCE_REPO check_validity_for_current_dir_as_git_repo END--------------------->\n"
+        echo_color purple "<-------------------SOURCE_REPO check_validity_of_current_dir_as_git_repo BEGIN------------------->"
+        check_validity_of_current_dir_as_git_repo "$SOURCE_REPO"
+        echo_color purple "<-------------------SOURCE_REPO check_validity_of_current_dir_as_git_repo END--------------------->\n"
     else
         echo_color red "no SOURCE_REPO:$SOURCE_REPO cache\n"
     fi
