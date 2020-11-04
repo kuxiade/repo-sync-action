@@ -320,8 +320,10 @@ check_existence_of_url_for_hub_with_git() {
 # 判断 url 作为远程仓库是否存在于 hub 上
 check_existence_of_url_for_hub() {
     if [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
+        echo_color green "use curl"
         check_existence_of_url_for_hub_with_curl "$1"
     else
+        echo_color green "use git"
         check_existence_of_url_for_hub_with_git "$1"
     fi
 }
