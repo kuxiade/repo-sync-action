@@ -21,10 +21,10 @@ inputs:
     default: '/github/workspace/mirror-repo-cache'
   err_exit_flag:
     description: "Exit immediately if a simple command exits with a non-zero status. (use 'set -e')"
-    required: true
+    default: true
   debug_flag:
     description: "Enable DEBUG for the script. (use 'set -x')"
-    required: false
+    default: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
