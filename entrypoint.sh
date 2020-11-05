@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 
-set -e
-#set -x
+ERR_EXIT_FLAG="${INPUT_ERR_EXIT_FLAG}"
+DEBUG_FLAG="${INPUT_DEBUG_FLAG}"
+
+if [[ "$ERR_EXIT_FLAG" == "true" ]]; then
+  set -e
+fi
+
+if [[ "$DEBUG_FLAG" == "true" ]]; then
+  set -x
+fi
 
 # ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
-SOURCE_REPO="${INPUT_SOURCE_REPO}"
-DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
+SRC_REPO_URL="${INPUT_SRC_REPO_URL}"
+DST_REPO_URL="${INPUT_DST_REPO_URL}"
 #FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 
-SOURCE_REPO_DIR_MAYBE_DOTGIT="$(basename "$SOURCE_REPO")"
+SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL="$(basename "$SRC_REPO_URL")"
 
 # 提示语句字体颜色设置
 echo_color() {
@@ -57,9 +65,11 @@ ssh_config() {
 
 # 打印传入参数的值
 print_var_info() {
-    echo "SOURCE_REPO=$SOURCE_REPO"
-    echo "DESTINATION_REPO=$DESTINATION_REPO"
-    echo "SOURCE_REPO_DIR=$SOURCE_REPO_DIR_MAYBE_DOTGIT"
+    echo "ERR_EXIT_FLAG=$ERR_EXIT_FLAG"
+    echo "DEBUG_FLAG=$DEBUG_FLAG"
+    echo "SRC_REPO_URL=$SRC_REPO_URL"
+    echo "DST_REPO_URL=$DST_REPO_URL"
+    echo "SRC_REPO_DIR_OF_URL=$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
     echo "CACHE_PATH=$CACHE_PATH"
 }
 
@@ -120,10 +130,10 @@ check_protocol_type_for_url() {
     echo "$url_protocol_type"
 }
 
-# 获取 url 的用户名
-get_username_from_url() {
+# 获取 url 的仓库拥有者名称，可以是 users（用户） 也可以是 orgs（组织）或者 enterprises（企业）
+get_repoowner_from_url() {
     local ownername_reponame_maybe_dotgit_in_repourl
-    local hub_username
+    local hub_repoowner
     if [[ "$1" =~ ^https://gitee.com/.+ ]]; then
         ownername_reponame_maybe_dotgit_in_repourl="${1#https://gitee.com/}"
     elif [[ "$1" =~ ^git@gitee.com:.+ ]]; then
@@ -137,10 +147,10 @@ get_username_from_url() {
         exit 0
     fi
 
-    # 或许也可以考虑使用 dirname 命令来得到 username：
-    #hub_username="$(dirname "$ownername_reponame_maybe_dotgit_in_repourl")"
-    hub_username="${ownername_reponame_maybe_dotgit_in_repourl%/*}"
-    echo "$hub_username"
+    # 或许也可以考虑使用 dirname 命令来得到 repoowner：
+    #hub_repoowner="$(dirname "$ownername_reponame_maybe_dotgit_in_repourl")"
+    hub_repoowner="${ownername_reponame_maybe_dotgit_in_repourl%/*}"
+    echo "$hub_repoowner"
 }
 
 # 获取 url 的仓库名
@@ -182,18 +192,18 @@ get_reponame_from_url() {
     echo "$hub_reponame"
 }
 
-# 判断 github 上的用户名是否合法
-check_validity_of_username_adapt_github() {
+# 判断 github 上的仓库拥有者名称是否合法
+check_validity_of_repoowner_adapt_github() {
     :
 }
 
-# 判断 gitee 上的用户名是否合法
-check_validity_of_username_adapt_gitee() {
+# 判断 gitee 上的仓库拥有者名称是否合法
+check_validity_of_repoowner_adapt_gitee() {
     # gitee 账户名只允许字母、数字或者下划线（_）、中划线（-），至少 2 个字符，必须以字母开头，不能以特殊字符结尾。
     if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
-        echo_color green "Gitee repo: The format of the userName:$1 is right."
+        echo_color green "Gitee repo: The format of the repoowner:$1 is right."
     else
-        echo_color red "Gitee repo: The format of the userName:$1 is wrong."
+        echo_color red "Gitee repo: The format of the repoowner:$1 is wrong."
         exit 0
     fi
 }
@@ -237,14 +247,14 @@ check_validity_of_reponame_adapt_gitee() {
 check_existence_of_url_for_hub_with_curl() {
     local url_hub_type
     #local url_protocol_type
-    local url_username
+    local url_repoowner
     local url_reponame
     url_hub_type="$(check_hub_type_for_url "$1")"
     #url_protocol_type="$(check_protocol_type_for_url "$1")"
-    url_username="$(get_username_from_url "$1")"
+    url_repoowner="$(get_repoowner_from_url "$1")"
     url_reponame="$(get_reponame_from_url "$1")"
     echo "url_hub_type=$url_hub_type"
-    echo "url_username=$url_username"
+    echo "url_repoowner=$url_repoowner"
     echo "url_reponame=$url_reponame"
 
     if [[ "$url_hub_type" == "gitee" ]]; then
@@ -255,7 +265,7 @@ check_existence_of_url_for_hub_with_curl() {
         local access_token="$GITHUB_ACCESS_TOKEN"
     fi
 
-    local request_url="$request_url_prefix/$url_username/$url_reponame?access_token=$access_token"
+    local request_url="$request_url_prefix/$url_repoowner/$url_reponame?access_token=$access_token"
     echo "request_url = $request_url"
 
     if type curl > /dev/null 2>&1; then
@@ -275,11 +285,11 @@ check_existence_of_url_for_hub_with_curl() {
             fi
             
             echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
-            echo "\"$url_username/$url_reponame\""
-            if [[ "$repo_full_name_get_from_request_url" == "\"$url_username/$url_reponame\"" ]]; then
+            echo "\"$url_repoowner/$url_reponame\""
+            if [[ "$repo_full_name_get_from_request_url" == "\"$url_repoowner/$url_reponame\"" ]]; then
                 echo_color green "$1 is existed as a remote repo on Hub"
             else
-                # 占位，除非 Hub 服务器鬼畜了，不然不会出现从 url 获取的 $repo_full_name_get_from_request_url 和 url 中的 "$url_username/$url_reponame" 不一致。
+                # 占位，除非 Hub 服务器鬼畜了，不然不会出现从 url 获取的 $repo_full_name_get_from_request_url 和 url 中的 "$url_repoowner/$url_reponame" 不一致。
                 :
             fi
         else
@@ -334,20 +344,20 @@ check_existence_of_url_for_hub() {
 check_overall_validity_of_url() {
     local url_hub_type
     #local url_protocol_type
-    local url_username
+    local url_repoowner
     local url_reponame
     url_hub_type="$(check_hub_type_for_url "$1")"
     #url_protocol_type="$(check_protocol_type_for_url "$1")"
-    url_username="$(get_username_from_url "$1")"
+    url_repoowner="$(get_repoowner_from_url "$1")"
     url_reponame="$(get_reponame_from_url "$1")"
     echo "url_hub_type=$url_hub_type"
-    echo "url_username=$url_username"
+    echo "url_repoowner=$url_repoowner"
     echo "url_reponame=$url_reponame"
 
     check_spaces_in_string "$1"
 
     if [[ "$url_hub_type" == "gitee" ]]; then
-        check_validity_of_username_adapt_gitee "$url_username"
+        check_validity_of_repoowner_adapt_gitee "$url_repoowner"
         check_validity_of_reponame_adapt_gitee "$url_reponame"
     elif [[ "$url_hub_type" == "github" ]]; then
         check_validity_of_reponame_adapt_github "$url_reponame"
@@ -395,26 +405,26 @@ entrypoint_main() {
     
     ssh_config
 
-    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_of_url BEGIN------------------->"
-    check_overall_validity_of_url "$SOURCE_REPO"
-    echo_color purple "<-------------------SOURCE_REPO check_overall_validity_of_url END--------------------->\n"
+    echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url BEGIN------------------->"
+    check_overall_validity_of_url "$SRC_REPO_URL"
+    echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
-    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_of_url BEGIN------------------->"
-    check_overall_validity_of_url "$DESTINATION_REPO"
-    echo_color purple "<-------------------DESTINATION_REPO check_overall_validity_of_url END--------------------->\n"
+    echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url BEGIN------------------->"
+    check_overall_validity_of_url "$DST_REPO_URL"
+    echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
     fi
     cd "$CACHE_PATH"
     
-    if [ -d "$SOURCE_REPO_DIR_MAYBE_DOTGIT" ] ; then
-        cd "$SOURCE_REPO_DIR_MAYBE_DOTGIT"
-        echo_color purple "<-------------------SOURCE_REPO check_validity_of_current_dir_as_git_repo BEGIN------------------->"
-        check_validity_of_current_dir_as_git_repo "$SOURCE_REPO"
-        echo_color purple "<-------------------SOURCE_REPO check_validity_of_current_dir_as_git_repo END--------------------->\n"
+    if [ -d "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL" ] ; then
+        cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+        echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
+        check_validity_of_current_dir_as_git_repo "$SRC_REPO_URL"
+        echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
     else
-        echo_color red "no SOURCE_REPO:$SOURCE_REPO cache\n"
+        echo_color red "no $SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
     fi
 }
 

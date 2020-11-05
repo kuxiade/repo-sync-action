@@ -5,29 +5,33 @@ branding:
   icon: "upload-cloud"
   color: "blue"
 inputs:
-  ssh_private_key:
-    description: "The private SSH key which is used to to push code in destination hub."
-    required: true
-  source_repo:
+  src_repo_url:
     description: 'SSH URL of the source repo.'
     required: true
     default: ''
-  destination_repo:
+  dst_repo_url:
     description: 'SSH URL of the destination repo.'
     required: true
     default: ''
-  force_creat_destination_repo:
+  force_creat_dst_repo:
     description: "If destination repo does not exist, force to create it."
     default: false
   cache_path:
     description: "The path to cache the source repos code."
     default: '/github/workspace/mirror-repo-cache'
+  err_exit_flag:
+    description: "Exit immediately if a simple command exits with a non-zero status. (use 'set -e')"
+    required: true
+  debug_flag:
+    description: "Enable DEBUG for the script. (use 'set -x')"
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.ssh_private_key }}
-    - ${{ inputs.source_repo }}
-    - ${{ inputs.destination_repo }}
-    - ${{ inputs.force_creat_destination_repo}}
+    - ${{ inputs.src_repo_url }}
+    - ${{ inputs.dst_repo_url }}
+    - ${{ inputs.force_creat_dst_repo}}
     - ${{ inputs.cache_path }}
+    - ${{ inputs.err_exit_flag }}
+    - ${{ inputs.debug_flag }}
