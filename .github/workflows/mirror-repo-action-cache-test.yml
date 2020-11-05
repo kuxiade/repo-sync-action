@@ -70,7 +70,7 @@ jobs:
         env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          GITEE_DDD: ${{ secrets.GITEE_PERSONAL_ACCESS_TOKEN }}
+          GITEE_TOKEN: ${{ secrets.GITEE_PERSONAL_ACCESS_TOKEN }}
           HUB_DDD: ${{ secrets.HUB_PERSONAL_ACCESS_TOKEN }}
         with:
           # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
