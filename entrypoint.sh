@@ -3,7 +3,7 @@
 set -e
 #set -x
 
-# ENV: HUB_ACCESS_TOKEN GITEE_TOKEN SSH_PRIVATE_KEY
+# ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
 SOURCE_REPO="${INPUT_SOURCE_REPO}"
 DESTINATION_REPO="${INPUT_DESTINATION_REPO}"
 #FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
@@ -249,10 +249,10 @@ check_existence_of_url_for_hub_with_curl() {
 
     if [[ "$url_hub_type" == "gitee" ]]; then
         local request_url_prefix="https://gitee.com/api/v5/repos"
-        local access_token="$GITEE_TOKEN"
+        local access_token="$GITEE_ACCESS_TOKEN"
     elif [[ "$url_hub_type" == "github" ]]; then
         local request_url_prefix="https://api.github.com/repos"
-        local access_token="$HUB_ACCESS_TOKEN"
+        local access_token="$GITHUB_ACCESS_TOKEN"
     fi
 
     local request_url="$request_url_prefix/$url_username/$url_reponame?access_token=$access_token"
@@ -320,9 +320,9 @@ check_existence_of_url_for_hub_with_git() {
 
 # 判断 url 作为远程仓库是否存在于 hub 上
 check_existence_of_url_for_hub() {
-    echo "$GITEE_TOKEN" "damlsfg"
-    echo "$HUB_ACCESS_TOKEN" "sjfdkgl"
-    if [ -n "$GITEE_TOKEN" ] && [ -n "$HUB_ACCESS_TOKEN" ]; then
+    echo "$GITEE_ACCESS_TOKEN" "damlsfg"
+    echo "$GITHUB_ACCESS_TOKEN" "sjfdkgl"
+    if [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
         echo_color green "use curl"
         check_existence_of_url_for_hub_with_curl "$1"
     else
