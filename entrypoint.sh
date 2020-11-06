@@ -260,18 +260,21 @@ check_existence_of_url_for_hub_with_curl() {
     if [[ "$url_hub_type" == "gitee" ]]; then
         local request_url_prefix="https://gitee.com/api/v5/repos"
         local access_token="$GITEE_ACCESS_TOKEN"
+        local request_url="$request_url_prefix/$url_repoowner/$url_reponame?access_token=$access_token"
+        local curl_options="-f -X GET -H 'Content-Type: application/json;charset=UTF-8'"
     elif [[ "$url_hub_type" == "github" ]]; then
         local request_url_prefix="https://api.github.com/repos"
         local access_token="$GITHUB_ACCESS_TOKEN"
+        local request_url="$request_url_prefix/$url_repoowner/$url_reponame"
+        local curl_options="-f -X GET -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token $access_token'"
     fi
 
-    local request_url="$request_url_prefix/$url_repoowner/$url_reponame?access_token=$access_token"
     echo "request_url = $request_url"
 
     if type curl > /dev/null 2>&1; then
         # 使用 `curl [-f | --fail] <request_url>` 来检查仓库是否存在
         # 该方法比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
-        if content_get_from_request_url=$(curl -f "$request_url"); then
+        if content_get_from_request_url=$(curl "$curl_options" "$request_url"); then
             exit_status_code_flag=$?
             echo $exit_status_code_flag
             echo "Success"
