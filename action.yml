@@ -13,7 +13,7 @@ inputs:
     description: 'SSH URL of the destination repo.'
     required: true
     default: ''
-  force_creat_dst_repo:
+  create_dst_repo_nonexist:
     description: "If destination repo does not exist, force to create it. must be true or false."
     default: false
   cache_path:
@@ -34,7 +34,7 @@ runs:
   args:
     - ${{ inputs.src_repo_url }}
     - ${{ inputs.dst_repo_url }}
-    - ${{ inputs.force_creat_dst_repo}}
+    - ${{ inputs.create_dst_repo_nonexist}}
     - ${{ inputs.cache_path }}
     - ${{ inputs.request_tool }}
     - ${{ inputs.errexit_flag }}

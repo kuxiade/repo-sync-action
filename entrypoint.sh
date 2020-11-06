@@ -14,7 +14,7 @@ fi
 # ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
 SRC_REPO_URL="${INPUT_SRC_REPO_URL}"
 DST_REPO_URL="${INPUT_DST_REPO_URL}"
-#FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
+CREATE_DST_REPO_NONEXIST="${CREATE_DST_REPO_NONEXIST}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 REQUEST_TOOL="${INPUT_REQUEST_TOOL}"
 SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL="$(basename "$SRC_REPO_URL")"
@@ -69,6 +69,7 @@ print_var_info() {
     echo "XTRACE_DEBUG=$XTRACE_DEBUG"
     echo "SRC_REPO_URL=$SRC_REPO_URL"
     echo "DST_REPO_URL=$DST_REPO_URL"
+    echo "CREATE_DST_REPO_NONEXIST=$CREATE_DST_REPO_NONEXIST"
     echo "SRC_REPO_DIR_OF_URL=$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
     echo "CACHE_PATH=$CACHE_PATH"
     echo "REQUEST_TOOL=$REQUEST_TOOL"
@@ -338,13 +339,13 @@ check_existence_of_url_for_hub() {
     echo "$GITEE_ACCESS_TOKEN" "damlsfg"
     echo "$GITHUB_ACCESS_TOKEN" "sjfdkgl"
     if [[ "$REQUEST_TOOL" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
-        echo_color green "use curl"
+        echo_color green "Use curl to check the existence of url for hub"
         check_existence_of_url_for_hub_with_curl "$1"
     elif [[ "$REQUEST_TOOL" == "git" ]]; then
-        echo_color green "use git"
+        echo_color green "Use git to check the existence of url for hub"
         check_existence_of_url_for_hub_with_git "$1"
     else
-        echo_color yellow "Request tool unknown! must be git or curl."
+        echo_color yellow "request_tool unknown! must be git or curl."
         exit 0
     fi
 }
