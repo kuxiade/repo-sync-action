@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-ERR_EXIT_FLAG="${INPUT_ERR_EXIT_FLAG}"
-DEBUG_FLAG="${INPUT_DEBUG_FLAG}"
+ERREXIT_FLAG="${INPUT_ERREXIT_FLAG}"
+XTRACE_DEBUG="${INPUT_XTRACE_DEBUG}"
 
-if [[ "$ERR_EXIT_FLAG" == "true" ]]; then
+if [[ "$ERREXIT_FLAG" == "true" ]]; then
   set -e
 fi
 
-if [[ "$DEBUG_FLAG" == "true" ]]; then
+if [[ "$XTRACE_DEBUG" == "true" ]]; then
   set -x
 fi
 
@@ -16,7 +16,7 @@ SRC_REPO_URL="${INPUT_SRC_REPO_URL}"
 DST_REPO_URL="${INPUT_DST_REPO_URL}"
 #FORCE_CREAT_DESTINATION_REPO="${INPUT_FORCE_CREAT_DESTINATION_REPO}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
-
+REQUEST_TOOL="${INPUT_REQUEST_TOOL}"
 SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL="$(basename "$SRC_REPO_URL")"
 
 # 提示语句字体颜色设置
@@ -65,12 +65,13 @@ ssh_config() {
 
 # 打印传入参数的值
 print_var_info() {
-    echo "ERR_EXIT_FLAG=$ERR_EXIT_FLAG"
-    echo "DEBUG_FLAG=$DEBUG_FLAG"
+    echo "ERREXIT_FLAG=$ERREXIT_FLAG"
+    echo "XTRACE_DEBUG=$XTRACE_DEBUG"
     echo "SRC_REPO_URL=$SRC_REPO_URL"
     echo "DST_REPO_URL=$DST_REPO_URL"
     echo "SRC_REPO_DIR_OF_URL=$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
     echo "CACHE_PATH=$CACHE_PATH"
+    echo "REQUEST_TOOL=$REQUEST_TOOL"
 }
 
 # 判断字符串中是否含有空格
@@ -274,6 +275,7 @@ check_existence_of_url_for_hub_with_curl() {
     if type curl > /dev/null 2>&1; then
         # 使用 `curl [-f | --fail] <request_url>` 来检查仓库是否存在
         # 该方法比较麻烦，对私有仓库的判断需要 GitHub 和 Gitee的 access_token，会导致整个操作变得复杂。故，注释掉此处代码，仅供参考。
+        local content_get_from_request_url
         if content_get_from_request_url=$(curl "${curl_options[@]}" "$request_url"); then
             exit_status_code_flag=$?
             echo $exit_status_code_flag
@@ -335,12 +337,15 @@ check_existence_of_url_for_hub_with_git() {
 check_existence_of_url_for_hub() {
     echo "$GITEE_ACCESS_TOKEN" "damlsfg"
     echo "$GITHUB_ACCESS_TOKEN" "sjfdkgl"
-    if [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
+    if [[ "$url_hub_type" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
         echo_color green "use curl"
         check_existence_of_url_for_hub_with_curl "$1"
-    else
+    elif [[ "$url_hub_type" == "git" ]]; then
         echo_color green "use git"
         check_existence_of_url_for_hub_with_git "$1"
+    else
+        echo_color yellow "Request tool unknown! must be git or curl."
+        exit 0
     fi
 }
 

@@ -80,7 +80,8 @@ jobs:
           # 需要同步到的目的仓库
           dst_repo_url: "git@gitee.com:kuxiade/git-mirror-action.git"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          cache_path: /github/workspace/mirror-repo-cache
+          cache_path: "/github/workspace/mirror-repo-cache"
+          request_tool: "curl"
 
       - name: Mirror Github:github/docs to Gitee with mirror-repo-action
         uses: ./.
