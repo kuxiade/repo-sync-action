@@ -247,14 +247,17 @@ check_validity_of_reponame_adapt_gitee() {
 # Example for Github:
 
 check_existence_of_url_for_hub_with_curl() {
+    local hub_repo_url_var="$1"
+    local hub_repo_url_value="${!hub_repo_url_var}"
+
     local url_hub_type
     #local url_protocol_type
     local url_repoowner
     local url_reponame
-    url_hub_type="$(check_hub_type_for_url "$1")"
+    url_hub_type="$(check_hub_type_for_url "$hub_repo_url_value")"
     #url_protocol_type="$(check_protocol_type_for_url "$1")"
-    url_repoowner="$(get_repoowner_from_url "$1")"
-    url_reponame="$(get_reponame_from_url "$1")"
+    url_repoowner="$(get_repoowner_from_url "$hub_repo_url_value")"
+    url_reponame="$(get_reponame_from_url "$hub_repo_url_value")"
     echo "url_hub_type=$url_hub_type"
     echo "url_repoowner=$url_repoowner"
     echo "url_reponame=$url_reponame"
@@ -293,7 +296,7 @@ check_existence_of_url_for_hub_with_curl() {
             echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
             echo "\"$url_repoowner/$url_reponame\""
             if [[ "$repo_full_name_get_from_request_url" == "\"$url_repoowner/$url_reponame\"" ]]; then
-                echo_color green "$1 is existed as a remote repo on Hub"
+                echo_color green "$hub_repo_url_value is existed as a remote repo on Hub"
             else
                 # 占位，除非 Hub 服务器鬼畜了，不然不会出现从 url 获取的 $repo_full_name_get_from_request_url 和 url 中的 "$url_repoowner/$url_reponame" 不一致。
                 :
@@ -304,7 +307,7 @@ check_existence_of_url_for_hub_with_curl() {
             echo "Fail"
             #echo "$content_get_from_request_url"
             if [[ $exit_status_code_flag -eq 22 ]]; then
-                echo "HTTP 找不到网页，$1 可能是私有仓库或者不存在该仓库。"
+                echo "HTTP 找不到网页，$hub_repo_url_value 可能是私有仓库或者不存在该仓库。"
             elif [[ $exit_status_code_flag -eq 7 ]]; then
                 echo "$request_url 拒接连接，被目标服务器限流。"
             else
@@ -319,13 +322,16 @@ check_existence_of_url_for_hub_with_curl() {
 
 # 使用 git 来判断 url 作为远程仓库是否存在于 hub 上
 check_existence_of_url_for_hub_with_git() {
+    local hub_repo_url_var="$1"
+    local hub_repo_url_value="${!hub_repo_url_var}"
+
     if type git > /dev/null 2>&1; then
         # 使用 `git ls-remote <repo_url>` 来检查仓库是否存在，repo_url 使用 SSH 方式
         # 该方法需要使用到 SSH 密钥对，比较方便。
-        if { git ls-remote "$1" > /dev/null; } 2>&1; then
-            echo_color green "$1 is existed as a remote repo on Hub"
+        if { git ls-remote "$hub_repo_url_value" > /dev/null; } 2>&1; then
+            echo_color green "$hub_repo_url_value is existed as a remote repo on Hub"
         else
-            echo_color red "$1 is not existed as a remote repo on Hub"
+            echo_color red "$hub_repo_url_value is not existed as a remote repo on Hub"
             exit 0
         fi
     else
@@ -336,14 +342,17 @@ check_existence_of_url_for_hub_with_git() {
 
 # 判断 url 作为远程仓库是否存在于 hub 上
 check_existence_of_url_for_hub() {
+    local hub_repo_url_var="$1"
+    #local hub_repo_url_value="${!hub_repo_url_var}"
+
     echo "$GITEE_ACCESS_TOKEN" "damlsfg"
     echo "$GITHUB_ACCESS_TOKEN" "sjfdkgl"
     if [[ "$REQUEST_TOOL" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
         echo_color green "Use curl to check the existence of url for hub"
-        check_existence_of_url_for_hub_with_curl "$1"
+        check_existence_of_url_for_hub_with_curl "$hub_repo_url_var"
     elif [[ "$REQUEST_TOOL" == "git" ]]; then
         echo_color green "Use git to check the existence of url for hub"
-        check_existence_of_url_for_hub_with_git "$1"
+        check_existence_of_url_for_hub_with_git "$hub_repo_url_var"
     else
         echo_color yellow "request_tool unknown! must be git or curl."
         exit 0
@@ -351,19 +360,22 @@ check_existence_of_url_for_hub() {
 }
 
 check_overall_validity_of_url() {
+    local hub_repo_url_var="$1"
+    local hub_repo_url_value="${!hub_repo_url_var}"
+
     local url_hub_type
     #local url_protocol_type
     local url_repoowner
     local url_reponame
-    url_hub_type="$(check_hub_type_for_url "$1")"
+    url_hub_type="$(check_hub_type_for_url "$hub_repo_url_value")"
     #url_protocol_type="$(check_protocol_type_for_url "$1")"
-    url_repoowner="$(get_repoowner_from_url "$1")"
-    url_reponame="$(get_reponame_from_url "$1")"
+    url_repoowner="$(get_repoowner_from_url "$hub_repo_url_value")"
+    url_reponame="$(get_reponame_from_url "$hub_repo_url_value")"
     echo "url_hub_type=$url_hub_type"
     echo "url_repoowner=$url_repoowner"
     echo "url_reponame=$url_reponame"
 
-    check_spaces_in_string "$1"
+    check_spaces_in_string "$hub_repo_url_value"
 
     if [[ "$url_hub_type" == "gitee" ]]; then
         check_validity_of_repoowner_adapt_gitee "$url_repoowner"
@@ -372,7 +384,7 @@ check_overall_validity_of_url() {
         check_validity_of_reponame_adapt_github "$url_reponame"
     fi
 
-    check_existence_of_url_for_hub "$1"
+    check_existence_of_url_for_hub "$hub_repo_url_var"
 }
 
 # 判断当前目录是否为有效的 git 仓库。
@@ -415,11 +427,11 @@ entrypoint_main() {
     ssh_config
 
     echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url BEGIN------------------->"
-    check_overall_validity_of_url "$SRC_REPO_URL"
+    check_overall_validity_of_url SRC_REPO_URL
     echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
     echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url BEGIN------------------->"
-    check_overall_validity_of_url "$DST_REPO_URL"
+    check_overall_validity_of_url DST_REPO_URL
     echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
     if [ ! -d "$CACHE_PATH" ]; then
