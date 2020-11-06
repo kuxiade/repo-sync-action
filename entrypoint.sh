@@ -337,10 +337,10 @@ check_existence_of_url_for_hub_with_git() {
 check_existence_of_url_for_hub() {
     echo "$GITEE_ACCESS_TOKEN" "damlsfg"
     echo "$GITHUB_ACCESS_TOKEN" "sjfdkgl"
-    if [[ "$url_hub_type" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
+    if [[ "$REQUEST_TOOL" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
         echo_color green "use curl"
         check_existence_of_url_for_hub_with_curl "$1"
-    elif [[ "$url_hub_type" == "git" ]]; then
+    elif [[ "$REQUEST_TOOL" == "git" ]]; then
         echo_color green "use git"
         check_existence_of_url_for_hub_with_git "$1"
     else
