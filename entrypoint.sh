@@ -492,7 +492,7 @@ entrypoint_main() {
 
     git remote set-url --push origin "$DST_REPO_URL"
     git fetch -p origin
-    git push origin refs/tags/*:refs/tags/* --all --prune
+    git push origin --all --tags --prune
 }
 
 # 入口
