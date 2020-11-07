@@ -1,27 +1,27 @@
 name: Test mirror-repo-action
 
-on:
-  # push推送时触发
-  push:
-    branches: [ main ]
-    # 匹配到该路径的文件有push时触发
-    paths:
-      # .github/workflows/ 目录下的文件有推送提交时，工作流触发
-      #- '.github/workflows/**'
-      # 只有当本文件有推送提交时，才工作流触发
-      - '.github/workflows/mirror-repo-action-test.yml'
-      #- 'action.yml'
-      #- 'Dockerfile'
-      #- 'entrypoint.sh'
-    # paths-ignore 表示该路径的文件有push时忽略触发。这里使用上面的 paths 来设置更符合我的要求(只有当本文件有推送提交时，该工作流触发 )。
-    # paths-ignore:
-    #   - 'docs/**'
-    #   - 'README.md'
-  # 定时任务触发
-  schedule:
-    # 每天北京时间9点跑
-    # Runs at 04:00 UTC (12:00 AM Beijing) every day
-    - cron:  '0 4 * * *'
+# on:
+#   # push推送时触发
+#   push:
+#     branches: [ main ]
+#     # 匹配到该路径的文件有push时触发
+#     paths:
+#       # .github/workflows/ 目录下的文件有推送提交时，工作流触发
+#       #- '.github/workflows/**'
+#       # 只有当本文件有推送提交时，才工作流触发
+#       - '.github/workflows/mirror-repo-action-test.yml'
+#       #- 'action.yml'
+#       #- 'Dockerfile'
+#       #- 'entrypoint.sh'
+#     # paths-ignore 表示该路径的文件有push时忽略触发。这里使用上面的 paths 来设置更符合我的要求(只有当本文件有推送提交时，该工作流触发 )。
+#     # paths-ignore:
+#     #   - 'docs/**'
+#     #   - 'README.md'
+#   # 定时任务触发
+#   schedule:
+#     # 每天北京时间9点跑
+#     # Runs at 04:00 UTC (12:00 AM Beijing) every day
+#     - cron:  '0 4 * * *'
 
 jobs:
   run:
@@ -48,6 +48,13 @@ jobs:
           src_repo_url: "git@github.com:wearerequired/git-mirror-action.git"
           # 需要同步到的目的仓库
           dst_repo_url: "git@gitee.com:kuxiade/git-mirror-action.git"
+          # 仓库名从 foo 改为 bar
+          foo_to_bar: >
+            (foo . bar)
+            (aaa . AAA)
+            (bbb . BBB)
+            (ccc CCC)
+            (ddd DDD)
       - name: a Print post-cache path
         # 运行时展开为: ls -la /home/runner/work/git-mirror-sync/git-mirror-sync/hub-mirror-cache
         run: |
