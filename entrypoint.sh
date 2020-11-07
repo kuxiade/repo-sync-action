@@ -492,7 +492,8 @@ entrypoint_main() {
 
     git remote set-url --push origin "$DST_REPO_URL"
     git fetch -p origin
-    git push origin refs/remotes/origin/*:refs/heads/* --tags --prune
+    git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
+    git push --mirror
 }
 
 # 入口
