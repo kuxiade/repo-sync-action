@@ -388,7 +388,35 @@ check_overall_validity_of_url() {
 }
 
 # 判断当前目录是否为有效的 git 仓库。
-check_validity_of_current_dir_as_git_repo() {
+# check_validity_of_current_dir_as_git_repo() {
+#     local repo_remote_url_for_fetch_with_fuzzy_match
+#     local repo_remote_url_for_fetch_with_exact_match
+
+#     # git clone --mirror 克隆下来的为纯仓库。
+#     # git rev-parse --is-inside-work-tree 判断是否为非纯的普通仓库。
+#     # git rev-parse --is-bare-repository 判断是否为纯仓库（或者叫裸仓库）。
+#     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ] || [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
+#         echo_color green "current dir is a git repo!"
+#         # 模糊匹配，获取到的字符串前后可能有空格。
+#         # 此处有问题，GitHub action 使用的 ubuntu-latest 中的 grep 没有 -P 选项，而 -E 选项又不支持 (?<=origin).*(?=\(fetch\))，该问题待解决
+#         #repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Po "(?<=origin).*(?=\(fetch\))")
+#         repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | awk '/^origin.+\(fetch\)$/ {print $2}')
+#         echo "$repo_remote_url_for_fetch_with_fuzzy_match"
+#         # 精确匹配，删除字符串前后空格。
+#         repo_remote_url_for_fetch_with_exact_match=$(trim_spaces_around_string "$repo_remote_url_for_fetch_with_fuzzy_match")
+#         echo "$repo_remote_url_for_fetch_with_exact_match"
+#         if [[ "$repo_remote_url_for_fetch_with_exact_match" == "$1" ]]; then
+#             echo_color green "The repo url of pre-fetch matches the src repo url."
+#         else
+#             echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+#         fi
+#     else
+#         echo_color yellow "current dir is not a git repo!"
+#     fi
+# }
+
+get_validity_of_current_dir_as_git_repo() {
+    local validity_of_current_dir_as_git_repo
     local repo_remote_url_for_fetch_with_fuzzy_match
     local repo_remote_url_for_fetch_with_exact_match
 
@@ -396,25 +424,23 @@ check_validity_of_current_dir_as_git_repo() {
     # git rev-parse --is-inside-work-tree 判断是否为非纯的普通仓库。
     # git rev-parse --is-bare-repository 判断是否为纯仓库（或者叫裸仓库）。
     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ] || [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
-        echo_color green "current dir is a git repo!"
         # 模糊匹配，获取到的字符串前后可能有空格。
         # 此处有问题，GitHub action 使用的 ubuntu-latest 中的 grep 没有 -P 选项，而 -E 选项又不支持 (?<=origin).*(?=\(fetch\))，该问题待解决
         #repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Po "(?<=origin).*(?=\(fetch\))")
         repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | awk '/^origin.+\(fetch\)$/ {print $2}')
-        echo "$repo_remote_url_for_fetch_with_fuzzy_match"
         # 精确匹配，删除字符串前后空格。
         repo_remote_url_for_fetch_with_exact_match=$(trim_spaces_around_string "$repo_remote_url_for_fetch_with_fuzzy_match")
-        echo "$repo_remote_url_for_fetch_with_exact_match"
         if [[ "$repo_remote_url_for_fetch_with_exact_match" == "$1" ]]; then
-            echo_color green "The repo url of pre-fetch matches the src repo url."
+            validity_of_current_dir_as_git_repo="true"
         else
-            echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+            validity_of_current_dir_as_git_repo="warn"
         fi
     else
-        echo_color yellow "current dir is not a git repo!"
+        validity_of_current_dir_as_git_repo="false"
     fi
-}
 
+    echo "$validity_of_current_dir_as_git_repo"
+}
 
 # main 函数
 entrypoint_main() {
@@ -442,11 +468,31 @@ entrypoint_main() {
     if [ -d "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL" ] ; then
         cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
         echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
-        check_validity_of_current_dir_as_git_repo "$SRC_REPO_URL"
+
+        validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$SRC_REPO_URL")
+        if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
+            echo_color green "current dir is a git repo!"
+            echo_color green "The repo url of pre-fetch matches the src repo url."
+        elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
+            echo_color green "current dir is a git repo!"
+            echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+            cd .. && rm -rf "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+            git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+        elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
+            echo_color yellow "current dir is not a git repo!"
+            cd .. && rm -rf "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+            git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+        fi
+
         echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
     else
         echo_color red "no $SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
+        git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
     fi
+
+    git remote set-url --push origin "$DST_REPO_URL"
+    git fetch -p origin
+    git push --all --prune refs/tags/*:refs/tags/*
 }
 
 # 入口
