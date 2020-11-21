@@ -444,9 +444,10 @@ entrypoint_main() {
     
     SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$SRC_REPO_URL")
     SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
-    GIT_CLONE_MIRROR="mirror"
+    #GIT_CLONE_MIRROR="mirror"
     GIT_CLONE_TYPE=${GIT_CLONE_MIRROR:-"normal"}
     if [[ "$GIT_CLONE_TYPE" == "mirror" ]]; then
+        # 使用镜像克隆/推送
         if [ -d "$SRC_REPO_DIR_DOTGIT_OF_URL" ] ; then
             cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
@@ -481,6 +482,7 @@ entrypoint_main() {
         echo_color cyan "------------------> git push --mirror..."
         git push --mirror
     elif [[ "$GIT_CLONE_TYPE" == "normal" ]]; then
+        # 使用普通克隆/推送
         if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
             cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
