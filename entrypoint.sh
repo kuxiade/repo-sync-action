@@ -79,10 +79,10 @@ print_var_info() {
 check_spaces_in_string() {
     if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
     then
-        echo_color red "There are spaces in the string: '$1'."
+        echo_color red "There are spaces in the string:'$1'."
         exit 0
     else
-        echo_color green "There are not spaces in the string: '$1'."
+        echo_color green "There are not spaces in the string:'$1'."
     fi
 }
 
@@ -301,7 +301,7 @@ check_existence_of_url_for_hub_with_curl() {
             echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
             echo "\"$url_repoowner/$url_reponame\""
             if [[ "$repo_full_name_get_from_request_url" == "\"$url_repoowner/$url_reponame\"" ]]; then
-                echo_color green "$hub_repo_url_value is existed as a remote repo on Hub"
+                echo_color green "'$hub_repo_url_value' is existed as a remote repo on Hub"
             else
                 # 占位，除非 Hub 服务器鬼畜了，不然不会出现从 url 获取的 $repo_full_name_get_from_request_url 和 url 中的 "$url_repoowner/$url_reponame" 不一致。
                 :
@@ -312,7 +312,7 @@ check_existence_of_url_for_hub_with_curl() {
             echo "Fail"
             #echo "$content_get_from_request_url"
             if [[ $exit_status_code_flag -eq 22 ]]; then
-                echo "HTTP 找不到网页，$hub_repo_url_value 可能是私有仓库或者不存在该仓库。"
+                echo "HTTP 找不到网页，'$hub_repo_url_value' 可能是私有仓库或者不存在该仓库。"
             elif [[ $exit_status_code_flag -eq 7 ]]; then
                 echo "$request_url 拒接连接，被目标服务器限流。"
             else
@@ -334,9 +334,9 @@ check_existence_of_url_for_hub_with_git() {
         # 使用 `git ls-remote <repo_url>` 来检查仓库是否存在，repo_url 使用 SSH 方式
         # 该方法需要使用到 SSH 密钥对，比较方便。
         if { git ls-remote "$hub_repo_url_value" > /dev/null; } 2>&1; then
-            echo_color green "$hub_repo_url_value is existed as a remote repo on Hub"
+            echo_color green "'$hub_repo_url_value' is existed as a remote repo on Hub"
         else
-            echo_color red "$hub_repo_url_value is not existed as a remote repo on Hub"
+            echo_color red "'$hub_repo_url_value' is not existed as a remote repo on Hub"
             exit 0
         fi
     else
