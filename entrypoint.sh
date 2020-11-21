@@ -79,10 +79,10 @@ print_var_info() {
 check_spaces_in_string() {
     if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
     then
-        echo_color red "There are spaces in the string: $1."
+        echo_color red "There are spaces in the string: '$1'."
         exit 0
     else
-        echo_color green "There are not spaces in the string: $1."
+        echo_color green "There are not spaces in the string: '$1'."
     fi
 }
 
@@ -203,9 +203,9 @@ check_validity_of_repoowner_adapt_github() {
 check_validity_of_repoowner_adapt_gitee() {
     # gitee 账户名只允许字母、数字或者下划线（_）、中划线（-），至少 2 个字符，必须以字母开头，不能以特殊字符结尾。
     if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9_-]{1,}$"; then
-        echo_color green "Gitee repo: The format of the repoowner:$1 is right."
+        echo_color green "Gitee repo: The format of the repoowner:'$1' is right."
     else
-        echo_color red "Gitee repo: The format of the repoowner:$1 is wrong."
+        echo_color red "Gitee repo: The format of the repoowner:'$1' is wrong."
         exit 0
     fi
 }
@@ -215,13 +215,13 @@ check_validity_of_reponame_adapt_github() {
     # github 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，开头符合前面条件即可，长度至少为1个字符。
     # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
     if [[ "$1" == "." ]] || [[ "$1" == ".." ]]; then
-        echo_color red "Github repo: The format of the repoName:$1 is wrong."
+        echo_color red "Github repo: The format of the repoName:'$1' is wrong."
         exit 0
     else
         if echo "$1" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
-            echo_color green "Github repo: The format of the repoName:$1 is right."
+            echo_color green "Github repo: The format of the repoName:'$1' is right."
         else
-            echo_color red "Github repo: The format of the repoName:$1 is wrong."
+            echo_color red "Github repo: The format of the repoName:'$1' is wrong."
             exit 0
         fi
     fi
@@ -231,9 +231,9 @@ check_validity_of_reponame_adapt_github() {
 check_validity_of_reponame_adapt_gitee() {
     # gitee 仓库名只允许包含字母、数字或者下划线(_)、中划线(-)、英文句号(.)，必须以字母开头，且长度为2~191个字符。
     if echo "$1" | grep -Eq "^[a-zA-Z][a-zA-Z0-9._-]{1,190}$"; then
-        echo_color green "Gitee repo: The format of the repoName:$1 is right."
+        echo_color green "Gitee repo: The format of the repoName:'$1' is right."
     else
-        echo_color red "Gitee repo: The format of the repoName:$1 is wrong."
+        echo_color red "Gitee repo: The format of the repoName:'$1' is wrong."
         exit 0
     fi
 }
@@ -459,26 +459,26 @@ entrypoint_main() {
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
                 cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone --mirror...\n"
+                echo_color cyan "------------------> git clone --mirror..."
                 git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
                 echo_color yellow "current dir is not a git repo!"
                 cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone --mirror...\n"
+                echo_color cyan "------------------> git clone --mirror..."
                 git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             fi
 
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
         else
-            echo_color red "no $SRC_REPO_DIR_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
-            echo_color cyan "------------------> git clone --mirror...\n"
+            echo_color red "no '$SRC_REPO_DIR_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
+            echo_color cyan "------------------> git clone --mirror..."
             git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
         fi
 
         git remote set-url --push origin "$DST_REPO_URL"
         git fetch -p origin
         git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
-        echo_color cyan "------------------> git push --mirror...\n"
+        echo_color cyan "------------------> git push --mirror..."
         git push --mirror
     elif [[ "$GIT_CLONE_TYPE" == "normal" ]]; then
         if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
@@ -493,25 +493,25 @@ entrypoint_main() {
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
                 cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone...\n"
+                echo_color cyan "------------------> git clone..."
                 git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
                 echo_color yellow "current dir is not a git repo!"
                 cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone...\n"
+                echo_color cyan "------------------> git clone..."
                 git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             fi
 
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
         else
-            echo_color red "no $SRC_REPO_DIR_NO_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
-            echo_color cyan "------------------> git clone...\n"
+            echo_color red "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
+            echo_color cyan "------------------> git clone..."
             git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
         fi
 
         git remote set-url --push origin "$DST_REPO_URL"
         git fetch -p origin
-        echo_color cyan "------------------> git push...\n"
+        echo_color cyan "------------------> git push..."
         git push origin refs/remotes/origin/*:refs/heads/* --tags --prune
     fi
 
