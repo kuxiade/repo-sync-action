@@ -437,6 +437,13 @@ entrypoint_main() {
     check_overall_validity_of_url DST_REPO_URL
     echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
+    remove_cache_dir_true="true"
+    remove_cache_dir_flag=${remove_cache_dir_true:-"false"}
+    # 删除缓存目录
+    if [ -d "$CACHE_PATH" ] && [[ "$remove_cache_dir_flag" == "true" ]]; then
+        rm -rf "$CACHE_PATH"
+    fi
+
     if [ ! -d "$CACHE_PATH" ]; then
         mkdir -p "$CACHE_PATH"
     fi
