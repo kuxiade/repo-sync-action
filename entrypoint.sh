@@ -239,6 +239,7 @@ check_validity_of_reponame_adapt_gitee() {
 }
 
 # 使用 curl 来判断 url 作为远程仓库是否存在于 hub 上
+# 注意，非授权用户使用 curl 访问 https://gitee.com/api/v5/*** 或者 https://api.github.com/*** 有次数限制，故不推荐该方法。
 # Example for Gitee:
 # Curl
     # curl -X GET --header 'Content-Type: application/json;charset=UTF-8' 'https://gitee.com/api/v5/repos/kuxiade/docker-arch?access_token=abcdefghijklmnopqrstuvwxyz'
@@ -265,11 +266,15 @@ check_existence_of_url_for_hub_with_curl() {
     if [[ "$url_hub_type" == "gitee" ]]; then
         local request_url_prefix="https://gitee.com/api/v5/repos"
         local access_token="$GITEE_ACCESS_TOKEN"
+        # 下面request_url中，只在$access_token的'授权账户'与'需要验证存在性的仓库的所有者所属的账户'一致时，才需要加上 ?access_token=$access_token。
+        # 不一致时，也就表明'需要验证存在性的仓库的所有者所属的账户'并非'授权账户'，无法查看私有仓库且无法突破访问次数限制。故，放弃该方法。
         local request_url="$request_url_prefix/$url_repoowner/$url_reponame?access_token=$access_token"
         local curl_options=(-f -X GET -H 'Content-Type: application/json;charset=UTF-8')
     elif [[ "$url_hub_type" == "github" ]]; then
         local request_url_prefix="https://api.github.com/repos"
         local access_token="$GITHUB_ACCESS_TOKEN"
+        # 下面request_url中，只在$access_token的'授权账户'与'需要验证存在性的仓库的所有者所属的账户'一致时，才需要加上 ?access_token=$access_token。
+        # 不一致时，也就表明'需要验证存在性的仓库的所有者所属的账户'并非'授权账户'，无法查看私有仓库且无法突破访问次数限制。故，放弃该方法。
         local request_url="$request_url_prefix/$url_repoowner/$url_reponame"
         local curl_options=(-f -X GET -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/vnd.github.v3+json' -H "Authorization: token $access_token")
     fi
@@ -387,34 +392,6 @@ check_overall_validity_of_url() {
     check_existence_of_url_for_hub "$hub_repo_url_var"
 }
 
-# 判断当前目录是否为有效的 git 仓库。
-# check_validity_of_current_dir_as_git_repo() {
-#     local repo_remote_url_for_fetch_with_fuzzy_match
-#     local repo_remote_url_for_fetch_with_exact_match
-
-#     # git clone --mirror 克隆下来的为纯仓库。
-#     # git rev-parse --is-inside-work-tree 判断是否为非纯的普通仓库。
-#     # git rev-parse --is-bare-repository 判断是否为纯仓库（或者叫裸仓库）。
-#     if [ "$(git rev-parse --is-inside-work-tree)" = "true" ] || [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
-#         echo_color green "current dir is a git repo!"
-#         # 模糊匹配，获取到的字符串前后可能有空格。
-#         # 此处有问题，GitHub action 使用的 ubuntu-latest 中的 grep 没有 -P 选项，而 -E 选项又不支持 (?<=origin).*(?=\(fetch\))，该问题待解决
-#         #repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | grep -Po "(?<=origin).*(?=\(fetch\))")
-#         repo_remote_url_for_fetch_with_fuzzy_match=$(git remote -v | awk '/^origin.+\(fetch\)$/ {print $2}')
-#         echo "$repo_remote_url_for_fetch_with_fuzzy_match"
-#         # 精确匹配，删除字符串前后空格。
-#         repo_remote_url_for_fetch_with_exact_match=$(trim_spaces_around_string "$repo_remote_url_for_fetch_with_fuzzy_match")
-#         echo "$repo_remote_url_for_fetch_with_exact_match"
-#         if [[ "$repo_remote_url_for_fetch_with_exact_match" == "$1" ]]; then
-#             echo_color green "The repo url of pre-fetch matches the src repo url."
-#         else
-#             echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
-#         fi
-#     else
-#         echo_color yellow "current dir is not a git repo!"
-#     fi
-# }
-
 get_validity_of_current_dir_as_git_repo() {
     local validity_of_current_dir_as_git_repo
     local repo_remote_url_for_fetch_with_fuzzy_match
@@ -465,35 +442,79 @@ entrypoint_main() {
     fi
     cd "$CACHE_PATH"
     
-    if [ -d "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL" ] ; then
-        cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
-        echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
+    SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$SRC_REPO_URL")
+    SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
+    GIT_CLONE_MIRROR="mirror"
+    GIT_CLONE_TYPE=${GIT_CLONE_MIRROR:-"normal"}
+    if [[ "$GIT_CLONE_TYPE" == "mirror" ]]; then
+        if [ -d "$SRC_REPO_DIR_DOTGIT_OF_URL" ] ; then
+            cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
+            echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
 
-        validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$SRC_REPO_URL")
-        if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
-            echo_color green "current dir is a git repo!"
-            echo_color green "The repo url of pre-fetch matches the src repo url."
-        elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
-            echo_color green "current dir is a git repo!"
-            echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
-            cd .. && rm -rf "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
-            git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
-        elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
-            echo_color yellow "current dir is not a git repo!"
-            cd .. && rm -rf "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
-            git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+            validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$SRC_REPO_URL")
+            if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
+                echo_color green "current dir is a git repo!"
+                echo_color green "The repo url of pre-fetch matches the src repo url."
+            elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
+                echo_color green "current dir is a git repo!"
+                echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+                cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
+                echo_color cyan "------------------> git clone --mirror...\n"
+                git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
+            elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
+                echo_color yellow "current dir is not a git repo!"
+                cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
+                echo_color cyan "------------------> git clone --mirror...\n"
+                git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
+            fi
+
+            echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
+        else
+            echo_color red "no $SRC_REPO_DIR_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
+            echo_color cyan "------------------> git clone --mirror...\n"
+            git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
         fi
 
-        echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
-    else
-        echo_color red "no $SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
-        git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
+        git remote set-url --push origin "$DST_REPO_URL"
+        git fetch -p origin
+        git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
+        echo_color cyan "------------------> git push --mirror...\n"
+        git push --mirror
+    elif [[ "$GIT_CLONE_TYPE" == "normal" ]]; then
+        if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
+            cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+            echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo BEGIN------------------->"
+
+            validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$SRC_REPO_URL")
+            if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
+                echo_color green "current dir is a git repo!"
+                echo_color green "The repo url of pre-fetch matches the src repo url."
+            elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
+                echo_color green "current dir is a git repo!"
+                echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+                cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+                echo_color cyan "------------------> git clone...\n"
+                git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+            elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
+                echo_color yellow "current dir is not a git repo!"
+                cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+                echo_color cyan "------------------> git clone...\n"
+                git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+            fi
+
+            echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
+        else
+            echo_color red "no $SRC_REPO_DIR_NO_DOTGIT_OF_URL:$SRC_REPO_URL cache\n"
+            echo_color cyan "------------------> git clone...\n"
+            git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+        fi
+
+        git remote set-url --push origin "$DST_REPO_URL"
+        git fetch -p origin
+        echo_color cyan "------------------> git push...\n"
+        git push origin refs/remotes/origin/*:refs/heads/* --tags --prune
     fi
 
-    git remote set-url --push origin "$DST_REPO_URL"
-    git fetch -p origin
-    git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
-    git push --mirror
 }
 
 # 入口
