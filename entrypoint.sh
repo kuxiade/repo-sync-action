@@ -518,8 +518,9 @@ entrypoint_main() {
             git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
         fi
 
-        git remote set-url --push origin "$DST_REPO_URL"
+        #git remote set-url --push origin "$DST_REPO_URL"
         #git fetch -p origin
+        git remote add gitee_upstream "$DST_REPO_URL"
         git pull --all --prune
         # 需要删除默认分支，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
         #git remote set-head origin --delete
@@ -529,9 +530,9 @@ entrypoint_main() {
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         git --version
         # 推送所有分支
-        git push --all origin --force
+        git push gitee_upstream --all --force --prune
         # 推送所有标签
-        git push origin --tags --force
+        git push gitee_upstream --tags --force --prune
     fi
 
 }
