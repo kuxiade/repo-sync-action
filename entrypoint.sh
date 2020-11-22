@@ -520,7 +520,7 @@ entrypoint_main() {
 
         git remote set-url --push origin "$DST_REPO_URL"
         #git fetch -p origin
-        git pull -p
+        git pull --all --prune
         # 需要删除默认分支，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
         #git remote set-head origin --delete
         echo_color cyan "------------------> git push..."
