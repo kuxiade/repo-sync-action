@@ -524,8 +524,8 @@ entrypoint_main() {
         #git remote set-head origin --delete
         echo_color cyan "------------------> git push..."
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
-        git push origin --all --force --prune
-        git push origin --tags --force --prune
+        git push origin --all
+        git push origin --tags
     fi
 
 }
