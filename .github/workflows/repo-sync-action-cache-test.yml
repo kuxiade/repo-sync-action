@@ -83,7 +83,7 @@ jobs:
           cache_path: "/github/workspace/mirror-repo-cache"
           request_tool: "curl"
 
-      - name: Mirror Github:github/docs to Gitee with hub-mirror-action
+      - name: Mirror Github:Yikun/hub-mirror-action to Gitee with repo-sync-action
         uses: ./.
         env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
