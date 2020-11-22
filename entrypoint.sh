@@ -451,7 +451,7 @@ entrypoint_main() {
     
     SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$SRC_REPO_URL")
     SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
-    #GIT_CLONE_MIRROR="mirror"
+    GIT_CLONE_MIRROR="mirror"
     GIT_CLONE_TYPE=${GIT_CLONE_MIRROR:-"normal"}
     if [[ "$GIT_CLONE_TYPE" == "mirror" ]]; then
         # 使用镜像克隆/推送
@@ -463,6 +463,7 @@ entrypoint_main() {
             if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color green "The repo url of pre-fetch matches the src repo url."
+                git fetch -p origin
             elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
@@ -484,7 +485,6 @@ entrypoint_main() {
         fi
 
         git remote set-url --push origin "$DST_REPO_URL"
-        git fetch -p origin
         git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
         echo_color cyan "------------------> git push --mirror..."
         git push --mirror
