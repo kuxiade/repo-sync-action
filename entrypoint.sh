@@ -523,7 +523,9 @@ entrypoint_main() {
         # 需要删除默认分支，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
         #git remote set-head origin --delete
         echo_color cyan "------------------> git push..."
-        git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
+        #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
+        git push origin --all --force --prune
+        git push origin --tags --force --prune
     fi
 
 }
