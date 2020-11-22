@@ -529,9 +529,9 @@ entrypoint_main() {
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         git --version
         # 推送所有分支
-        git push --all origin
+        git push --all origin --force
         # 推送所有标签
-        git push origin --tags
+        git push origin --tags --force
     fi
 
 }
