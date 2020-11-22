@@ -528,9 +528,9 @@ entrypoint_main() {
         echo_color cyan "------------------> git push..."
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         # 推送所有分支
-        git push origin --all --prune
+        git push --all origin
         # 推送所有标签
-        git push origin --tags --prune
+        git push origin --tags
     fi
 
 }
