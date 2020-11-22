@@ -498,6 +498,7 @@ entrypoint_main() {
             if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color green "The repo url of pre-fetch matches the src repo url."
+                git pull --prune
             elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
@@ -518,21 +519,15 @@ entrypoint_main() {
             git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
         fi
 
-        #git remote set-url --push origin "$DST_REPO_URL"
-        #git fetch -p origin
-        git remote add gitee_upstream "$DST_REPO_URL"
-        git pull --all --prune
+        git remote set-url --push origin "$DST_REPO_URL"
+        # Print out all branches
+        git --no-pager branch -a -vv
         # 需要删除默认分支，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
-        #git remote set-head origin --delete
+        git remote set-head origin --delete
         # Print out all branches
         git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
-        #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
-        git --version
-        # 推送所有分支
-        git push gitee_upstream --all --force
-        # 推送所有标签
-        git push gitee_upstream --tags --force
+        git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
     fi
 
 }
