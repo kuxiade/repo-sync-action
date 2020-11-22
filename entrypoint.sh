@@ -523,6 +523,8 @@ entrypoint_main() {
         git pull --all --prune
         # 需要删除默认分支，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
         #git remote set-head origin --delete
+        # Print out all branches
+        git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         # 推送所有分支
