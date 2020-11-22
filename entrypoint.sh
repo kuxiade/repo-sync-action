@@ -527,6 +527,7 @@ entrypoint_main() {
         git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
+        git --version
         # 推送所有分支
         git push --all origin
         # 推送所有标签
