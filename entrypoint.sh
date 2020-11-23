@@ -533,10 +533,30 @@ entrypoint_main() {
         git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
+        force_push="true"
+        if [[ "$force_push" == "true" ]]; then
+            git_push_branch_args=(--force)
+            git_push_tag_args=(--force)
+        fi
+
+        echo "git_push_branch_args_1=${git_push_branch_args[@]}"
+        echo "git_push_tag_args=${git_push_tag_args[@]}"
+
+        if [[ "$SRC_REPO_BRANCH" == "refs/remotes/source/*" && "$DST_REPO_BRANCH" == "refs/heads/*" ]]; then
+            git_push_branch_args=("${git_push_branch_args[@]}" --prune)
+        fi
+
+        if [[ "$SRC_REPO_TAG" == "refs/tags/*" && "$DST_REPO_TAG" == "refs/tags/*" ]]; then
+            git_push_tag_args=("${git_push_tag_args[@]}" --prune)
+        fi
+
+        echo "git_push_branch_args_2=${git_push_branch_args[@]}"
+        echo "git_push_tag_args_2=${git_push_tag_args[@]}"
+
         # 推送分支
-        git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" -f
+        git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}"
         # 推送标签
-        git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" -f
+        git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}"
     fi
 
 }
