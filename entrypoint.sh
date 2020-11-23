@@ -542,7 +542,7 @@ entrypoint_main() {
         echo "git_push_branch_args_1=${git_push_branch_args[@]}"
         echo "git_push_tag_args=${git_push_tag_args[@]}"
 
-        if [[ "$SRC_REPO_BRANCH" == "refs/remotes/source/*" && "$DST_REPO_BRANCH" == "refs/heads/*" ]]; then
+        if [[ "$SRC_REPO_BRANCH" == "refs/remotes/origin/*" && "$DST_REPO_BRANCH" == "refs/heads/*" ]]; then
             git_push_branch_args=("${git_push_branch_args[@]}" --prune)
         fi
 
