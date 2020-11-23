@@ -533,7 +533,8 @@ entrypoint_main() {
         git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
-        force_push="true"
+        
+        #force_push="true"
         if [[ "$force_push" == "true" ]]; then
             git_push_branch_args=(--force)
             git_push_tag_args=(--force)
