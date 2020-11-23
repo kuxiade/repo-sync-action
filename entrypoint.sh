@@ -13,7 +13,11 @@ fi
 
 # ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
 SRC_REPO_URL="${INPUT_SRC_REPO_URL}"
+SRC_REPO_BRANCH="${INPUT_SRC_REPO_BRANCH}"
+SRC_REPO_TAG="${INPUT_SRC_REPO_TAG}"
 DST_REPO_URL="${INPUT_DST_REPO_URL}"
+DST_REPO_BRANCH="${INPUT_DST_REPO_BRANCH}"
+DST_REPO_TAG="${INPUT_DST_REPO_TAG}"
 CREATE_DST_REPO_NONEXIST="${INPUT_CREATE_DST_REPO_NONEXIST}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 REQUEST_TOOL="${INPUT_REQUEST_TOOL}"
@@ -451,7 +455,8 @@ entrypoint_main() {
     
     SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$SRC_REPO_URL")
     SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
-    GIT_CLONE_MIRROR="mirror"
+    # 注释掉下面这行，则使用普通克隆，否则使用镜像克隆。
+    #GIT_CLONE_MIRROR="mirror"
     GIT_CLONE_TYPE=${GIT_CLONE_MIRROR:-"normal"}
     if [[ "$GIT_CLONE_TYPE" == "mirror" ]]; then
         # 使用镜像克隆/推送
@@ -522,12 +527,16 @@ entrypoint_main() {
         git remote set-url --push origin "$DST_REPO_URL"
         # Print out all branches
         git --no-pager branch -a -vv
-        # 需要删除默认分支，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
+        # 需要删除 remotes/origin/HEAD，不然使用 git push origin "refs/remotes/origin/*:refs/heads/*" 命令推送到目的端时，会创建一个HEAD分支。
         git remote set-head origin --delete
         # Print out all branches
         git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
-        git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
+        #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
+        # 推送分支
+        git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" -f
+        # 推送标签
+        git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" -f
     fi
 
 }

@@ -9,10 +9,22 @@ inputs:
     description: 'SSH URL of the source repo.'
     required: true
     default: ''
+  src_repo_branch:
+    description: "Branch name to sync from."
+    default: 'refs/remotes/source/*'
+  src_repo_tag:
+    description: "Tag name to sync from."
+    default: 'refs/tags/*'
   dst_repo_url:
     description: 'SSH URL of the destination repo.'
     required: true
     default: ''
+  dst_repo_branch:
+    description: "Branch name to sync to."
+    default: 'refs/heads/*'
+  dst_repo_tag:
+    description: "Tag name to sync to."
+    default: 'refs/tags/*'
   create_dst_repo_nonexist:
     description: "If destination repo does not exist, force to create it. must be true or false."
     default: false
@@ -33,7 +45,11 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.src_repo_url }}
+    - ${{ inputs.src_repo_branch }}
+    - ${{ inputs.src_repo_tag }}
     - ${{ inputs.dst_repo_url }}
+    - ${{ inputs.dst_repo_branch }}
+    - ${{ inputs.dst_repo_tag }}
     - ${{ inputs.create_dst_repo_nonexist}}
     - ${{ inputs.cache_path }}
     - ${{ inputs.request_tool }}
