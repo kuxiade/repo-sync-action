@@ -526,12 +526,13 @@ entrypoint_main() {
 
         git remote set-url --push origin "$DST_REPO_URL"
         # Print out all branches
-        git --no-pager branch -a -vv
+        #git --no-pager branch -a -vv
         # 需要删除 remotes/origin/HEAD，不然使用 git push origin "refs/remotes/origin/*:refs/heads/*" 命令推送到目的端时，会创建一个HEAD分支。
         git remote set-head origin --delete
         # Print out all branches
-        git --no-pager branch -a -vv
+        #git --no-pager branch -a -vv
         echo_color cyan "------------------> git push..."
+        
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         
         #force_push="true"
