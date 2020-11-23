@@ -11,7 +11,7 @@ inputs:
     default: ''
   src_repo_branch:
     description: "Branch name to sync from."
-    default: 'refs/remotes/source/*'
+    default: 'refs/remotes/origin/*'
   src_repo_tag:
     description: "Tag name to sync from."
     default: 'refs/tags/*'
