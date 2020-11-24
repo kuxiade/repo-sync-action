@@ -555,8 +555,10 @@ entrypoint_main() {
         echo "git_push_branch_args_2=" "${git_push_branch_args[@]}"
         echo "git_push_tag_args_2=" "${git_push_tag_args[@]}"
 
+        echo "git push branch..."
         # 推送分支
         git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}"
+        echo "git push tags..."
         # 推送标签
         git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}"
     fi
