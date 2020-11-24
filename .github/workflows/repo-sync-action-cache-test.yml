@@ -124,11 +124,11 @@ jobs:
           # 需要被同步的源端仓库
           src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
           #src_repo_branch: "refs/remotes/origin/bowdenk7"
-          src_repo_tag: "v0.150.0"
+          src_repo_tag: ""
           # 需要同步到的目的仓库
           dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
           #dst_repo_branch: "refs/heads/csharp-update"
-          dst_repo_tag: "v0.150.0"
+          dst_repo_tag: "refs/tags/v0.150.0"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           cache_path: /github/workspace/mirror-repo-cache
 
