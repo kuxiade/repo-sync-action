@@ -426,7 +426,7 @@ get_validity_of_current_dir_as_git_repo() {
 # main 函数
 entrypoint_main() {
     echo -e ""
-    echo_color cyan "------------------> go in entrypoint_main func\n"
+    echo_color cyan "--------> go in entrypoint_main func\n"
     echo_color purple "<-------------------parameter info BEGIN------------------->"
     print_var_info
     echo_color purple "<-------------------parameter info END--------------------->\n"
@@ -473,25 +473,25 @@ entrypoint_main() {
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
                 cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone --mirror..."
+                echo_color cyan "--------> git clone --mirror..."
                 git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
                 echo_color yellow "current dir is not a git repo!"
                 cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone --mirror..."
+                echo_color cyan "--------> git clone --mirror..."
                 git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             fi
 
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
         else
             echo_color red "no '$SRC_REPO_DIR_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
-            echo_color cyan "------------------> git clone --mirror..."
+            echo_color cyan "--------> git clone --mirror..."
             git clone --mirror "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
         fi
 
         git remote set-url --push origin "$DST_REPO_URL"
         git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
-        echo_color cyan "------------------> git push --mirror..."
+        echo_color cyan "--------> git push --mirror..."
         git push --mirror
     elif [[ "$GIT_CLONE_TYPE" == "normal" ]]; then
         # 使用普通克隆/推送
@@ -508,19 +508,19 @@ entrypoint_main() {
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
                 cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone..."
+                echo_color cyan "--------> git clone..."
                 git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
                 echo_color yellow "current dir is not a git repo!"
                 cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                echo_color cyan "------------------> git clone..."
+                echo_color cyan "--------> git clone..."
                 git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             fi
 
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
         else
             echo_color red "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
-            echo_color cyan "------------------> git clone..."
+            echo_color cyan "--------> git clone..."
             git clone "$SRC_REPO_URL" && cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
         fi
 
@@ -531,10 +531,106 @@ entrypoint_main() {
         git remote set-head origin --delete
         # Print out all branches
         #git --no-pager branch -a -vv
-        echo_color cyan "------------------> git push..."
+        echo_color cyan "--------> git push..."
         
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         
+        # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
+        if [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/$ ]]; then
+            echo_color red "The format of the 'src_repo_branch' parameter is illegal"
+            exit 1
+        fi
+        if [[ "$DST_REPO_BRANCH" =~ ^refs/heads/$ ]]; then
+            echo_color red "The format of the 'dst_repo_branch' parameter is illegal"
+            exit 1
+        fi
+        if [[ -z "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
+            echo_color red "Because only push the current branch to $DST_REPO_URL, so exit."
+            exit 1
+        elif [[ -z "$SRC_REPO_BRANCH" ]] && [[ -n "$DST_REPO_BRANCH" ]]; then
+            echo_color yellow "remove $DST_REPO_BRANCH branch for $DST_REPO_URL."
+        elif [[ -n "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
+            echo_color red "The 'dst_repo_branch' parameter cannot be empty"
+            exit 1
+        fi
+        if [[ -n "$SRC_REPO_BRANCH" ]] && [[ ! "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]]; then
+            SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
+        fi
+        if [[ -n "$DST_REPO_BRANCH" ]] && [[ ! "$DST_REPO_BRANCH" =~ ^refs/heads/.+ ]]; then
+            DST_REPO_BRANCH="refs/heads/$DST_REPO_BRANCH"
+        fi
+
+        if [[ "$SRC_REPO_TAG" =~ ^refs/tags/$ ]]; then
+            echo_color red "The format of the 'src_repo_tag' parameter is illegal"
+            exit 1
+        fi
+        if [[ "$DST_REPO_TAG" =~ ^refs/tags/$ ]]; then
+            echo_color red "The format of the 'dst_repo_tag' parameter is illegal"
+            exit 1
+        fi
+        if [[ -z "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
+            echo_color red "Because only push the current branch to $DST_REPO_URL, so exit."
+            exit 1
+        elif [[ -z "$SRC_REPO_TAG" ]] && [[ -n "$DST_REPO_TAG" ]]; then
+            echo_color yellow "remove $DST_REPO_TAG tag for $DST_REPO_URL."
+        elif [[ -n "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
+            echo_color red "The 'dst_repo_tag' parameter cannot be empty"
+            exit 1
+        fi
+        if [[ -n "$SRC_REPO_TAG" ]] && [[ ! "$SRC_REPO_TAG" =~ ^refs/tags/.+ ]]; then
+            SRC_REPO_TAG="refs/tags/$SRC_REPO_TAG"
+        fi
+        if [[ -n "$DST_REPO_TAG" ]] && [[ ! "$DST_REPO_TAG" =~ ^refs/tags/.+ ]]; then
+            DST_REPO_TAG="refs/tags/$DST_REPO_TAG"
+        fi
+
+
+
+        # if [[ "$SRC_REPO_BRANCH" == "" ]]; then
+        #     echo_color red "The format of the 'src_repo_branch' parameter is illegal"
+        #     exit 1
+        # elif [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]] || [[ "$SRC_REPO_BRANCH" == "" ]]; then
+        #     echo_color green "The format of the 'src_repo_branch' parameter is legal"
+        # else
+        #     SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
+        # fi
+        
+        # if [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/$ ]]; then
+        #     echo_color red "The format of the 'src_repo_branch' parameter is illegal"
+        #     exit 1
+        # elif [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]] || [[ "$SRC_REPO_BRANCH" == "" ]]; then
+        #     echo_color green "The format of the 'src_repo_branch' parameter is legal"
+        # else
+        #     SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
+        # fi
+
+        # if [[ "$DST_REPO_BRANCH" =~ ^refs/heads/$ ]]; then
+        #     echo_color red "The format of the 'dst_repo_branch' parameter is illegal"
+        #     exit 1
+        # elif [[ "$DST_REPO_BRANCH" =~ ^refs/heads/.+ ]]; then
+        #     echo_color green "The format of the 'dst_repo_branch' parameter is legal"
+        # else
+        #     DST_REPO_BRANCH="refs/heads/$DST_REPO_BRANCH"
+        # fi
+
+        if [[ "$SRC_REPO_TAG" =~ ^refs/tags/$ ]]; then
+            echo_color red "The format of the 'src_repo_tag' parameter is illegal"
+            exit 1
+        elif [[ "$SRC_REPO_TAG" =~ ^refs/tags/.+ ]] || [[ "$SRC_REPO_TAG" == "" ]]; then
+            echo_color green "The format of the 'src_repo_tag' parameter is legal"
+        else
+            SRC_REPO_TAG="refs/tags/$SRC_REPO_TAG"
+        fi
+
+        if [[ "$DST_REPO_TAG" =~ ^refs/tags/$ ]]; then
+            echo_color red "The format of the 'dst_repo_tag' parameter is illegal"
+            exit 1
+        elif [[ "$DST_REPO_TAG" =~ ^refs/tags/.+ ]]; then
+            echo_color green "The format of the 'dst_repo_tag' parameter is legal"
+        else
+            SRC_REPO_TAG="refs/tags/$DST_REPO_TAG"
+        fi
+
         force_push="true"
         if [[ "$force_push" == "true" ]]; then
             git_push_branch_args=(--force)
@@ -555,10 +651,10 @@ entrypoint_main() {
         echo "git_push_branch_args_2=" "${git_push_branch_args[@]}"
         echo "git_push_tag_args_2=" "${git_push_tag_args[@]}"
 
-        echo "git push branch..."
+        echo_color cyan "--------> git push branch..."
         # 推送分支
         git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}"
-        echo "git push tags..."
+        echo_color cyan "--------> git push tags..."
         # 推送标签
         git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}"
     fi
