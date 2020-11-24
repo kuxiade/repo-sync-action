@@ -113,6 +113,23 @@ jobs:
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           cache_path: /github/workspace/mirror-repo-cache
 
+      - name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
+        uses: ./.
+        env:
+          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+        with:
+          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+          # 需要被同步的源端仓库
+          src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
+          src_repo_branch: "bowdenk7"
+          # 需要同步到的目的仓库
+          dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
+          dst_repo_branch: "HEAD"
+          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
+          cache_path: /github/workspace/mirror-repo-cache
+
       - name: a Print post-cache path
         # 运行时展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
         run: |
