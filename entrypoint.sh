@@ -531,7 +531,7 @@ entrypoint_main() {
         git remote set-head origin --delete
         # Print out all branches
         #git --no-pager branch -a -vv
-        echo_color cyan "--------> git push..."
+        #echo_color cyan "--------> git push..."
         
         #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         
@@ -548,7 +548,8 @@ entrypoint_main() {
             echo_color red "Because only push the current branch to $DST_REPO_URL, so exit."
             exit 1
         elif [[ -z "$SRC_REPO_BRANCH" ]] && [[ -n "$DST_REPO_BRANCH" ]]; then
-            echo_color yellow "remove $DST_REPO_BRANCH branch for $DST_REPO_URL."
+            #echo_color yellow "remove $DST_REPO_BRANCH branch for $DST_REPO_URL."
+            remove_branch="true"
         elif [[ -n "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
             echo_color red "The 'dst_repo_branch' parameter cannot be empty"
             exit 1
@@ -572,7 +573,8 @@ entrypoint_main() {
             echo_color red "Because only push the current branch to $DST_REPO_URL, so exit."
             exit 1
         elif [[ -z "$SRC_REPO_TAG" ]] && [[ -n "$DST_REPO_TAG" ]]; then
-            echo_color yellow "remove $DST_REPO_TAG tag for $DST_REPO_URL."
+            #echo_color yellow "remove $DST_REPO_TAG tag for $DST_REPO_URL."
+            remove_tag="true"
         elif [[ -n "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
             echo_color red "The 'dst_repo_tag' parameter cannot be empty"
             exit 1
@@ -605,9 +607,15 @@ entrypoint_main() {
         echo "git_push_tag_args_2=" "${git_push_tag_args[@]}"
 
         echo_color cyan "--------> git push branch..."
+        if [[ "$remove_branch" == "true" ]]; then
+            echo_color yellow "remove $DST_REPO_BRANCH branch for $DST_REPO_URL."
+        fi
         # 推送分支
         git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}"
         echo_color cyan "--------> git push tags..."
+        if [[ "$remove_tag" == "true" ]]; then
+            echo_color yellow "remove $DST_REPO_TAG tag for $DST_REPO_URL."
+        fi
         # 推送标签
         git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}"
     fi
