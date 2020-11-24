@@ -584,53 +584,6 @@ entrypoint_main() {
             DST_REPO_TAG="refs/tags/$DST_REPO_TAG"
         fi
 
-
-
-        # if [[ "$SRC_REPO_BRANCH" == "" ]]; then
-        #     echo_color red "The format of the 'src_repo_branch' parameter is illegal"
-        #     exit 1
-        # elif [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]] || [[ "$SRC_REPO_BRANCH" == "" ]]; then
-        #     echo_color green "The format of the 'src_repo_branch' parameter is legal"
-        # else
-        #     SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
-        # fi
-        
-        # if [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/$ ]]; then
-        #     echo_color red "The format of the 'src_repo_branch' parameter is illegal"
-        #     exit 1
-        # elif [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]] || [[ "$SRC_REPO_BRANCH" == "" ]]; then
-        #     echo_color green "The format of the 'src_repo_branch' parameter is legal"
-        # else
-        #     SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
-        # fi
-
-        # if [[ "$DST_REPO_BRANCH" =~ ^refs/heads/$ ]]; then
-        #     echo_color red "The format of the 'dst_repo_branch' parameter is illegal"
-        #     exit 1
-        # elif [[ "$DST_REPO_BRANCH" =~ ^refs/heads/.+ ]]; then
-        #     echo_color green "The format of the 'dst_repo_branch' parameter is legal"
-        # else
-        #     DST_REPO_BRANCH="refs/heads/$DST_REPO_BRANCH"
-        # fi
-
-        if [[ "$SRC_REPO_TAG" =~ ^refs/tags/$ ]]; then
-            echo_color red "The format of the 'src_repo_tag' parameter is illegal"
-            exit 1
-        elif [[ "$SRC_REPO_TAG" =~ ^refs/tags/.+ ]] || [[ "$SRC_REPO_TAG" == "" ]]; then
-            echo_color green "The format of the 'src_repo_tag' parameter is legal"
-        else
-            SRC_REPO_TAG="refs/tags/$SRC_REPO_TAG"
-        fi
-
-        if [[ "$DST_REPO_TAG" =~ ^refs/tags/$ ]]; then
-            echo_color red "The format of the 'dst_repo_tag' parameter is illegal"
-            exit 1
-        elif [[ "$DST_REPO_TAG" =~ ^refs/tags/.+ ]]; then
-            echo_color green "The format of the 'dst_repo_tag' parameter is legal"
-        else
-            SRC_REPO_TAG="refs/tags/$DST_REPO_TAG"
-        fi
-
         force_push="true"
         if [[ "$force_push" == "true" ]]; then
             git_push_branch_args=(--force)
