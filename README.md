@@ -145,9 +145,9 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 ### 单分支同步
 
-同步 git@github.com:microsoft/vscode-dev-containers.git 上的 `bowdenk7` 分支到 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `csharp-update` 分支
+同步 [git@github.com:microsoft/vscode-dev-containers.git](https://github.com/microsoft/vscode-dev-containers) 上的 `bowdenk7` 分支到 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `csharp-update` 分支
 
-git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `csharp-update` 分支不存在的话，会自动创建 `csharp-update` 分支
+[git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `csharp-update` 分支不存在的话，会自动创建 `csharp-update` 分支
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -173,9 +173,9 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 ### 单标签同步
 
-同步 git@github.com:microsoft/vscode-dev-containers.git 上的 `v0.150.0` 标签到 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `v0.148.0` 标签
+同步 [git@github.com:microsoft/vscode-dev-containers.git](https://github.com/microsoft/vscode-dev-containers) 上的 `v0.150.0` 标签到 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `v0.148.0` 标签
 
-git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `v0.148.0` 标签不存在的话，会自动创建 `v0.148.0` 标签
+[git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `v0.148.0` 标签不存在的话，会自动创建 `v0.148.0` 标签
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -203,7 +203,7 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 ### 删除目的端仓库上的某个分支
 
-删除 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `csharp-update` 分支
+删除 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `csharp-update` 分支
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -229,7 +229,7 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 ### 删除目的端仓库上的某个标签
 
-删除 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `v0.150.0` 标签
+删除 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `v0.150.0` 标签
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -255,7 +255,7 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     cache_path: /github/workspace/mirror-repo-cache
 ```
 
-- [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 是更详细的使用示例。
+> [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 是更详细的使用示例。
 
 ## 特别说明
 
