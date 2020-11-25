@@ -121,6 +121,8 @@
 
 ## 示例workflow
 
+详细的使用示例见：[repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml)。
+
 ### 整个仓库同步
 
 整个仓库同步，包含同步所有分支和所有标签
@@ -254,8 +256,6 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
     cache_path: /github/workspace/mirror-repo-cache
 ```
-
-> [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 是更详细的使用示例。
 
 ## 特别说明
 
