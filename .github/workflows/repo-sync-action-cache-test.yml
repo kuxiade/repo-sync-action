@@ -83,8 +83,6 @@ jobs:
           cache_path: "/github/workspace/mirror-repo-cache"
           request_tool: "curl"
 
-      
-
       - name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
         uses: ./.
         env:
