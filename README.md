@@ -121,9 +121,9 @@
 
 ## 示例workflow
 
-### 整个仓库同步：
+### 整个仓库同步
 
-包含同步所有分支和所有标签
+整个仓库同步，包含同步所有分支和所有标签
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -143,7 +143,11 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     cache_path: /github/workspace/mirror-repo-cache
 ```
 
-### 单分支同步：
+### 单分支同步
+
+同步 git@github.com:microsoft/vscode-dev-containers.git 上的 `bowdenk7` 分支到 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `csharp-update` 分支
+
+git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `csharp-update` 分支不存在的话，会自动创建 `csharp-update` 分支
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -167,7 +171,11 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     cache_path: /github/workspace/mirror-repo-cache
 ```
 
-### 单标签同步：
+### 单标签同步
+
+同步 git@github.com:microsoft/vscode-dev-containers.git 上的 `v0.150.0` 标签到 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `v0.148.0` 标签
+
+git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `v0.148.0` 标签不存在的话，会自动创建 `v0.148.0` 标签
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -188,12 +196,14 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # 需要同步到的目的仓库
     dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
     #dst_repo_branch: "refs/heads/csharp-update"
-    dst_repo_tag: "v0.150.0"
+    dst_repo_tag: "v0.148.0"
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
     cache_path: /github/workspace/mirror-repo-cache
 ```
 
-### 删除目的端仓库上的某个分支：
+### 删除目的端仓库上的某个分支
+
+删除 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `csharp-update` 分支
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -217,7 +227,9 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     cache_path: /github/workspace/mirror-repo-cache
 ```
 
-### 删除目的端仓库上的某个标签：
+### 删除目的端仓库上的某个标签
+
+删除 git@gitee.com:kuxiade/vscode-dev-containers.git 上的 `v0.150.0` 标签
 
 $ cat .github/workflows/repo-sync-action-cache-test.yml
 ```yaml
@@ -247,7 +259,7 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 ## 特别说明
 
-1. 本仓库 [action - kuxiade/hello-world-docker-action](https://github.com/kuxiade/hello-world-docker-action) 作为 action 时，必需的有效文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。
+1. 本仓库 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) 作为 action 时，必需的有效文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。
 
 2. `.github/workflows` 目录下的 .yml 或 .yaml 文件就是示例工作流程文件，其作为测试该仓库作为 action 工作时是否有效，可以删除 `.github/workflows` 下的所有文件，或者直接删除 `.github` 文件夹，这样做不会影响该仓库作为 action 的功能。
 
