@@ -286,6 +286,7 @@ git push --mirror
 
 
 ### 对于推送，有下面四种方法
+## 以下几种方法可能都无法将本地的'默认分支指定'也推送到远程，远程默认分支直接被gitee设置master或main了。待确认。
 ## 方法一：镜像克隆且镜像推送整个仓库，这个应该是同步的最完整的方式了。
 git clone --mirror "$SOURCE_REPO"
 git remote set-url --push origin "$DESTINATION_REPO"
@@ -304,18 +305,32 @@ git push --mirror
 # git push origin refs/tags/*:refs/tags/* --all --prune
 # 下面这种方法就是只推送所有分支到远程：
 git clone "$SOURCE_REPO"
+# git clone默认会把远程仓库整个给clone下来，但只会在本地默认创建一个master分支
+# 想要把其他分支取到本地需要执行下面的命令：git checkout -b <branch>
+# 所以，从GitHub上git clone代码，尽管克隆了整个仓库，但是其他分支没有取回本地并创建，这时候再推送到gitee上，
+# 实际上只推送了一个分支，其他分支没有推送到gitee，就因为本地此时也只有一个分支。
+# 要解决此问题，方法为一次性拉取该仓库的所有分支，命令如下：
+# 参考链接：https://blog.csdn.net/weixin_41287260/article/details/98987135
+for b in $(git branch -r | grep -v -- '->'); do git branch --track "${b##origin/}" "$b"; done
+# 运行上一条命令后，使用 git branch -v 即可看到所有远程分支都取回到本地了。
 git remote set-url --push origin "$DESTINATION_REPO"
 git fetch -p origin
 # push 使用了 --all 或者 --tags 时，那么前面克隆时就不能使用 --mirror 做镜像克隆，应使用普通克隆，因为三者不兼容。
-git push origin --all --prune
+# 推送本地的所有分支到远程，注意，这里是本地的分支，没有取回到本地的分支是不会推送的。
+# 由于普通克隆到本地的仓库中并不含有 refs/pull/*，因此下面的两条命令似乎可以使用 git push --mirror 代替。
+git push origin --all --prune --force
+# 推送所有标签到远程
+git push origin --tags --prune --force
 
-## 方法三：普通克隆，然后再推送所有分支及所有标签到远程仓库，分支和标签都同步了，相对比方法二只使用 --all 完整，但依然没有方法一使用 --mirror 来的完整。
+## 方法三：普通克隆，然后再推送所有分支及所有标签到远程仓库，分支和标签都同步了，和方法二效果差不多，但依然没有方法一使用 --mirror 来的完整。
 # --tags 表示推送所有标签（tag），类似于 refs/tags/*:refs/tags/*。--tags 可以与其他的 <refspec> 一起使用。
 git clone "$SOURCE_REPO"
 git remote set-url --push origin "$DESTINATION_REPO"
 git fetch -p origin
+# 需要删除 remotes/origin/HEAD，不然推送到目的端时，会创建一个HEAD分支。待确定该如何设置
+git remote set-head origin --delete
 # push 使用了 --all 或者 --tags 时，那么前面克隆时就不能使用 --mirror 做镜像克隆，应使用普通克隆，因为三者不兼容。
-git push origin refs/remotes/origin/*:refs/heads/* --tags --prune
+git push origin refs/remotes/origin/*:refs/heads/* --tags --prune --force
 
 ## 方法四：
 # 标记灵活，可以实现指定推送
