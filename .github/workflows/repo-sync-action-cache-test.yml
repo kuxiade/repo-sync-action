@@ -84,6 +84,7 @@ jobs:
           request_tool: "curl"
 
       - name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
+        continue-on-error: true
         uses: ./.
         env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
