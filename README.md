@@ -48,7 +48,7 @@
 
 4. 将 SSH 公钥分别添加到源端平台（如 GitHub）和目的端平台（如 Gitee），这样，就能把 GitHub 虚拟环境作为中转站来从源端平台（如 GitHub）同步仓库到目的端平台（如 Gitee）了。
 
-5. 参照示例工作流文件[repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml)的模式，新建用户自己的工作流文件（可直接将示例工作流文件[repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml)中的内容复制到用户自己的工作流文件中），将用户自己的工作流文件中的源端和目的端设置为用户所需的账号即可。
+5. 参照示例工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 的模式，新建用户自己的工作流文件（可直接将示例工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的内容复制到用户自己的工作流文件中），将用户自己的工作流文件中的源端和目的端设置为用户所需的账号即可。
 
 
 ## 参数配置
