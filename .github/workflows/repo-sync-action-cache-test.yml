@@ -115,7 +115,7 @@ jobs:
           # 需要被同步的源端仓库
           src_repo_url: "git@github.com:Yikun/hub-mirror-action.git"
           # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:kuxiade/hub -mirror-action.git"
+          dst_repo_url: "git@gitee.co m:kuxiade/hub-mirror-action.git"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           cache_path: /github/workspace/mirror-repo-cache
 
