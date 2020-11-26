@@ -431,13 +431,13 @@ entrypoint_main() {
     
     ssh_config
 
-    echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url BEGIN------------------->"
-    check_overall_validity_of_url SRC_REPO_URL
-    echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url END--------------------->\n"
+    # echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url BEGIN------------------->"
+    # check_overall_validity_of_url SRC_REPO_URL
+    # echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
-    echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url BEGIN------------------->"
-    check_overall_validity_of_url DST_REPO_URL
-    echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
+    # echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url BEGIN------------------->"
+    # check_overall_validity_of_url DST_REPO_URL
+    # echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
     # 是否删除缓存目录
     #remove_cache_dir_flag="true"
