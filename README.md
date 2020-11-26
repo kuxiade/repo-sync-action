@@ -24,7 +24,7 @@
 
 ## 特别说明
 
-1. 本仓库作为 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
+1. 本仓库 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) 作为 Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
 
 2. `.github/workflows` 目录下面的 .yml 或 .yaml 文件就是该 Action 的示例工作流程文件，其作为测试该仓库作为 Action 工作时是否有效，可以删除 `.github/workflows` 下的所有文件，或者直接删除 `.github` 文件夹，这样做不会影响该仓库作为 Action 的功能。
 
