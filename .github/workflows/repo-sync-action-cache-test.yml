@@ -33,6 +33,7 @@ jobs:
         run: |
           pwd
           ls -la
+          echo ${{ github.workspace }}
           ls -la ${{ github.workspace }}
 
       - name: Checkout source codes
@@ -64,6 +65,14 @@ jobs:
       - name: Print the cache status
         if: steps.cacheSrcRepos.outputs.cache-hit == 'true'
         run: echo "Cached successfully."
+
+      - name: b Print pre-cache path
+        # 运行时展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
+        run: |
+          pwd
+          ls -la
+          echo ${{ github.workspace }}
+          ls -la ${{ github.workspace }}
 
       - name: Mirror Github:wearerequired/git-mirror-action to Gitee with repo-sync-action
         uses: ./.
@@ -134,10 +143,12 @@ jobs:
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           cache_path: /github/workspace/mirror-repo-cache
 
-      - name: a Print post-cache path
+      - name: c Print post-cache path
         # 运行时展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
         run: |
           pwd
           ls -la
+          echo ${{ github.workspace }}
           ls -la ${{ github.workspace }}
+          echo ${{ github.workspace }}/mirror-repo-cache
           ls -la ${{ github.workspace }}/mirror-repo-cache
