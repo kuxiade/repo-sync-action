@@ -38,14 +38,15 @@
 ## 简单使用
 
 请自己新建一个仓库（按个人所需来新建或者复制 [工作流文件.yml](./.github/workflows/) 到你自己的仓库的 .github/workflows/ 目录下）。
+1. 请用户自行新建一个仓库，将其作为**同步git仓库**的专用仓库。
 
-1. 基于 SSH 配置公钥和私钥。
+2. 基于 SSH 配置公钥和私钥。
 
-2. 将私钥仓库上：通过仓库设置中的 Secrets 创建一个 `GITEE_PRIVATE_SSH_KEY` （名称可以自己取，符合规范即可）变量，将私钥内容拷贝到值区域。
+3. 将私钥添加到步骤1新建的仓库设置中：通过仓库设置中的 Secrets 创建一个 `GITEE_PRIVATE_SSH_KEY` （名称可以自己取，符合规范即可）变量，将私钥内容拷贝到值区域。
 
-3. 将 SSH 公钥分别添加到源端平台（如 GitHub）和目的端平台（如 Gitee），这样，就能把 GitHub 虚拟环境作为中转站来从源端平台（如 GitHub）同步仓库到目的端平台（如 Gitee）了。
+4. 将 SSH 公钥分别添加到源端平台（如 GitHub）和目的端平台（如 Gitee），这样，就能把 GitHub 虚拟环境作为中转站来从源端平台（如 GitHub）同步仓库到目的端平台（如 Gitee）了。
 
-4. 参照本仓库的工作流文件模式，将你自己新建仓库的工作流文件中的源端和目的端设置为你所需的账号即可。
+5. 参照本仓库的工作流文件模式，将你自己新建仓库的工作流文件中的源端和目的端设置为你所需的账号即可。
 
 
 ## 参数配置
@@ -60,7 +61,7 @@
 
 >注意：action 的虚拟机通过私钥和 Gitee 的公钥进行用户验证，验证通过即可通信。这里的公钥和私钥为一对密钥对，可以使用 `ssh-keygen` 命令生成
 
->注意：其实，上面步骤1中不需要将公钥添加到 Github 的可信名单里，为了本地和GitHub免密上下载代码，添加公钥到GitHub更好。
+>注意：其实，上面步骤1中如果不将公钥添加到 Github 的可信名单里，则无法免密上下载私有库代码，添加公钥到GitHub更好。
 
 这样子，每次 pull 之后，github 的源端仓库会自动推送到 gitee 的目的仓库。这里多加了时间触发，到某个时间会自动同步。
 
@@ -68,7 +69,7 @@
 
 相互通信的简单示意图如下：
 
-`GitHub(SSH private key)` --------> `虚拟机`(从 GitHub 获取到 SSH private key 并复制为自己的 SSH private key) <----(通过相对应的 SSH key 公私密钥对来相互通信)----> `Gitee(SSH public key)`
+`GitHub(repository secret -> SSH private key)` --------> `虚拟机`(从 GitHub repository secret 获取到 SSH private key 并复制为自己的 SSH private key) <----(通过相对应的 SSH key 公私密钥对来相互通信)----> `Gitee(SSH public key)`
 
 ### `src_repo_url`(必需)
 
