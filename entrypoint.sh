@@ -440,7 +440,7 @@ entrypoint_main() {
     echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
     # 是否删除缓存目录
-    remove_cache_dir_flag="true"
+    #remove_cache_dir_flag="true"
     remove_cache_dir_flag=${remove_cache_dir_flag:-"false"}
     # 删除缓存目录
     if [ -d "$CACHE_PATH" ] && [[ "$remove_cache_dir_flag" == "true" ]]; then
@@ -455,7 +455,7 @@ entrypoint_main() {
     SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$SRC_REPO_URL")
     SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
     # 注释掉下面这行，则使用普通克隆，否则使用镜像克隆。
-    #GIT_CLONE_TYPE="mirror"
+    GIT_CLONE_TYPE="mirror"
     GIT_CLONE_TYPE=${GIT_CLONE_TYPE:-"normal"}
     if [[ "$GIT_CLONE_TYPE" == "mirror" ]]; then
         # 使用镜像克隆/推送
