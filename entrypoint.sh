@@ -467,19 +467,19 @@ entrypoint_main() {
             if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color green "The repo url of pre-fetch matches the src repo url."
-                git fetch -p origin || echo_color red "error for 'git fetch -p origin'";exit 1
+                git fetch -p origin || (echo_color red "error for 'git fetch -p origin'";exit 1)
             elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
                 cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
                 echo_color cyan "--------> git clone --mirror..."
-                git clone --mirror "$SRC_REPO_URL" || echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1
+                git clone --mirror "$SRC_REPO_URL" || (echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1)
                 cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
                 echo_color yellow "current dir is not a git repo!"
                 cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
                 echo_color cyan "--------> git clone --mirror..."
-                git clone --mirror "$SRC_REPO_URL" || echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1
+                git clone --mirror "$SRC_REPO_URL" || (echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1)
                 cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
             fi
 
@@ -487,14 +487,14 @@ entrypoint_main() {
         else
             echo_color red "no '$SRC_REPO_DIR_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
             echo_color cyan "--------> git clone --mirror..."
-            git clone --mirror "$SRC_REPO_URL" || echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1
+            git clone --mirror "$SRC_REPO_URL" || (echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1)
             cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
         fi
 
         git remote set-url --push origin "$DST_REPO_URL"
         git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
         echo_color cyan "--------> git push --mirror..."
-        git push --mirror || echo_color red "error for 'git push --mirror'";exit 1
+        git push --mirror || (echo_color red "error for 'git push --mirror'";exit 1)
     elif [[ "$GIT_CLONE_TYPE" == "normal" ]]; then
         # 使用普通克隆/推送
         if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
@@ -505,19 +505,19 @@ entrypoint_main() {
             if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color green "The repo url of pre-fetch matches the src repo url."
-                git pull --prune || echo_color red "error for 'git pull --prune'";exit 1
+                git pull --prune || (echo_color red "error for 'git pull --prune'";exit 1)
             elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
                 echo_color green "current dir is a git repo!"
                 echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
                 cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
                 echo_color cyan "--------> git clone..."
-                git clone "$SRC_REPO_URL" || echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1
+                git clone "$SRC_REPO_URL" || (echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1)
                 cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
                 echo_color yellow "current dir is not a git repo!"
                 cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
                 echo_color cyan "--------> git clone..."
-                git clone "$SRC_REPO_URL" || echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1
+                git clone "$SRC_REPO_URL" || (echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1)
                 cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             fi
 
@@ -525,7 +525,7 @@ entrypoint_main() {
         else
             echo_color red "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
             echo_color cyan "--------> git clone..."
-            git clone "$SRC_REPO_URL" || echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1
+            git clone "$SRC_REPO_URL" || (echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1)
             cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
         fi
 
@@ -617,14 +617,14 @@ entrypoint_main() {
         fi
         # 推送分支
         git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}" \
-        || echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1
+        || (echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1)
         echo_color cyan "--------> git push tags..."
         if [[ "$remove_tag" == "true" ]]; then
             echo_color yellow "remove $DST_REPO_TAG tag for $DST_REPO_URL."
         fi
         # 推送标签
         git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
-        || echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1
+        || (echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1)
     fi
 
 }
