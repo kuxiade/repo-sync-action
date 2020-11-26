@@ -55,7 +55,7 @@
 
 ### `SSH_PRIVATE_KEY`(必需)
 
-环境变量，用于目的端上传代码的SSH key，用于上传代码。
+环境变量，用于目的端上传代码的SSH key，用于上传代码。使用 SSH 协议可以连接远程服务器和服务并向它们验证。 利用 SSH 密钥可以连接 GitHub/Gitee，而无需在每次访问时都提供用户名和个人访问令牌。可参考：[服务器上的-Git-生成-SSH-公钥](https://git-scm.com/book/zh/v2/服务器上的-Git-生成-SSH-公钥) 和 [使用 SSH 连接到 GitHub](https://help.github.com/articles/generating-ssh-keys)
 
 1. 我们需要使用 `ssh-keygen` 命令生成一对公钥和私钥，注意命名，然后将公钥（***.pub）的内容添加到 `Github` 和 `Gitee` 的可信名单里。
 
