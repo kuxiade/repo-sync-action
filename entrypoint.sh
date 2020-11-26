@@ -485,7 +485,7 @@ entrypoint_main() {
 
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
         else
-            echo_color red "no '$SRC_REPO_DIR_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
+            echo_color yellow "no '$SRC_REPO_DIR_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
             echo_color cyan "--------> git clone --mirror..."
             git clone --mirror "$SRC_REPO_URL" || (echo_color red "error for 'git clone --mirror $SRC_REPO_URL'";exit 1)
             cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
@@ -523,7 +523,7 @@ entrypoint_main() {
 
             echo_color purple "<-------------------SRC_REPO_URL check_validity_of_current_dir_as_git_repo END--------------------->\n"
         else
-            echo_color red "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
+            echo_color yellow "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $SRC_REPO_URL' cache\n"
             echo_color cyan "--------> git clone..."
             git clone "$SRC_REPO_URL" || (echo_color red "error for 'git clone $SRC_REPO_URL'";exit 1)
             cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
