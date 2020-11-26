@@ -31,10 +31,10 @@ jobs:
       - name: a Print pre-cache path
         # 运行时展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
         run: |
-          pwd
+          echo "ls -la" $PWD
           ls -la
           echo ""
-          echo ${{ github.workspace }}
+          echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
 
       - name: Checkout source codes
@@ -70,10 +70,10 @@ jobs:
       - name: b Print pre-cache path
         # 运行时展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
         run: |
-          pwd
+          echo "ls -la" $PWD
           ls -la
           echo ""
-          echo ${{ github.workspace }}
+          echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
 
       - name: Mirror Github:wearerequired/git-mirror-action to Gitee with repo-sync-action
@@ -148,11 +148,11 @@ jobs:
       - name: c Print post-cache path
         # 运行时展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
         run: |
-          pwd
+          echo "ls -la" $PWD
           ls -la
           echo ""
-          echo ${{ github.workspace }}
+          echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
           echo ""
-          echo ${{ github.workspace }}/mirror-repo-cache
+          echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
           ls -la ${{ github.workspace }}/mirror-repo-cache
