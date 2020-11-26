@@ -80,23 +80,23 @@
 
 ### `src_repo_branch`(可选)
 
-需要被同步的源端仓库中的分支，格式可以为 "dev" 或者 "refs/remotes/origin/dev"。默认值为 "refs/remotes/origin/*"，表示所有分支。
+需要被同步的源端仓库中的分支，格式只能为 "dev" 或者 "refs/remotes/origin/dev"，表示 dev 分支，'dev' 可以替换为其他分支名。默认值为 "refs/remotes/origin/*"，表示所有分支。
 
 ### `dst_repo_branch`(可选)
 
-需要同步到的目的端仓库中的分支，格式可以为 "dev" 或者 "refs/remotes/origin/dev"。默认值为 "refs/heads/*"，表示所有分支。
+需要同步到的目的端仓库中的分支，格式只能为 "dev" 或者 "refs/heads/dev"，表示 dev 分支，'dev' 可以替换为其他分支名。默认值为 "refs/heads/*"，表示所有分支。
 
 > 注意， `src_repo_branch` 和 `dst_repo_branch` 均为默认值时，表示同步所有分支。
 
-> 注意，当 `src_repo_branch` 为 "" 而 `dst_repo_branch` 为 "dev" 或者 "refs/remotes/origin/dev" 时，表示删除目的端仓库的 `dev` 分支。
+> 注意，当 `src_repo_branch` 为 "" 而 `dst_repo_branch` 为 "dev" 或者 "refs/heads/dev" 时，表示删除目的端仓库的 `dev` 分支。
 
 ### `src_repo_tag`(可选)
 
-需要被同步的源端仓库中的标签，格式可以为 "v1" 或者 "refs/tags/v1"。默认值为 "refs/tags/*"，表示所有标签。
+需要被同步的源端仓库中的标签，格式只能为 "v1" 或者 "refs/tags/v1"，表示 v1 标签，'v1' 可以替换为其他标签名。默认值为 "refs/tags/*"，表示所有标签。
 
 ### `dst_repo_tag`(可选)
 
-需要同步到的目的端仓库中的标签，格式可以为 "v1" 或者 "refs/tags/v1"。默认值为 "refs/tags/*"，表示所有标签。
+需要同步到的目的端仓库中的标签，格式只能为 "v1" 或者 "refs/tags/v1"，表示 v1 标签，'v1' 可以替换为其他标签名。默认值为 "refs/tags/*"，表示所有标签。
 
 > 注意， `src_repo_tag` 和 `dst_repo_tag` 均为默认值时，表示同步所有标签。
 
@@ -104,11 +104,13 @@
 
 ### `cache_path`(可选)
 
+默认值为 '/github/workspace/mirror-repo-cache'
+
 `cache_path` 选项需要搭配 [actions/cache](https://github.com/actions/cache) 使用，配置后会对同步的仓库内容进行缓存，缩短仓库同步时间。有关缓存相关，请阅读[缓存依赖项以加快工作流程](https://docs.github.com/cn/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows)
 
 ### `request_tool`(可选)
 
-判断仓库是否存在所使用的工具，其值必须为 "git" 或者 "curl"，默认值为 "git"。由于 curl 访问 GitHub API 在单位时间内有次数限制，故最好使用默认值，即不要设置该参数为 "curl"。
+判断仓库是否存在所使用的工具，其值必须为 "git" 或者 "curl"，默认值为 "git"。由于 curl 访问 GitHub API 在单位时间内有次数限制，其功能代码仅作参考。故最好使用默认值，即不要设置该参数为 "curl"。
 
 ### `errexit_flag`(可选)
 
