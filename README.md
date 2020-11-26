@@ -1,6 +1,6 @@
 # 目录
 
-- [一些说明](#一些说明)
+- [特别说明](#特别说明)
 - [简单使用](#简单使用)
 - [参数配置](#参数配置)
   - [`SSH_PRIVATE_KEY`(必需)](#SSH_PRIVATE_KEY必需)
@@ -20,16 +20,19 @@
   - [单标签同步](#单标签同步)
   - [删除目的端仓库上的某个分支](#删除目的端仓库上的某个分支)
   - [删除目的端仓库上的某个标签](#删除目的端仓库上的某个标签)
-- [特别说明](#特别说明)
 - [参考资料](#参考资料)
 
-## 一些说明
+## 特别说明
 
-1. 本仓库作为 Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
+1. 本仓库作为 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
 
-2. `.github/workflows` 目录下面的 .yml 或 .yaml 文件就是该 Action 的示例工作流程文件，其作为测试该仓库作为 Action 工作时是否有效，可删除。
+2. `.github/workflows` 目录下面的 .yml 或 .yaml 文件就是该 Action 的示例工作流程文件，其作为测试该仓库作为 Action 工作时是否有效，可以删除 `.github/workflows` 下的所有文件，或者直接删除 `.github` 文件夹，这样做不会影响该仓库作为 Action 的功能。
 
-3. 该 GitHub Action 使用 SSH 方式将源端平台（如 GitHub）上的仓库克隆到 GitHub 的虚拟环境中，然后再通过 SSH 方式将虚拟环境中的仓库推送到目的端平台（如 Gitee）上。
+3. `doc` 文件夹下的文件作为补充文档，对创建 action 来说非必需，同样可以删除 doc 文件夹。
+
+4. `README.md` 作为说明文档，对创建 action 来说非必需，一样可以删除。不过说明文档还是非常重要的，方便其他用户参照使用该 Action。
+
+5. 该 GitHub Action 使用 SSH 方式将源端平台（如 GitHub）上的仓库克隆到 GitHub 的虚拟环境中，然后再通过 SSH 方式将虚拟环境中的仓库推送到目的端平台（如 Gitee）上。
 
    由于克隆和推送都使用了 SSH 方式，因此，凡是使用了该 Action 的工作流，其所在的仓库必须在仓库 Settings -> Secrets -> New repository secret，将 SSH 私钥添加到其中。
 
@@ -258,16 +261,6 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
     cache_path: /github/workspace/mirror-repo-cache
 ```
-
-## 特别说明
-
-1. 本仓库 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) 作为 action 时，必需的有效文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。
-
-2. `.github/workflows` 目录下的 .yml 或 .yaml 文件就是示例工作流程文件，其作为测试该仓库作为 action 工作时是否有效，可以删除 `.github/workflows` 下的所有文件，或者直接删除 `.github` 文件夹，这样做不会影响该仓库作为 action 的功能。
-
-3. doc 文件夹下的文件作为补充文档，对创建 action 来说非必需，同样可以删除 doc 文件夹。
-
-4. README.md 作为说明文档，对创建 action 来说非必需，一样可以删除。不过说明文档还是非常重要的，方便其他用户参照使用该 action。
 
 ## 参考资料
 
