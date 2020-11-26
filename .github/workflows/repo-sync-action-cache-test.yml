@@ -33,6 +33,7 @@ jobs:
         run: |
           pwd
           ls -la
+          echo ""
           echo ${{ github.workspace }}
           ls -la ${{ github.workspace }}
 
@@ -71,6 +72,7 @@ jobs:
         run: |
           pwd
           ls -la
+          echo ""
           echo ${{ github.workspace }}
           ls -la ${{ github.workspace }}
 
@@ -148,7 +150,9 @@ jobs:
         run: |
           pwd
           ls -la
+          echo ""
           echo ${{ github.workspace }}
           ls -la ${{ github.workspace }}
+          echo ""
           echo ${{ github.workspace }}/mirror-repo-cache
           ls -la ${{ github.workspace }}/mirror-repo-cache
