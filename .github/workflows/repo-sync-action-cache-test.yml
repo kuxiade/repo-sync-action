@@ -3,7 +3,7 @@ name: Test repo-sync-action with cache
 on:
   # push推送时触发
   push:
-    branches: [ main-mini ]
+    branches: [ main ]
     # 匹配到该路径的文件有push时触发
     paths:
       # .github/workflows/ 目录下的文件有推送提交时，工作流触发
