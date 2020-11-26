@@ -431,6 +431,7 @@ entrypoint_main() {
     
     ssh_config
 
+    # 提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错
     # echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url BEGIN------------------->"
     # check_overall_validity_of_url SRC_REPO_URL
     # echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url END--------------------->\n"
@@ -439,7 +440,7 @@ entrypoint_main() {
     # check_overall_validity_of_url DST_REPO_URL
     # echo_color purple "<-------------------DST_REPO_URL check_overall_validity_of_url END--------------------->\n"
 
-    # 是否删除缓存目录
+    # 是否删除缓存目录，取消注释的话则会删除缓存目录
     #remove_cache_dir_flag="true"
     remove_cache_dir_flag=${remove_cache_dir_flag:-"false"}
     # 删除缓存目录
