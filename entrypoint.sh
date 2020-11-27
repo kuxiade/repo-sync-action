@@ -268,7 +268,11 @@ check_existence_of_url_for_hub_with_curl() {
         local access_token="$GITEE_ACCESS_TOKEN"
         # 下面request_url中，只在$access_token的'授权账户'与'需要验证存在性的仓库的所有者所属的账户'一致时，才需要加上 ?access_token=$access_token。
         # 不一致时，也就表明'需要验证存在性的仓库的所有者所属的账户'并非'授权账户'，无法查看私有仓库且无法突破访问次数限制。故，放弃该方法。
-        local request_url="$request_url_prefix/$url_repoowner/$url_reponame?access_token=$access_token"
+        if [ -n "$access_token" ]; then
+            local request_url="$request_url_prefix/$url_repoowner/$url_reponame?access_token=$access_token"
+        else
+            local request_url="$request_url_prefix/$url_repoowner/$url_reponame"
+        fi
         local curl_options=(-f -X GET -H 'Content-Type: application/json;charset=UTF-8')
     elif [[ "$url_hub_type" == "github" ]]; then
         local request_url_prefix="https://api.github.com/repos"
@@ -276,7 +280,12 @@ check_existence_of_url_for_hub_with_curl() {
         # 下面request_url中，只在$access_token的'授权账户'与'需要验证存在性的仓库的所有者所属的账户'一致时，才需要加上 ?access_token=$access_token。
         # 不一致时，也就表明'需要验证存在性的仓库的所有者所属的账户'并非'授权账户'，无法查看私有仓库且无法突破访问次数限制。故，放弃该方法。
         local request_url="$request_url_prefix/$url_repoowner/$url_reponame"
-        local curl_options=(-f -X GET -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/vnd.github.v3+json' -H "Authorization: token $access_token")
+        if [ -n "$access_token" ]; then
+            local curl_options=(-f -X GET -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/vnd.github.v3+json' -H "Authorization: token $access_token")
+        else
+            local curl_options=(-f -X GET -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/vnd.github.v3+json')
+        fi
+        
     fi
 
     echo "request_url = $request_url"
