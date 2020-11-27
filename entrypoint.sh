@@ -352,16 +352,16 @@ check_existence_of_url_for_hub() {
     # 判断远程仓库是否存在时使用的命令工具，可以为 git 或 curl。
     local request_tool
     # 注释掉下面这行的话，则 request_tool 默认使用 git。
-    request_tool="curl"
+    #request_tool="curl"
     request_tool=${request_tool:-"git"}
     if [[ "$request_tool" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
-        echo_color green "Use curl to check the existence of url for hub"
+        echo_color green "Use 'curl' to check the existence of url for hub"
         check_existence_of_url_for_hub_with_curl "$hub_repo_url_var"
     elif [[ "$request_tool" == "git" ]]; then
-        echo_color green "Use git to check the existence of url for hub"
+        echo_color green "Use 'git' to check the existence of url for hub"
         check_existence_of_url_for_hub_with_git "$hub_repo_url_var"
     else
-        echo_color yellow "request_tool unknown! must be git or curl."
+        echo_color yellow "'request_tool' unknown! must be 'git' or 'curl'."
         exit 0
     fi
 }
