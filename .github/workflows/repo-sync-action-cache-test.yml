@@ -28,6 +28,12 @@ jobs:
     name: Run test
     runs-on: ubuntu-latest
     steps:
+      - name: a Print sys-release
+        run: |
+          echo "Print sys-release"
+          cat /etc/*-release
+          echo ""
+
       - name: a Print pre-cache path
         # 此时还没有取回上一次的缓存到指定的 'steps.cacheSrcRepos.with.path' 中
         run: |
@@ -66,6 +72,12 @@ jobs:
       - name: Print the cache status
         if: steps.cacheSrcRepos.outputs.cache-hit == 'true'
         run: echo "Cached successfully."
+
+      - name: b Print sys-release
+        run: |
+          echo "Print sys-release"
+          cat /etc/*-release
+          echo ""
 
       - name: b Print post-cache path - Last time cache
         # 此时已经取回了上一次的缓存到指定的 'steps.cacheSrcRepos.with.path' 中
