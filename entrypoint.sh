@@ -444,7 +444,7 @@ entrypoint_main() {
     ssh_config
 
     # 提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错
-    process_error_in_advance_flag="true"
+    #process_error_in_advance_flag="true"
     process_error_in_advance_flag=${process_error_in_advance_flag:-"false"}
     if [[ "$process_error_in_advance_flag" == "true" ]]; then
         echo_color purple "<-------------------SRC_REPO_URL check_overall_validity_of_url BEGIN------------------->"
