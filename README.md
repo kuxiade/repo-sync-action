@@ -2,6 +2,10 @@
 
 - [特别说明](#特别说明)
 - [简单使用](#简单使用)
+- [特殊变量](#特殊变量)
+  - [`request_tool`(仅作参考)](#`request_tool`仅作参考)
+  - [`remove_cache_dir_flag`(仅作参考)](#`remove_cache_dir_flag`仅作参考)
+  - [`git_clone_type`(仅作参考)](#`git_clone_type`仅作参考)
 - [参数配置](#参数配置)
   - [`SSH_PRIVATE_KEY`(必需)](#SSH_PRIVATE_KEY必需)
   - [`src_repo_url`(必需)](#src_repo_url必需)
@@ -11,7 +15,6 @@
   - [`src_repo_tag`(可选)](#src_repo_tag可选)
   - [`dst_repo_tag`(可选)](#dst_repo_tag可选)
   - [`cache_path`(可选)](#cache_path可选)
-  - [`request_tool`(可选)](#request_tool可选)
   - [`errexit_flag`(可选)](#errexit_flag可选)
   - [`xtrace_debug`(可选)](#xtrace_debug可选)
 - [示例workflow](#示例workflow)
@@ -50,6 +53,21 @@
 
 5. 参照示例工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 的模式，新建用户自己的工作流文件（可直接将示例工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的内容复制到用户自己的工作流文件中），将用户自己的工作流文件中的源端和目的端设置为用户所需的账号即可。
 
+## 特殊变量
+
+`特殊变量`只作为仓库开发者测试部分功能时使用的，用户不需要关注这个，仅作参考或者请忽略。
+
+### `request_tool`(仅作参考)
+
+request_tool 变量位于 check_existence_of_url_for_hub 函数内，判断远程仓库是否存在时使用的命令工具，其值只能为 "git" 或 "curl"。
+
+### `remove_cache_dir_flag`(仅作参考)
+
+remove_cache_dir_flag 变量位于 entrypoint_main 函数内，用于判断是否删除缓存目录，其值只能为 "true" 或 "false"。
+
+### `git_clone_type`(仅作参考)
+
+git_clone_type 变量位于 entrypoint_main 函数内，克隆时使用的方式（镜像克隆或者普通克隆），其值只能为 "mirror" 或 "normal"。
 
 ## 参数配置
 

@@ -472,9 +472,9 @@ entrypoint_main() {
     SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$SRC_REPO_URL")
     SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
     # 注释掉下面这行，则使用普通克隆，否则使用镜像克隆。
-    #GIT_CLONE_TYPE="mirror"
-    GIT_CLONE_TYPE=${GIT_CLONE_TYPE:-"normal"}
-    if [[ "$GIT_CLONE_TYPE" == "mirror" ]]; then
+    #git_clone_type="mirror"
+    git_clone_type=${git_clone_type:-"normal"}
+    if [[ "$git_clone_type" == "mirror" ]]; then
         # 使用镜像克隆/推送
         if [ -d "$SRC_REPO_DIR_DOTGIT_OF_URL" ] ; then
             cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
@@ -512,7 +512,7 @@ entrypoint_main() {
         git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
         echo_color cyan "--------> git push --mirror..."
         git push --mirror || (echo_color red "error for 'git push --mirror'";exit 1)
-    elif [[ "$GIT_CLONE_TYPE" == "normal" ]]; then
+    elif [[ "$git_clone_type" == "normal" ]]; then
         # 使用普通克隆/推送
         if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
             cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
