@@ -80,7 +80,7 @@ check_spaces_in_string() {
     if [[ "$1" =~ \ |\' ]]    #  slightly more readable: if [[ "$string" =~ ( |\') ]]
     then
         echo_color red "There are spaces in the string:'$1'."
-        exit 0
+        exit 1
     else
         echo_color green "There are not spaces in the string:'$1'."
     fi
@@ -107,7 +107,7 @@ check_hub_type_for_url() {
         url_hub_type="github"
     else
         echo_color red "$1 is unknow the hub type."
-        exit 0
+        exit 1
     fi
 
     echo "$url_hub_type"
@@ -126,7 +126,7 @@ check_protocol_type_for_url() {
         url_protocol_type="SSH"
     else
         echo_color red "$1 is unknow the protocol type."
-        exit 0
+        exit 1
     fi
 
     echo "$url_protocol_type"
@@ -146,7 +146,7 @@ get_repoowner_from_url() {
         ownername_reponame_maybe_dotgit_in_repourl="${1#git@github.com:}"
     else
         echo_color red "$1 is unknow the protocol type."
-        exit 0
+        exit 1
     fi
 
     # 或许也可以考虑使用 dirname 命令来得到 repoowner：
@@ -185,7 +185,7 @@ get_reponame_from_url() {
         ownername_reponame_in_repourl="${1#git@github.com:}"
     else
         echo_color red "$1 is unknow the protocol type."
-        exit 0
+        exit 1
     fi
 
     # 这里其实可以使用 basename 命令来得到 reponame：
@@ -206,7 +206,7 @@ check_validity_of_repoowner_adapt_gitee() {
         echo_color green "Gitee repo: The format of the repoowner:'$1' is right."
     else
         echo_color red "Gitee repo: The format of the repoowner:'$1' is wrong."
-        exit 0
+        exit 1
     fi
 }
 
@@ -216,13 +216,13 @@ check_validity_of_reponame_adapt_github() {
     # 注意，github 仓库名不能是一个或者两个英文句号(.)，可以为至少三个英文句号(.)。
     if [[ "$1" == "." ]] || [[ "$1" == ".." ]]; then
         echo_color red "Github repo: The format of the repoName:'$1' is wrong."
-        exit 0
+        exit 1
     else
         if echo "$1" | grep -Eq "^[a-zA-Z0-9._-][a-zA-Z0-9._-]*$"; then
             echo_color green "Github repo: The format of the repoName:'$1' is right."
         else
             echo_color red "Github repo: The format of the repoName:'$1' is wrong."
-            exit 0
+            exit 1
         fi
     fi
 }
@@ -234,7 +234,7 @@ check_validity_of_reponame_adapt_gitee() {
         echo_color green "Gitee repo: The format of the repoName:'$1' is right."
     else
         echo_color red "Gitee repo: The format of the repoName:'$1' is wrong."
-        exit 0
+        exit 1
     fi
 }
 
@@ -297,14 +297,14 @@ check_existence_of_url_for_hub_with_curl() {
         if content_get_from_request_url=$(curl "${curl_options[@]}" "$request_url"); then
             exit_status_code_flag=$?
             echo $exit_status_code_flag
-            echo "Success"
+            echo "Access Success"
             #echo "$content_get_from_request_url"
 
             if type jq > /dev/null 2>&1; then
                 repo_full_name_get_from_request_url=$(echo "$content_get_from_request_url" | jq '.full_name')
             else
                 echo_color red "There is no 'jq' command, please install it"
-                exit 0
+                exit 1
             fi
             
             echo "repo_full_name_get_from_request_url = $repo_full_name_get_from_request_url"
@@ -318,19 +318,22 @@ check_existence_of_url_for_hub_with_curl() {
         else
             exit_status_code_flag=$?
             echo "exit_status_code_flag = $exit_status_code_flag"
-            echo "Fail"
+            echo "Access Fail"
             #echo "$content_get_from_request_url"
             if [[ $exit_status_code_flag -eq 22 ]]; then
-                echo "HTTP 找不到网页，'$hub_repo_url_value' 可能是私有仓库或者不存在该仓库。"
+                echo_color red "HTTP 找不到网页，'$hub_repo_url_value' 可能是私有仓库或者不存在该仓库。"
+                exit 1
             elif [[ $exit_status_code_flag -eq 7 ]]; then
-                echo "$request_url 拒接连接，被目标服务器限流。"
+                echo_color red "$request_url 拒接连接，被目标服务器限流。"
+                exit 1
             else
-                echo "Curl: exit_status_code_flag = $exit_status_code_flag"
+                echo_color red "Curl: exit_status_code_flag = $exit_status_code_flag"
+                exit 1
             fi
         fi
     else
         echo_color red "There is no 'curl' command, please install it"
-        exit 0
+        exit 1
     fi
 }
 
@@ -346,11 +349,11 @@ check_existence_of_url_for_hub_with_git() {
             echo_color green "'$hub_repo_url_value' is existed as a remote repo on Hub"
         else
             echo_color red "'$hub_repo_url_value' is not existed as a remote repo on Hub"
-            exit 0
+            exit 1
         fi
     else
         echo_color red "There is no 'git' command, please install it"
-        exit 0
+        exit 1
     fi
 }
 
@@ -371,7 +374,7 @@ check_existence_of_url_for_hub() {
         check_existence_of_url_for_hub_with_git "$hub_repo_url_var"
     else
         echo_color yellow "'request_tool' unknown! must be 'git' or 'curl'."
-        exit 0
+        exit 1
     fi
 }
 
