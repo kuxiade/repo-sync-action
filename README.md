@@ -4,6 +4,7 @@
 - [简单使用](#简单使用)
 - [特殊变量](#特殊变量)
   - [`request_tool`(仅作参考)](#request_tool仅作参考)
+  - [`process_error_in_advance_flag`(仅作参考)](#process_error_in_advance_flag仅作参考)
   - [`remove_cache_dir_flag`(仅作参考)](#remove_cache_dir_flag仅作参考)
   - [`git_clone_type`(仅作参考)](#git_clone_type仅作参考)
 - [参数配置](#参数配置)
@@ -62,6 +63,10 @@
 ### `request_tool`(仅作参考)
 
 request_tool 变量位于 check_existence_of_url_for_hub 函数内，判断远程仓库是否存在时使用的命令工具，其值只能为 "git" 或 "curl"。
+
+### `process_error_in_advance_flag`(仅作参考)
+
+process_error_in_advance_flag 变量位于 entrypoint_main 函数内，值为 "true" 时用于提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错。其值只能为 "true" 或 "false"。
 
 ### `remove_cache_dir_flag`(仅作参考)
 
