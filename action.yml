@@ -28,9 +28,6 @@ inputs:
   cache_path:
     description: "The path to cache the source repos code."
     default: '/github/workspace/mirror-repo-cache'
-  request_tool:
-    description: "Tool for checking the existence of url for hub, must be git or curl."
-    default: 'git'
   errexit_flag:
     description: "Exit immediately if a simple command exits with a non-zero status, must be true or false. (use 'set -e', equivalent to 'set -o errexit')"
     default: true
@@ -48,6 +45,5 @@ runs:
     - ${{ inputs.dst_repo_branch }}
     - ${{ inputs.dst_repo_tag }}
     - ${{ inputs.cache_path }}
-    - ${{ inputs.request_tool }}
     - ${{ inputs.errexit_flag }}
     - ${{ inputs.xtrace_debug }}

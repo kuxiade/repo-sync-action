@@ -19,7 +19,6 @@ DST_REPO_URL="${INPUT_DST_REPO_URL}"
 DST_REPO_BRANCH="${INPUT_DST_REPO_BRANCH}"
 DST_REPO_TAG="${INPUT_DST_REPO_TAG}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
-REQUEST_TOOL="${INPUT_REQUEST_TOOL}"
 SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL="$(basename "$SRC_REPO_URL")"
 
 # 提示语句字体颜色设置
@@ -74,7 +73,6 @@ print_var_info() {
     echo "DST_REPO_URL=$DST_REPO_URL"
     echo "SRC_REPO_DIR_OF_URL=$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
     echo "CACHE_PATH=$CACHE_PATH"
-    echo "REQUEST_TOOL=$REQUEST_TOOL"
 }
 
 # 判断字符串中是否含有空格
@@ -351,13 +349,15 @@ check_existence_of_url_for_hub_with_git() {
 check_existence_of_url_for_hub() {
     local hub_repo_url_var="$1"
     #local hub_repo_url_value="${!hub_repo_url_var}"
-
-    echo "$GITEE_ACCESS_TOKEN" "damlsfg"
-    echo "$GITHUB_ACCESS_TOKEN" "sjfdkgl"
-    if [[ "$REQUEST_TOOL" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
+    # 判断远程仓库是否存在时使用的命令工具，可以为 git 或 curl。
+    local request_tool
+    # 注释掉下面这行的话，则 request_tool 默认使用 git。
+    request_tool="curl"
+    request_tool=${request_tool:-"git"}
+    if [[ "$request_tool" == "curl" ]] && [ -n "$GITEE_ACCESS_TOKEN" ] && [ -n "$GITHUB_ACCESS_TOKEN" ]; then
         echo_color green "Use curl to check the existence of url for hub"
         check_existence_of_url_for_hub_with_curl "$hub_repo_url_var"
-    elif [[ "$REQUEST_TOOL" == "git" ]]; then
+    elif [[ "$request_tool" == "git" ]]; then
         echo_color green "Use git to check the existence of url for hub"
         check_existence_of_url_for_hub_with_git "$hub_repo_url_var"
     else

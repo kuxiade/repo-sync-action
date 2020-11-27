@@ -97,7 +97,6 @@ jobs:
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: "/github/workspace/mirror-repo-cache"
-          request_tool: "curl"
 
       - name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
         # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
