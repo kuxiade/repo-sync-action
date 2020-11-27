@@ -1,11 +1,11 @@
-# 巧用 Github Action 同步代码到 Gitee
+## 巧用 Github Action 同步代码到 Gitee
 
 本文转载自 [Yikun/hub-mirror-action](https://github.com/Yikun/hub-mirror-action) 作者 Yikun 写的关于 Yikun/hub-mirror-action 的博客文章：[巧用Github Action同步代码到Gitee](http://yikun.github.io/2020/01/17/%E5%B7%A7%E7%94%A8Github-Action%E5%90%8C%E6%AD%A5%E4%BB%A3%E7%A0%81%E5%88%B0Gitee/)
 
-## 1. 背景
+### 1. 背景
 在开源贡献的代码托管的过程中，我们有时候有需要将 Github 的代码同步到其他远端仓库的需求。具体的，对于我们目前参与的项目来说核心诉求是：以 Github 社区作为主仓，并且定期自动同步到 Gitee 作为镜像仓库。
 
-## 2. 调研
+### 2. 调研
 - 结论1: 由于会被 Github 屏蔽，Gitee 的自动同步功能暂时无法支持。
 
   这个问题在 Gitee 的官方反馈中，[建议github导入的项目能设置定时同步](https://gitee.com/oschina/git-osc/issues/IKH12)提及过，官方的明确答复是不支持。最近又再次和官方渠道求证，由于会被 Github 屏蔽的关系，这个功能不会被支持。本着有轮子用轮子，没轮子造轮子的原则，我们只能选择自己实现。
@@ -20,7 +20,7 @@
 
 最终结论：我们需要自己实现一个工具，通过某种计算资源自动的去完成周期同步功能。
 
-## 3. 选型
+### 3. 选型
 其实调研结论有了后，我们面对的选型就那么几种：
 
 - 使用 crontab 调用脚本周期性同步。这个计算资源得我们自己维护，太重了。排除！
@@ -29,9 +29,9 @@
 
 PS：严格来讲，Github Action 其实是第二种选择的子集，其实就是单纯的想体验一把，并且把我们的业务需求实现了。
 
-## 4. 实现
+### 4. 实现
 
-### 4.1 GITHUB ACTION 的实现
+#### 4.1 GITHUB ACTION 的实现
 
 Github Action 提供了[2种方式](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/about-actions#types-of-actions)去实现 Action：
 
@@ -43,7 +43,7 @@ Github Action 提供了[2种方式](https://help.github.com/en/actions/automatin
 
 作为以后端开发为主的我们，没太多纠结就选择了第一种类型。关于怎么构建一个 Github 的 Action 可以参考 Github 的官方文档 [Building actions](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/building-actions)。官方文档真的写的非常详细了，并且也通了了 hello-world 级别的入门教程。
 
-### 4.1 同步的核心代码实现
+#### 4.1 同步的核心代码实现
 
 而最终的关键实现就是，我们需要定义这个容器运行的脚本，原理很简单：
 
@@ -61,7 +61,7 @@ Github Action 提供了[2种方式](https://help.github.com/en/actions/automatin
 
 关心细节的同学，具体可以参考代码：[https://github.com/Yikun/gitee-mirror-action/blob/master/entrypoint.sh](https://github.com/Yikun/gitee-mirror-action/blob/master/entrypoint.sh)
 
-## 5. 怎么用呢？
+### 5. 怎么用呢？
 举了个简单的例子，我们想将 Github/kunpengcompute 同步到 Gitee/kunpengcompute 上面，需要做的非常简单，只需要2步：
 
 1. 将 Gitee 的`私钥`和 `Token`，上传到项目的 `setting` 的 `Secrets` 中。
@@ -105,7 +105,7 @@ Github Action 提供了[2种方式](https://help.github.com/en/actions/automatin
 
     可以在[链接](https://github.com/kunpengcompute/Kunpeng/actions)看到，这个使用 Gitee Mirror Action 的 workflow 已经运行起来后，每个阶段的原理和最终的效果
 
-## 6. 最后
+### 6. 最后
 
 好啦，这篇硬核软文就写到这里，有同步需求的同学，放心使用。更多用法，可以参考 Hub-mirror-action 的主页 Readme。
 

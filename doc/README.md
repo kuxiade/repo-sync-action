@@ -1,4 +1,4 @@
-### 参考资料
+## 参考资料
 
 - 本地（从官方拉取的）参考文档：[简体中文](./creating-a-docker-container-action.zh-CN.md) | [English](./creating-a-docker-container-action.md)
 
