@@ -1,6 +1,6 @@
 ## 巧用 Github Action 同步代码到 Gitee
 
-本文转载自 [Yikun/hub-mirror-action](https://github.com/Yikun/hub-mirror-action) 作者 Yikun 写的关于 Yikun/hub-mirror-action 的博客文章：[巧用Github Action同步代码到Gitee](http://yikun.github.io/2020/01/17/%E5%B7%A7%E7%94%A8Github-Action%E5%90%8C%E6%AD%A5%E4%BB%A3%E7%A0%81%E5%88%B0Gitee/)
+本文转载自 [Yikun/hub-mirror-action](https://github.com/Yikun/hub-mirror-action) 作者 Yikun 写的关于 Yikun/hub-mirror-action 的博客文章：[巧用Github Action同步代码到Gitee](http://yikun.github.io/2020/01/17/巧用Github-Action同步代码到Gitee/)
 
 ### 1. 背景
 在开源贡献的代码托管的过程中，我们有时候有需要将 Github 的代码同步到其他远端仓库的需求。具体的，对于我们目前参与的项目来说核心诉求是：以 Github 社区作为主仓，并且定期自动同步到 Gitee 作为镜像仓库。
