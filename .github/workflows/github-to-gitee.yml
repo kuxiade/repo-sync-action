@@ -1,4 +1,4 @@
-name: Sync repo from github to gitee
+name: Sync repo from Github to Gitee
 
 on:
   # push推送时触发
@@ -25,7 +25,7 @@ on:
 
 jobs:
   job1:
-    name: github to gitee:mirror-hub
+    name: Github to Gitee:mirror-hub
     runs-on: ubuntu-latest
     steps:
       - name: a Print sys-release
@@ -155,7 +155,7 @@ jobs:
 
 
   job2:
-    name: github to gitee:emacs-hub
+    name: Github to Gitee:emacs-hub
     runs-on: ubuntu-latest
     steps:
       - name: a Print sys-release
