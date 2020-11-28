@@ -611,8 +611,8 @@ entrypoint_main() {
             git_push_tag_args=(--force)
         fi
 
-        echo "git_push_branch_args_1=" "${git_push_branch_args[@]}"
-        echo "git_push_tag_args=" "${git_push_tag_args[@]}"
+        #echo "git_push_branch_args_1=" "${git_push_branch_args[@]}"
+        #echo "git_push_tag_args=" "${git_push_tag_args[@]}"
 
         if [[ "$SRC_REPO_BRANCH" == "refs/remotes/origin/*" && "$DST_REPO_BRANCH" == "refs/heads/*" ]]; then
             git_push_branch_args=("${git_push_branch_args[@]}" --prune)
@@ -622,8 +622,8 @@ entrypoint_main() {
             git_push_tag_args=("${git_push_tag_args[@]}" --prune)
         fi
 
-        echo "git_push_branch_args_2=" "${git_push_branch_args[@]}"
-        echo "git_push_tag_args_2=" "${git_push_tag_args[@]}"
+        #echo "git_push_branch_args_2=" "${git_push_branch_args[@]}"
+        #echo "git_push_tag_args_2=" "${git_push_tag_args[@]}"
 
         echo_color cyan "--------> git push branch..."
         if [[ "$remove_branch" == "true" ]]; then
