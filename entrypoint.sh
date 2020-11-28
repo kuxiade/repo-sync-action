@@ -457,7 +457,7 @@ entrypoint_main() {
     fi
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
-    #remove_cache_dir_flag="true"
+    remove_cache_dir_flag="true"
     remove_cache_dir_flag=${remove_cache_dir_flag:-"false"}
     # 删除缓存目录
     if [ -d "$CACHE_PATH" ] && [[ "$remove_cache_dir_flag" == "true" ]]; then
@@ -553,9 +553,6 @@ entrypoint_main() {
         git remote set-head origin --delete
         # Print out all branches
         #git --no-pager branch -a -vv
-        #echo_color cyan "--------> git push..."
-        
-        #git push origin "refs/remotes/origin/*:refs/heads/*" --tags --force --prune
         
         # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
         if [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/$ ]]; then
