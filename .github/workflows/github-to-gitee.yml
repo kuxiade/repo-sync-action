@@ -61,7 +61,7 @@ jobs:
         id: cacheSrcRepos
         with:
           # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
-          path: ${{ github.workspace }}/mirror-repo-cache
+          path: ${{ github.workspace }}/${{ github.job }}
           key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-${{ steps.someInfo.outputs.timeInfo }}
           # or
           # key: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-${{ steps.someInfo.outputs.timeInfo }}
@@ -83,8 +83,8 @@ jobs:
           echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
           echo ""
-          echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
-          ls -la ${{ github.workspace }}/mirror-repo-cache || exit 0
+          echo "ls -la" ${{ github.workspace }}/${{ github.job }}
+          ls -la ${{ github.workspace }}/${{ github.job }} || exit 0
 
       - name: Mirror docs
         uses: ./
@@ -100,7 +100,7 @@ jobs:
           dst_repo_url: "git@gitee.com:mirror-hub/github-docs.git"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
+          cache_path: /github/workspace/${{ github.job }}
 
       - name: Mirror ohmyzsh
         uses: ./
@@ -116,7 +116,7 @@ jobs:
           dst_repo_url: "git@gitee.com:mirror-hub/ohmyzsh.git"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
+          cache_path: /github/workspace/${{ github.job }}
 
       - name: Mirror vscode-dev-containers
         # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
@@ -138,7 +138,7 @@ jobs:
           #dst_repo_tag: "v0.150.0"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
+          cache_path: /github/workspace/${{ github.job }}
 
       - name: c Print post-cache path - This time cache
         # 本次缓存（可能包含有仓库更新的内容），也就是 'steps.cacheSrcRepos.with.path' 中的所有内容，
@@ -151,8 +151,8 @@ jobs:
           echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
           echo ""
-          echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
-          ls -la ${{ github.workspace }}/mirror-repo-cache || exit 0
+          echo "ls -la" ${{ github.workspace }}/${{ github.job }}
+          ls -la ${{ github.workspace }}/${{ github.job }} || exit 0
 
 
   job2:
