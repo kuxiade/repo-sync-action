@@ -18,10 +18,11 @@ on:
     #   - 'docs/**'
     #   - 'README.md'
   # 定时任务触发
-  # schedule:
-  #   # 每天北京时间9点跑
-  #   # Runs at 04:00 UTC (12:00 AM Beijing) every day
-  #   - cron:  '0 4 * * *'
+  schedule:
+    # Runs at 04:00 UTC (12:00 AM Beijing) every day
+    #- cron:  '0 4 * * *'
+    # 每隔4小时执行一次
+    - cron:  '0 */4 * * *'
 
 jobs:
   job1:

@@ -10,9 +10,9 @@ on:
       #- '.github/workflows/**'
       # 只有当本文件有推送提交时，才工作流触发
       - '.github/workflows/repo-sync-action-cache-test.yml'
-      - 'action.yml'
-      - 'Dockerfile'
-      - 'entrypoint.sh'
+      #- 'action.yml'
+      #- 'Dockerfile'
+      #- 'entrypoint.sh'
     # paths-ignore 表示该路径的文件有push时忽略触发。这里使用上面的 paths 来设置更符合我的要求(只有当本文件有推送提交时，该工作流触发 )。
     # paths-ignore:
     #   - 'docs/**'
