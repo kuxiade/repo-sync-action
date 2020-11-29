@@ -84,7 +84,7 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
-          ls -la ${{ github.workspace }}/${{ github.job }}-cache || exit 0
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
 
       - name: Mirror docs
         uses: ./
@@ -152,7 +152,7 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
-          ls -la ${{ github.workspace }}/${{ github.job }}-cache || exit 0
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
 
 
   job2:
@@ -214,7 +214,7 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
-          ls -la ${{ github.workspace }}/${{ github.job }}-cache || exit 0
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
 
       - name: Mirror doom-emacs
         uses: ./
@@ -404,4 +404,4 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
-          ls -la ${{ github.workspace }}/${{ github.job }}-cache || exit 0
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
