@@ -62,10 +62,10 @@ jobs:
         with:
           # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
           path: ${{ github.workspace }}/mirror-repo-cache
-          key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-cache-${{ steps.someInfo.outputs.timeInfo }}
+          key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-${{ steps.someInfo.outputs.timeInfo }}
           # or
           # key: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-${{ steps.someInfo.outputs.timeInfo }}
-          restore-keys: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-cache-
+          restore-keys: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-
           # or
           # restore-keys: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-
 
@@ -192,10 +192,10 @@ jobs:
         with:
           # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
           path: ${{ github.workspace }}/mirror-repo-cache
-          key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-cache-${{ steps.someInfo.outputs.timeInfo }}
+          key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-${{ steps.someInfo.outputs.timeInfo }}
           # or
           # key: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-${{ steps.someInfo.outputs.timeInfo }}
-          restore-keys: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-cache-
+          restore-keys: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-
           # or
           # restore-keys: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-
 
