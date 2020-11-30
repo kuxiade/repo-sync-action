@@ -57,7 +57,7 @@ jobs:
         uses: actions/github-script@v3
         with:
           script: |
-            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`);
+            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`)
       
       - name: Cache src repos with actions/cache
         uses: actions/cache@v2
@@ -188,7 +188,7 @@ jobs:
         uses: actions/github-script@v3
         with:
           script: |
-            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`);
+            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`)
       
       - name: Cache src repos with actions/cache
         uses: actions/cache@v2
