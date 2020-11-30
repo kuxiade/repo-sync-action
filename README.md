@@ -30,13 +30,13 @@
 
 1. 本仓库 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) 作为 Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
 
-2. 工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的 `jobs.<job_id>.runs-on` 设置为 `ubuntu-latest`，表示其虚拟环境为 `ubuntu-latest`，工作流中的操作就在该 `ubuntu-latest` 中构建执行。本 Action 为 `Docker Action`，`entrypoint.sh` 的执行实际在使用 `Dockerfile` 构建的容器内运行。其中，通过将 `ubuntu-latest` 中的文件夹设置为 Docker 容器的数据卷来存储容器中的数据（比如缓存文件），例如下面工作流运行信息中的 `/usr/bin/docker run <...> -v "/home/runner/work/repo-sync-action/repo-sync-action":"/github/workspace" <...>`，挂载主机（这里为 ubuntu-latest）的本地目录 /home/runner/work/repo-sync-action/repo-sync-action 到容器的 /github/workspace 目录。
+2. 工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的 `jobs.<job_id>.runs-on` 设置为 `ubuntu-latest`，表示其虚拟环境为 `ubuntu-latest`，工作流中的操作就在该 `ubuntu-latest` 中构建执行。本 Action 为 `Docker Action`，`entrypoint.sh` 的执行实际在使用 `Dockerfile` 构建的容器内运行。其中，通过将 `ubuntu-latest` 中的文件夹设置为 Docker 容器的数据卷来存储容器中的数据（比如缓存文件），例如下面复制自示例工作流运行信息中的 `/usr/bin/docker run <...> -v "/home/runner/work/repo-sync-action/repo-sync-action":"/github/workspace" <...>`，挂载主机（这里为 ubuntu-latest）的本地目录 /home/runner/work/repo-sync-action/repo-sync-action 到容器的 /github/workspace 目录。
 
-    build docker image
+    示例工作流运行信息：build docker image
     ```shell
     /usr/bin/docker build -t 179394:2c2a9259b7df5e693b0d7e7217b3659a -f "/home/runner/work/repo-sync-action/repo-sync-action/./Dockerfile" "/home/runner/work/repo-sync-action/repo-sync-action"
     ```
-    run docker container
+    示例工作流运行信息：run docker container
     ```shell
     /usr/bin/docker run <...>
     -v "/var/run/docker.sock":"/var/run/docker.sock" \
