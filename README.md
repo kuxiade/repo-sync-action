@@ -30,15 +30,31 @@
 
 1. 本仓库 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) 作为 Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
 
-2. 工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的 `jobs.runs-on` 设置为 `ubuntu-latest`，表示其虚拟环境为 `ubuntu-latest`，工作流中的操作就在该 `ubuntu-latest` 中构建执行。本 Action 为 `Docker Action`，`entrypoint.sh` 的执行实际在使用 `Dockerfile` 构建的容器内运行。其中，通过将 `ubuntu-latest` 中的文件夹设置为 Docker 容器的数据卷来存储容器中的数据（比如缓存文件）。
+2. 工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的 `jobs.<job_id>.runs-on` 设置为 `ubuntu-latest`，表示其虚拟环境为 `ubuntu-latest`，工作流中的操作就在该 `ubuntu-latest` 中构建执行。本 Action 为 `Docker Action`，`entrypoint.sh` 的执行实际在使用 `Dockerfile` 构建的容器内运行。其中，通过将 `ubuntu-latest` 中的文件夹设置为 Docker 容器的数据卷来存储容器中的数据（比如缓存文件），例如下面工作流运行信息中的 `/usr/bin/docker run <...> -v "/home/runner/work/repo-sync-action/repo-sync-action":"/github/workspace" <...>`，挂载主机（这里为 ubuntu-latest）的本地目录 /home/runner/work/repo-sync-action/repo-sync-action 到容器的 /github/workspace 目录。
 
-2. `.github/workflows` 目录下面的 .yml 或 .yaml 文件就是该 Action 的示例工作流程文件，其作为测试该仓库作为 Action 工作时是否有效，可以删除 `.github/workflows` 下的所有文件，或者直接删除 `.github` 文件夹，这样做不会影响该仓库作为 Action 的功能。
+    build docker image
+    ```shell
+    /usr/bin/docker build -t 179394:2c2a9259b7df5e693b0d7e7217b3659a -f "/home/runner/work/repo-sync-action/repo-sync-action/./Dockerfile" "/home/runner/work/repo-sync-action/repo-sync-action"
+    ```
+    run docker container
+    ```shell
+    /usr/bin/docker run <...>
+    -v "/var/run/docker.sock":"/var/run/docker.sock" \
+    -v "/home/runner/work/_temp/_github_home":"/github/home" \
+    -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+    -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+    -v "/home/runner/work/repo-sync-action/repo-sync-action":"/github/workspace" \
+    <...>
+    ```
 
-3. `doc` 文件夹下的文件作为补充文档，对创建 action 来说非必需，同样可以删除 doc 文件夹。
 
-4. `README.md` 作为说明文档，对创建 action 来说非必需，一样可以删除。不过说明文档还是非常重要的，方便其他用户参照使用该 Action。
+3. `.github/workflows` 目录下面的 .yml 或 .yaml 文件就是该 Action 的示例工作流程文件，其作为测试该仓库作为 Action 工作时是否有效，可以删除 `.github/workflows` 下的所有文件，或者直接删除 `.github` 文件夹，这样做不会影响该仓库作为 Action 的功能。
 
-5. 该 GitHub Action 使用 SSH 方式将源端平台（如 GitHub）上的仓库克隆到 GitHub 的虚拟环境中，然后再通过 SSH 方式将虚拟环境中的仓库推送到目的端平台（如 Gitee）上。
+4. `doc` 文件夹下的文件作为补充文档，对创建 action 来说非必需，同样可以删除 doc 文件夹。
+
+5. `README.md` 作为说明文档，对创建 action 来说非必需，一样可以删除。不过说明文档还是非常重要的，方便其他用户参照使用该 Action。
+
+6. 该 GitHub Action 使用 SSH 方式将源端平台（如 GitHub）上的仓库克隆到 GitHub 的虚拟环境中，然后再通过 SSH 方式将虚拟环境中的仓库推送到目的端平台（如 Gitee）上。
 
    由于克隆和推送都使用了 SSH 方式，因此，凡是使用了该 Action 的工作流，其所在的仓库必须在仓库 Settings -> Secrets -> New repository secret，将 SSH 私钥添加到其中。
 
