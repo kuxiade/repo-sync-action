@@ -49,7 +49,7 @@ jobs:
       - name: Get Time info
         id: getTime
         run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d%H%M%S")"
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d%H%M%S%N")"
         shell: bash
 
       - name: Get Repo info
@@ -177,15 +177,18 @@ jobs:
       - name: Checkout source codes
         uses: actions/checkout@v1
 
-      - name: Get repo and time
-        id: someInfo
+      - name: Get Time info
+        id: getTime
+        run: |
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d%H%M%S%N")"
+        shell: bash
+
+      - name: Get Repo info
+        id: getRepo
         uses: actions/github-script@v3
         with:
-          result-encoding: string
           script: |
-            core.setOutput('ownerRepoInfo', `${context.repo.owner}-${context.repo.repo}`);
-            core.setOutput('timeInfo', new Date(Date.now()).toISOString().replace(/[^0-9]/g, ""));
-            return context.repo.repo;
+            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`);
       
       - name: Cache src repos with actions/cache
         uses: actions/cache@v2
@@ -195,12 +198,8 @@ jobs:
           # ${{ github.job }} 展开为: <job_id>
           # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
           path: ${{ github.workspace }}/${{ github.job }}-cache
-          key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-${{ steps.someInfo.outputs.timeInfo }}
-          # or
-          # key: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-${{ steps.someInfo.outputs.timeInfo }}
-          restore-keys: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-${{ github.job }}-cache-
-          # or
-          # restore-keys: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-
+          key: ${{ runner.os }}-${{ steps.getRepo.outputs.ownerRepo }}-${{ github.job }}-cache-${{ steps.getTime.outputs.date }}
+          restore-keys: ${{ runner.os }}-${{ steps.getRepo.outputs.ownerRepo }}-${{ github.job }}-cache-
 
       - name: Print the cache status
         if: steps.cacheSrcRepos.outputs.cache-hit == 'true'
