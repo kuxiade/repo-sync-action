@@ -25,7 +25,7 @@ on:
     - cron:  '0 */4 * * *'
 
 jobs:
-  job1-sync:
+  job1:
     name: Github to Gitee:emacs-hub
     runs-on: ubuntu-latest
     steps:
