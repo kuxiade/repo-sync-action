@@ -1,9 +1,11 @@
+# obsolete 废弃了
+
 name: Sync repo from Github to Gitee
 
 on:
   # push推送时触发
   push:
-    branches: [ main ]
+    branches: [ main-obsolete ]
     # 匹配到该路径的文件有push时触发
     paths:
       # .github/workflows/ 目录下的文件有推送提交时，工作流触发
@@ -18,15 +20,15 @@ on:
     #   - 'docs/**'
     #   - 'README.md'
   # 定时任务触发
-  schedule:
-    # Runs at 04:00 UTC (12:00 AM Beijing) every day
-    #- cron:  '0 4 * * *'
-    # 每隔4小时执行一次
-    - cron:  '0 */4 * * *'
+  #schedule:
+  #  # Runs at 04:00 UTC (12:00 AM Beijing) every day
+  #  #- cron:  '0 4 * * *'
+  #  # 每隔4小时执行一次
+  #  - cron:  '0 */4 * * *'
 
 jobs:
-  job1-sync:
-    name: Github to Gitee:emacs-hub
+  job1:
+    name: Github to Gitee:mirror-hub
     runs-on: ubuntu-latest
     steps:
       - name: a Print sys-release
@@ -140,6 +142,83 @@ jobs:
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
+
+      - name: c Print post-cache path - This time cache
+        # 本次缓存（可能包含有仓库更新的内容），也就是 'steps.cacheSrcRepos.with.path' 中的所有内容，
+        # 在下一次执行该工作流时，其会作为缓存。被取回到指定的 'steps.cacheSrcRepos.with.path' 中
+        # 运行时缓存路径展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
+        run: |
+          echo "ls -la" $PWD
+          ls -la
+          echo ""
+          echo "ls -la" ${{ github.workspace }}
+          ls -la ${{ github.workspace }}
+          echo ""
+          echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
+
+
+  job2:
+    name: Github to Gitee:emacs-hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: a Print sys-release
+        run: |
+          echo "Print sys-release"
+          cat /etc/*-release
+
+      - name: a Print pre-cache path
+        # 此时还没有取回上一次的缓存到指定的 'steps.cacheSrcRepos.with.path' 中
+        run: |
+          echo "ls -la" $PWD
+          ls -la
+          echo ""
+          echo "ls -la" ${{ github.workspace }}
+          ls -la ${{ github.workspace }}
+
+      - name: Checkout source codes
+        uses: actions/checkout@v1
+
+      - name: Get Time info
+        id: getTime
+        run: |
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d%H%M%S%N")"
+        shell: bash
+
+      - name: Get Repo info
+        id: getRepo
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`)
+      
+      - name: Cache src repos with actions/cache
+        uses: actions/cache@v2
+        id: cacheSrcRepos
+        with:
+          # ${{ github.workspace }} 展开为: /home/runner/work/repo-sync-action/repo-sync-action
+          # ${{ github.job }} 展开为: <job_id>
+          # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
+          path: ${{ github.workspace }}/${{ github.job }}-cache
+          key: ${{ runner.os }}-${{ steps.getRepo.outputs.ownerRepo }}-${{ github.job }}-cache-${{ steps.getTime.outputs.date }}
+          restore-keys: ${{ runner.os }}-${{ steps.getRepo.outputs.ownerRepo }}-${{ github.job }}-cache-
+
+      - name: Print the cache status
+        if: steps.cacheSrcRepos.outputs.cache-hit == 'true'
+        run: echo "Cached successfully."
+
+      - name: b Print post-cache path - Last time cache
+        # 此时已经取回了上一次的缓存到指定的 'steps.cacheSrcRepos.with.path' 中
+        # 运行时缓存路径展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
+        run: |
+          echo "ls -la" $PWD
+          ls -la
+          echo ""
+          echo "ls -la" ${{ github.workspace }}
+          ls -la ${{ github.workspace }}
+          echo ""
+          echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
 
       - name: Mirror doom-emacs
         uses: ./
