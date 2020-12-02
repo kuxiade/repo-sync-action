@@ -266,6 +266,22 @@ jobs:
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
 
+      - name: Mirror awesome-pair
+        uses: ./
+        env:
+          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+        with:
+          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+          # 需要被同步的源端仓库
+          src_repo_url: "git@github.com:manateelazycat/awesome-pair.git"
+          # 需要同步到的目的仓库
+          dst_repo_url: "git@gitee.com:emacs-hub/awesome-pair.git"
+          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
+          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+          cache_path: /github/workspace/${{ github.job }}-cache
+
       - name: Mirror awesome-tab
         uses: ./
         env:
@@ -342,6 +358,22 @@ jobs:
           src_repo_url: "git@github.com:manateelazycat/insert-translated-name.git"
           # 需要同步到的目的仓库
           dst_repo_url: "git@gitee.com:emacs-hub/insert-translated-name.git"
+          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
+          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+          cache_path: /github/workspace/${{ github.job }}-cache
+
+      - name: Mirror nox
+        uses: ./
+        env:
+          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+        with:
+          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+          # 需要被同步的源端仓库
+          src_repo_url: "git@github.com:manateelazycat/nox.git"
+          # 需要同步到的目的仓库
+          dst_repo_url: "git@gitee.com:emacs-hub/nox.git"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
