@@ -1,4 +1,4 @@
-# obsolete 废弃了
+# obsolete 废弃了，job1 和 job2 同时执行时，在涉及到 ssh 通信验证时，可能造成 ssh 阻塞，导致连接超时
 
 name: Sync repo from Github to Gitee
 
