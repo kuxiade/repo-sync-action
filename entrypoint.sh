@@ -460,13 +460,19 @@ entrypoint_main() {
 
     echo "$SRC_TO_DST" | while read -r line; do
         if [ -n "$line" ]; then
+            i=1
             src_to_dst_per_line=($line)
             src_repo_url=${src_to_dst_per_line[0]}
             dst_repo_url=${src_to_dst_per_line[2]}
 
+            if (( i > 1 )); then
+                echo ""
+            fi
+            
             echo "src_repo_url=$src_repo_url"
             echo -e "dst_repo_url=${dst_repo_url}\n"
 
+            i++
 
             # 提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错
             #process_error_in_advance_flag="true"
