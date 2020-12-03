@@ -444,25 +444,11 @@ entrypoint_main() {
     echo_color purple "<-------------------parameter info END--------------------->\n"
     
     ssh_config
-
-    for item in $SRC_TO_DST; do
-        echo "$item"
-    done
-
-    touch temp
-
-    echo $SRC_TO_DST > temp
-
-    cat temp
-
-    cat temp | while read line; do
-        echo "foobar=$line"
-    done
     
 
-    # echo $SRC_TO_DST | while read line; do
-    #     echo "foobar=$line"
-    # done
+    echo "$SRC_TO_DST" | while read -r line; do
+        echo "foobar=$line"
+    done
     
     
     
