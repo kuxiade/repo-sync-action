@@ -445,6 +445,12 @@ entrypoint_main() {
     
     ssh_config
 
+    for item in $SRC_TO_DST; do
+        echo "$item"
+    done
+    
+    
+
     # # 提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错
     # #process_error_in_advance_flag="true"
     # process_error_in_advance_flag=${process_error_in_advance_flag:-"false"}
