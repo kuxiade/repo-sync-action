@@ -95,7 +95,6 @@ jobs:
             git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
             git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
-            git@github.com:microsoft/vvvvvvvvvvvvscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/ vscode-dev-containers.git
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:kuxiade/doom-emacs.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
