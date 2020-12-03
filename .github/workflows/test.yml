@@ -83,7 +83,7 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
-          ls -la ${{ github.workspace }}/mirror-repo-cache
+          ls -la ${{ github.workspace }}/mirror-repo-cache || (echo "error";exit 0)
 
       - name: Mirror Github:wearerequired/git-mirror-action to Gitee with repo-sync-action
         uses: ./
@@ -192,4 +192,4 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
-          ls -la ${{ github.workspace }}/mirror-repo-cache
+          ls -la ${{ github.workspace }}/mirror-repo-cache || (echo "error";exit 0)
