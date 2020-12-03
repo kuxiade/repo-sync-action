@@ -85,78 +85,6 @@ jobs:
           echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
           ls -la ${{ github.workspace }}/mirror-repo-cache || (echo "error";exit 0)
 
-      - name: Mirror Github:wearerequired/git-mirror-action to Gitee with repo-sync-action
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          GITEE_ACCESS_TOKEN: ${{ secrets.GITEE_PERSONAL_ACCESS_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.HUB_PERSONAL_ACCESS_TOKEN }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:hlissner/doom-emacs.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:kuxiade/doom-emacs.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: "/github/workspace/mirror-repo-cache"
-
-      - name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
-        # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
-        continue-on-error: true
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
-          #src_repo_branch: "refs/remotes/origin/bowdenk7"
-          src_repo_tag: "refs/tags/v0.150.0"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
-          #dst_repo_branch: "refs/heads/csharp-update"
-          dst_repo_tag: "v0.150.0"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
-
-      - name: Mirror Github:Yikun/hub-mirror-action to Gitee with repo-sync-action
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:Yikun/hub-mirror-action.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:kuxiade/hub-mirror-action.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
-
-      - name: Mirror Github:github/docs to Gitee with repo-sync-action
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:github/docs.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:kuxiade/github-docs.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
-
       - name: Test dev
         uses: ./
         env:
@@ -168,14 +96,8 @@ jobs:
             git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
             git@github.com:microsoft/vvvvvvvvvvvvscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
-            git@gits.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
+            git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/ vscode-dev-containers.git
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:kuxiade/doom-emacs.git
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:github/docs.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:kuxiade/github-docs.git"
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/mirror-repo-cache
