@@ -447,7 +447,9 @@ entrypoint_main() {
     
 
     echo "$SRC_TO_DST" | while read -r line; do
-        echo "foobar=$line"
+        if [ -n "$line" ]; then
+            echo "foobar=$line"
+        fi
     done
     
     
