@@ -448,8 +448,7 @@ entrypoint_main() {
 
     echo "$SRC_TO_DST" | while read -r line; do
         if [ -n "$line" ]; then
-            echo "foobar=$line"
-            src_to_dst="$line"
+            src_to_dst=($line)
             src_repo_url=${src_to_dst[1]}
             dst_repo_url=${src_to_dst[3]}
 
