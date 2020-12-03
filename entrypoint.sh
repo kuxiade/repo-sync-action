@@ -448,6 +448,12 @@ entrypoint_main() {
     for item in $SRC_TO_DST; do
         echo "$item"
     done
+
+    echo $SRC_TO_DST | while read line; do
+        echo "foobar=$line"
+    done
+    
+    
     
     
 
