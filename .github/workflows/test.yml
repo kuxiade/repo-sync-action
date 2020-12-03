@@ -163,7 +163,7 @@ jobs:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
         with:
-          src_to_dst: >
+          src_to_dst: |
             (git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git)
             (git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git)
             (git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git)
