@@ -472,7 +472,7 @@ entrypoint_main() {
             echo "src_repo_url=$src_repo_url"
             echo -e "dst_repo_url=${dst_repo_url}\n"
 
-            ((i++))
+            ((i=i+1))
 
             # 提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错
             #process_error_in_advance_flag="true"
