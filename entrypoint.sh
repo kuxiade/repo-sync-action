@@ -469,6 +469,7 @@ entrypoint_main() {
                 echo ""
             fi
             
+            echo_color purple "<======================$(get_reponame_from_url "$src_repo_url") BEGIN======================>"
             echo "src_repo_url=$src_repo_url"
             echo -e "dst_repo_url=${dst_repo_url}\n"
 
@@ -647,6 +648,7 @@ entrypoint_main() {
                 || (echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1)
             fi
         fi
+        echo_color purple "<======================$(get_reponame_from_url "$src_repo_url") END========================>"
     done
 }
 
