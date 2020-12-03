@@ -647,8 +647,8 @@ entrypoint_main() {
                 git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
                 || (echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1)
             fi
+            echo_color purple "<======================$(get_reponame_from_url "$src_repo_url") END========================>"
         fi
-        echo_color purple "<======================$(get_reponame_from_url "$src_repo_url") END========================>"
     done
 }
 
