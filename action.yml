@@ -5,6 +5,10 @@ branding:
   icon: "upload-cloud"
   color: "blue"
 inputs:
+  src_to_dst:
+    description: 'SSH URL of the source repo.'
+    required: true
+    default: ''
   src_repo_url:
     description: 'SSH URL of the source repo.'
     required: true
@@ -38,6 +42,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.src_to_dst }}
     - ${{ inputs.src_repo_url }}
     - ${{ inputs.src_repo_branch }}
     - ${{ inputs.src_repo_tag }}
