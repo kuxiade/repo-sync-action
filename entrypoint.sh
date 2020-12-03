@@ -458,14 +458,14 @@ entrypoint_main() {
     fi
     cd "$CACHE_PATH"
 
+    i=0
     echo "$SRC_TO_DST" | while read -r line; do
         if [ -n "$line" ]; then
-            i=1
             src_to_dst_per_line=($line)
             src_repo_url=${src_to_dst_per_line[0]}
             dst_repo_url=${src_to_dst_per_line[2]}
 
-            if (( i > 1 )); then
+            if (( i > 0 )); then
                 echo ""
             fi
             
