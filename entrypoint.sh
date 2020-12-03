@@ -449,9 +449,20 @@ entrypoint_main() {
         echo "$item"
     done
 
-    echo $SRC_TO_DST | while read line; do
+    touch temp
+
+    echo $SRC_TO_DST > temp
+
+    cat temp
+
+    cat temp | while read line; do
         echo "foobar=$line"
     done
+    
+
+    # echo $SRC_TO_DST | while read line; do
+    #     echo "foobar=$line"
+    # done
     
     
     
