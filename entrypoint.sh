@@ -435,6 +435,31 @@ get_validity_of_current_dir_as_git_repo() {
     echo "$validity_of_current_dir_as_git_repo"
 }
 
+err_retry() {
+    # 超时的限制时间
+    local time_out=360
+    # 重试总次数
+    local sum_retry=2
+    # 重试计数
+    local num_retry=0
+    until timeout $time_out "$@"; do
+        exit_status_code=$?
+        echo "Command failed! exit_status_code=$exit_status_code"
+        num_retry=$((num_retry + 1))
+        # 逐步延长重试的时间间隔，避免间隔过短时重试失败。
+        sleep_time=$((2 ** num_retry))
+        if (( num_retry <= sum_retry )); then
+            echo "($num_retry/$sum_retry) retry after $sleep_time seconds..."
+            sleep $sleep_time
+        else
+            echo "($num_retry/$sum_retry) retry end."
+            return $exit_status_code
+        fi
+    done
+
+    return 0
+}
+
 # main 函数
 entrypoint_main() {
     echo -e ""
@@ -458,22 +483,25 @@ entrypoint_main() {
     fi
     cd "$CACHE_PATH"
 
-    i=0
+    # 仓库映射的总个数
+    i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
+    # 处理到第几个仓库映射了
+    i_count=0
     echo "$SRC_TO_DST" | while read -r line; do
         if [ -n "$line" ]; then
             src_to_dst_per_line=($line)
             src_repo_url=${src_to_dst_per_line[0]}
             dst_repo_url=${src_to_dst_per_line[2]}
 
-            if (( i > 0 )); then
+            if (( i_count > 0 )); then
                 echo ""
             fi
             
-            echo_color purple "<======================$(get_reponame_from_url "$src_repo_url") BEGIN======================>"
+            ((i_count=i_count+1))
+
+            echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") BEGIN======================>"
             echo "src_repo_url=$src_repo_url"
             echo -e "dst_repo_url=${dst_repo_url}\n"
-
-            ((i=i+1))
 
             # 提前判断源端和目的端仓库地址是否合法，避免后面克隆或推送时报错
             #process_error_in_advance_flag="true"
@@ -618,8 +646,10 @@ entrypoint_main() {
                     DST_REPO_TAG="refs/tags/$DST_REPO_TAG"
                 fi
 
-                force_push="true"
-                if [[ "$force_push" == "true" ]]; then
+                # 是否强制推送
+                force_push_flag="true"
+                force_push_flag=${force_push_flag:-"false"}
+                if [[ "$force_push_flag" == "true" ]]; then
                     git_push_branch_args=(--force)
                     git_push_tag_args=(--force)
                 fi
