@@ -490,9 +490,16 @@ entrypoint_main() {
     echo "$SRC_TO_DST" | while read -r line; do
         if [ -n "$line" ]; then
             src_to_dst_per_line=($line)
-            src_repo_url=${src_to_dst_per_line[0]}
-            dst_repo_url=${src_to_dst_per_line[2]}
-
+            length_src_to_dst_per_line=${#src_to_dst_per_line[@]}
+            echo "length_src_to_dst_per_line=$length_src_to_dst_per_line"
+            if (( length_src_to_dst_per_line == 2 )); then
+                src_repo_url=${src_to_dst_per_line[0]}
+                dst_repo_url=${src_to_dst_per_line[1]}
+            elif (( length_src_to_dst_per_line == 3 )); then
+                src_repo_url=${src_to_dst_per_line[0]}
+                dst_repo_url=${src_to_dst_per_line[2]}
+            fi
+            
             if (( i_count > 0 )); then
                 echo ""
             fi
@@ -677,7 +684,7 @@ entrypoint_main() {
                 git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
                 || (echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1)
             fi
-            echo_color purple "<======================$(get_reponame_from_url "$src_repo_url") END========================>"
+            echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") END========================>"
         fi
     done
 }
