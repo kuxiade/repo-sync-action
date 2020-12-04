@@ -489,22 +489,25 @@ entrypoint_main() {
     i_count=0
     echo "$SRC_TO_DST" | while read -r line; do
         if [ -n "$line" ]; then
+            i_count_tmp=$i_count
+            ((i_count=i_count+1))
+
             src_to_dst_per_line=($line)
             length_src_to_dst_per_line=${#src_to_dst_per_line[@]}
-            echo "length_src_to_dst_per_line=$length_src_to_dst_per_line"
             if (( length_src_to_dst_per_line == 2 )); then
                 src_repo_url=${src_to_dst_per_line[0]}
                 dst_repo_url=${src_to_dst_per_line[1]}
             elif (( length_src_to_dst_per_line == 3 )); then
                 src_repo_url=${src_to_dst_per_line[0]}
                 dst_repo_url=${src_to_dst_per_line[2]}
+            else
+                echo_color red "(${i_count}/${i_total}) 'src_to_dst' mapping error!"
             fi
             
-            if (( i_count > 0 )); then
+            # 在前后两个打印信息之间添加空行
+            if (( i_count_tmp > 0 )); then
                 echo ""
             fi
-            
-            ((i_count=i_count+1))
 
             echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") BEGIN======================>"
             echo "src_repo_url=$src_repo_url"
