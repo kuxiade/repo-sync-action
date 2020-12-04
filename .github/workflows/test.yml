@@ -18,10 +18,10 @@ on:
     #   - 'docs/**'
     #   - 'README.md'
   # 定时任务触发
-  # schedule:
-  #   # 每天北京时间9点跑
-  #   # Runs at 04:00 UTC (12:00 AM Beijing) every day
-  #   - cron:  '0 4 * * *'
+  schedule:
+    # 每天北京时间9点跑
+    # Runs at 04:00 UTC (12:00 AM Beijing) every day
+    - cron:  '0 1 * * *'
 
 jobs:
   run:
@@ -96,6 +96,9 @@ jobs:
             git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:kuxiade/doom-emacs.git
+            git@github.com:manateelazycat/auto-save.git ---> git@gitee.com:emacs-hub/auto-save.git
+            git@github.com:manateelazycat/emacs-application-framework.git ---> git@gitee.com:emacs-hub/emacs-application-framework.git
+            git@github.com:manateelazycat/snails.git ---> git@gitee.com:emacs-hub/snails.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/mirror-repo-cache
