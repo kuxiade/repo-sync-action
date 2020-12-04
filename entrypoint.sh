@@ -501,7 +501,9 @@ entrypoint_main() {
                 src_repo_url=${src_to_dst_per_line[0]}
                 dst_repo_url=${src_to_dst_per_line[2]}
             else
+                echo ""
                 echo_color red "(${i_count}/${i_total}) 'src_to_dst' mapping error!"
+                exit 1
             fi
             
             # 在前后两个打印信息之间添加空行
