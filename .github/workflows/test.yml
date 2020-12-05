@@ -27,6 +27,8 @@ jobs:
   run:
     name: Run test
     runs-on: ubuntu-latest
+    # 在 GitHub 自动取消运行之前可让作业运行的最大分钟数。 默认值：360
+    timeout-minutes: 60
     steps:
       - name: a Print sys-release
         run: |
@@ -86,6 +88,8 @@ jobs:
           ls -la ${{ github.workspace }}/mirror-repo-cache || (echo "error";exit 0)
 
       - name: Test dev
+        # 终止进程之前运行该步骤的最大分钟数。
+        timeout-minutes: 30
         uses: ./
         env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
@@ -97,8 +101,6 @@ jobs:
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:kuxiade/doom-emacs.git
             git@github.com:manateelazycat/auto-save.git ---> git@gitee.com:emacs-hub/auto-save.git
-            
-            
             git@github.com:manateelazycat/aweshell.git ---> git@gitee.com:emacs-hub/aweshell.git
             git@github.com:manateelazycat/awesome-pair.git ---> git@gitee.com:emacs-hub/awesome-pair.git
             git@github.com:manateelazycat/awesome-tab.git ---> git@gitee.com:emacs-hub/awesome-tab.git
