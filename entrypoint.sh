@@ -437,14 +437,12 @@ get_validity_of_current_dir_as_git_repo() {
 
 # 命令出错或失败或超时时重试
 err_retry_cmd() {
-    # 超时的限制时间
-    #local time_out=360
     # 重试总次数
-    local sum_retry=1
+    local sum_retry=2
     # 重试计数
     local num_retry=0
     # 重试之前的等待时间，防止前次命令的进程还没有退出。
-    local sleep_time=2
+    local sleep_time=5
     until eval "$@"; do
         exit_status_code=$?
         pre_num_retry=$num_retry
@@ -486,7 +484,7 @@ entrypoint_main() {
     fi
     cd "$CACHE_PATH"
 
-    # 下面注释内容仅供参考
+    # 下面块注释的内容仅供参考
 :<<EOF
     ### 使用 while read 将多行内容中的每行遍历
     # 仓库映射的总个数
@@ -579,168 +577,125 @@ EOF
             fi
             
             SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$src_repo_url")
-            SRC_REPO_DIR_DOTGIT_OF_URL=${SRC_REPO_DIR_NO_DOTGIT_OF_URL}.git
-            # 注释掉下面这行，则使用普通克隆，否则使用镜像克隆。
-            #git_clone_type="mirror"
-            git_clone_type=${git_clone_type:-"normal"}
-            if [[ "$git_clone_type" == "mirror" ]]; then
-                # 使用镜像克隆/推送
-                if [ -d "$SRC_REPO_DIR_DOTGIT_OF_URL" ] ; then
-                    cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                    echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo BEGIN------------------->"
+            # 超时的时间
+            time_out=5m
+            # 使用普通克隆/推送
+            if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
+                cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+                echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo BEGIN------------------->"
 
-                    validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$src_repo_url")
-                    if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
-                        echo_color green "current dir is a git repo!"
-                        echo_color green "The repo url of pre-fetch matches the src repo url."
-                        # 在 || 后面必须使用大括号，大括号中的命令不会新开一个子shell运行，则其中的 exit 1 会退出脚本；
-                        # 如果这里是小括号，由于大括号中的命令会新开一个子shell运行，则其中的 exit 1 会子shell，而不是退出脚本。这里需要报错后退出脚本。
-                        git fetch -p origin || { echo_color red "error for 'git fetch -p origin'";exit 1; }
-                    elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
-                        echo_color green "current dir is a git repo!"
-                        echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
-                        cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                        echo_color cyan "--------> git clone --mirror..."
-                        git clone --mirror "$src_repo_url" || { echo_color red "error for 'git clone --mirror $src_repo_url'";exit 1; }
-                        cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                    elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
-                        echo_color yellow "current dir is not a git repo!"
-                        cd .. && rm -rf "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                        echo_color cyan "--------> git clone --mirror..."
-                        git clone --mirror "$src_repo_url" || { echo_color red "error for 'git clone --mirror $src_repo_url'";exit 1; }
-                        cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                    fi
-
-                    echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo END--------------------->\n"
-                else
-                    echo_color yellow "no '$SRC_REPO_DIR_DOTGIT_OF_URL: $src_repo_url' cache\n"
-                    echo_color cyan "--------> git clone --mirror..."
-                    git clone --mirror "$src_repo_url" || { echo_color red "error for 'git clone --mirror $src_repo_url'";exit 1; }
-                    cd "$SRC_REPO_DIR_DOTGIT_OF_URL"
-                fi
-
-                git remote set-url --push origin "$dst_repo_url"
-                git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
-                echo_color cyan "--------> git push --mirror..."
-                git push --mirror || { echo_color red "error for 'git push --mirror'";exit 1; }
-            elif [[ "$git_clone_type" == "normal" ]]; then
-                # 使用普通克隆/推送
-                if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
+                validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$src_repo_url")
+                if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
+                    echo_color green "current dir is a git repo!"
+                    echo_color green "The repo url of pre-fetch matches the src repo url."
+                    err_retry_cmd timeout $time_out git pull --prune || { echo_color red "error for 'git pull --prune'";exit 1; }
+                elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
+                    echo_color green "current dir is a git repo!"
+                    echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
+                    cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
+                    echo_color cyan "--------> git clone..."
+                    git clone "$src_repo_url" || { echo_color red "error for 'git clone $src_repo_url'";exit 1; }
                     cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                    echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo BEGIN------------------->"
-
-                    validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$src_repo_url")
-                    if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
-                        echo_color green "current dir is a git repo!"
-                        echo_color green "The repo url of pre-fetch matches the src repo url."
-                        err_retry_cmd timeout 5m git pull --prune || { echo_color red "error for 'git pull --prune'";exit 1; }
-                    elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
-                        echo_color green "current dir is a git repo!"
-                        echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
-                        cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                        echo_color cyan "--------> git clone..."
-                        git clone "$src_repo_url" || { echo_color red "error for 'git clone $src_repo_url'";exit 1; }
-                        cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                    elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
-                        echo_color yellow "current dir is not a git repo!"
-                        cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                        echo_color cyan "--------> git clone..."
-                        git clone "$src_repo_url" || { echo_color red "error for 'git clone $src_repo_url'";exit 1; }
-                        cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                    fi
-
-                    echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo END--------------------->\n"
-                else
-                    echo_color yellow "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $src_repo_url' cache\n"
+                elif [[ "$validity_of_current_dir_as_git_repo" == "false" ]]; then
+                    echo_color yellow "current dir is not a git repo!"
+                    cd .. && rm -rf "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
                     echo_color cyan "--------> git clone..."
                     git clone "$src_repo_url" || { echo_color red "error for 'git clone $src_repo_url'";exit 1; }
                     cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
                 fi
 
-                git remote set-url --push origin "$dst_repo_url"
-                # 需要删除 remotes/origin/HEAD，不然使用 git push origin "refs/remotes/origin/*:refs/heads/*" 命令推送到目的端时，会创建一个HEAD分支。
-                git remote set-head origin --delete
-                
-                # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
-                if [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/$ ]]; then
-                    echo_color red "The format of the 'src_repo_branch' parameter is illegal"
-                    exit 1
-                fi
-                if [[ "$DST_REPO_BRANCH" =~ ^refs/heads/$ ]]; then
-                    echo_color red "The format of the 'dst_repo_branch' parameter is illegal"
-                    exit 1
-                fi
-                if [[ -z "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
-                    echo_color red "Because only push the current branch to $dst_repo_url, so exit."
-                    exit 1
-                elif [[ -z "$SRC_REPO_BRANCH" ]] && [[ -n "$DST_REPO_BRANCH" ]]; then
-                    remove_branch="true"
-                elif [[ -n "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
-                    echo_color red "The 'dst_repo_branch' parameter cannot be empty"
-                    exit 1
-                fi
-                if [[ -n "$SRC_REPO_BRANCH" ]] && [[ ! "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]]; then
-                    SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
-                fi
-                if [[ -n "$DST_REPO_BRANCH" ]] && [[ ! "$DST_REPO_BRANCH" =~ ^refs/heads/.+ ]]; then
-                    DST_REPO_BRANCH="refs/heads/$DST_REPO_BRANCH"
-                fi
-
-                if [[ "$SRC_REPO_TAG" =~ ^refs/tags/$ ]]; then
-                    echo_color red "The format of the 'src_repo_tag' parameter is illegal"
-                    exit 1
-                fi
-                if [[ "$DST_REPO_TAG" =~ ^refs/tags/$ ]]; then
-                    echo_color red "The format of the 'dst_repo_tag' parameter is illegal"
-                    exit 1
-                fi
-                if [[ -z "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
-                    echo_color red "Because only push the current branch to $dst_repo_url, so exit."
-                    exit 1
-                elif [[ -z "$SRC_REPO_TAG" ]] && [[ -n "$DST_REPO_TAG" ]]; then
-                    remove_tag="true"
-                elif [[ -n "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
-                    echo_color red "The 'dst_repo_tag' parameter cannot be empty"
-                    exit 1
-                fi
-                if [[ -n "$SRC_REPO_TAG" ]] && [[ ! "$SRC_REPO_TAG" =~ ^refs/tags/.+ ]]; then
-                    SRC_REPO_TAG="refs/tags/$SRC_REPO_TAG"
-                fi
-                if [[ -n "$DST_REPO_TAG" ]] && [[ ! "$DST_REPO_TAG" =~ ^refs/tags/.+ ]]; then
-                    DST_REPO_TAG="refs/tags/$DST_REPO_TAG"
-                fi
-
-                # 是否强制推送
-                force_push_flag="true"
-                force_push_flag=${force_push_flag:-"false"}
-                if [[ "$force_push_flag" == "true" ]]; then
-                    git_push_branch_args=(--force)
-                    git_push_tag_args=(--force)
-                fi
-
-                if [[ "$SRC_REPO_BRANCH" == "refs/remotes/origin/*" && "$DST_REPO_BRANCH" == "refs/heads/*" ]]; then
-                    git_push_branch_args=("${git_push_branch_args[@]}" --prune)
-                fi
-
-                if [[ "$SRC_REPO_TAG" == "refs/tags/*" && "$DST_REPO_TAG" == "refs/tags/*" ]]; then
-                    git_push_tag_args=("${git_push_tag_args[@]}" --prune)
-                fi
-
-                echo_color cyan "--------> git push branch..."
-                if [[ "$remove_branch" == "true" ]]; then
-                    echo_color yellow "remove $DST_REPO_BRANCH branch for $dst_repo_url."
-                fi
-                # 推送分支
-                err_retry_cmd timeout 5m git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}" \
-                || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
-                echo_color cyan "--------> git push tags..."
-                if [[ "$remove_tag" == "true" ]]; then
-                    echo_color yellow "remove $DST_REPO_TAG tag for $dst_repo_url."
-                fi
-                # 推送标签
-                err_retry_cmd timeout 5m git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
-                || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
+                echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo END--------------------->\n"
+            else
+                echo_color yellow "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $src_repo_url' cache\n"
+                echo_color cyan "--------> git clone..."
+                git clone "$src_repo_url" || { echo_color red "error for 'git clone $src_repo_url'";exit 1; }
+                cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
             fi
+
+            git remote set-url --push origin "$dst_repo_url"
+            # 需要删除 remotes/origin/HEAD，不然使用 git push origin "refs/remotes/origin/*:refs/heads/*" 命令推送到目的端时，会创建一个HEAD分支。
+            git remote set-head origin --delete
+            
+            # =~：左侧是字符串，右侧是一个模式，判断左侧的字符串能否被右侧的模式所匹配：通常只在 [[ ]] 中使用, 模式中可以使用行首、行尾锚定符，但是模式不要加引号。
+            if [[ "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/$ ]]; then
+                echo_color red "The format of the 'src_repo_branch' parameter is illegal"
+                exit 1
+            fi
+            if [[ "$DST_REPO_BRANCH" =~ ^refs/heads/$ ]]; then
+                echo_color red "The format of the 'dst_repo_branch' parameter is illegal"
+                exit 1
+            fi
+            if [[ -z "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
+                echo_color red "Because only push the current branch to $dst_repo_url, so exit."
+                exit 1
+            elif [[ -z "$SRC_REPO_BRANCH" ]] && [[ -n "$DST_REPO_BRANCH" ]]; then
+                remove_branch="true"
+            elif [[ -n "$SRC_REPO_BRANCH" ]] && [[ -z "$DST_REPO_BRANCH" ]]; then
+                echo_color red "The 'dst_repo_branch' parameter cannot be empty"
+                exit 1
+            fi
+            if [[ -n "$SRC_REPO_BRANCH" ]] && [[ ! "$SRC_REPO_BRANCH" =~ ^refs/remotes/origin/.+ ]]; then
+                SRC_REPO_BRANCH="refs/remotes/origin/$SRC_REPO_BRANCH"
+            fi
+            if [[ -n "$DST_REPO_BRANCH" ]] && [[ ! "$DST_REPO_BRANCH" =~ ^refs/heads/.+ ]]; then
+                DST_REPO_BRANCH="refs/heads/$DST_REPO_BRANCH"
+            fi
+
+            if [[ "$SRC_REPO_TAG" =~ ^refs/tags/$ ]]; then
+                echo_color red "The format of the 'src_repo_tag' parameter is illegal"
+                exit 1
+            fi
+            if [[ "$DST_REPO_TAG" =~ ^refs/tags/$ ]]; then
+                echo_color red "The format of the 'dst_repo_tag' parameter is illegal"
+                exit 1
+            fi
+            if [[ -z "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
+                echo_color red "Because only push the current branch to $dst_repo_url, so exit."
+                exit 1
+            elif [[ -z "$SRC_REPO_TAG" ]] && [[ -n "$DST_REPO_TAG" ]]; then
+                remove_tag="true"
+            elif [[ -n "$SRC_REPO_TAG" ]] && [[ -z "$DST_REPO_TAG" ]]; then
+                echo_color red "The 'dst_repo_tag' parameter cannot be empty"
+                exit 1
+            fi
+            if [[ -n "$SRC_REPO_TAG" ]] && [[ ! "$SRC_REPO_TAG" =~ ^refs/tags/.+ ]]; then
+                SRC_REPO_TAG="refs/tags/$SRC_REPO_TAG"
+            fi
+            if [[ -n "$DST_REPO_TAG" ]] && [[ ! "$DST_REPO_TAG" =~ ^refs/tags/.+ ]]; then
+                DST_REPO_TAG="refs/tags/$DST_REPO_TAG"
+            fi
+
+            # 是否强制推送
+            force_push_flag="true"
+            force_push_flag=${force_push_flag:-"false"}
+            if [[ "$force_push_flag" == "true" ]]; then
+                git_push_branch_args=(--force)
+                git_push_tag_args=(--force)
+            fi
+
+            if [[ "$SRC_REPO_BRANCH" == "refs/remotes/origin/*" && "$DST_REPO_BRANCH" == "refs/heads/*" ]]; then
+                git_push_branch_args=("${git_push_branch_args[@]}" --prune)
+            fi
+
+            if [[ "$SRC_REPO_TAG" == "refs/tags/*" && "$DST_REPO_TAG" == "refs/tags/*" ]]; then
+                git_push_tag_args=("${git_push_tag_args[@]}" --prune)
+            fi
+
+            echo_color cyan "--------> git push branch..."
+            if [[ "$remove_branch" == "true" ]]; then
+                echo_color yellow "remove $DST_REPO_BRANCH branch for $dst_repo_url."
+            fi
+            # 推送分支
+            err_retry_cmd timeout $time_out git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}" \
+            || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
+            echo_color cyan "--------> git push tags..."
+            if [[ "$remove_tag" == "true" ]]; then
+                echo_color yellow "remove $DST_REPO_TAG tag for $dst_repo_url."
+            fi
+            # 推送标签
+            err_retry_cmd timeout $time_out git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
+            || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
+            
             echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") END========================>"
         fi
     done
