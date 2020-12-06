@@ -486,23 +486,68 @@ entrypoint_main() {
     fi
     cd "$CACHE_PATH"
 
+    # 下面注释内容仅供参考
+:<<EOF
     # 仓库映射的总个数
     i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
     # 处理到第几个仓库映射了
     i_count=0
-    echo "$SRC_TO_DST" | while read -r line; do
-        if [ -n "$line" ]; then
+    echo "$SRC_TO_DST" | while read -r src_to_dst_per_line; do     # 注意，read 后的 -r：不允许反斜杠来转义任何字符。
+        if [ -n "$src_to_dst_per_line" ]; then
             i_count_tmp=$i_count
             ((i_count=i_count+1))
 
-            src_to_dst_per_line=($line)
-            length_src_to_dst_per_line=${#src_to_dst_per_line[@]}
-            if (( length_src_to_dst_per_line == 2 )); then
-                src_repo_url=${src_to_dst_per_line[0]}
-                dst_repo_url=${src_to_dst_per_line[1]}
-            elif (( length_src_to_dst_per_line == 3 )); then
-                src_repo_url=${src_to_dst_per_line[0]}
-                dst_repo_url=${src_to_dst_per_line[2]}
+            # src_to_dst_array_per_line=($src_to_dst_per_line)   #<=== 好像不提倡这种方式，可使用下面 read -ra 方式。
+            # IFS=" " 表示空格作为分隔符；read 后的 -r 表示不允许反斜杠来转义任何字符，-a(array) 表示把输入内容按分隔符(空格或者跳格之类)分配给数组，连续的空格也算为1个分割。
+            IFS=" " read -r -a src_to_dst_array_per_line <<< "$src_to_dst_per_line"
+            length_src_to_dst_array_per_line=${#src_to_dst_array_per_line[@]}
+
+            ...
+        fi
+    done
+
+    这里也可以使用另一种方式
+    # 仓库映射的总个数
+    i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
+    # 处理到第几个仓库映射了
+    i_count=0
+    # 将多行内容（如下的 "$SRC_TO_DST"）赋值给数组变量（如下的 src_to_dst_array），每行作为一个元素。
+    mapfile -t src_to_dst_array <<< "$SRC_TO_DST"
+    for((i=0;i<${#src_to_dst_array[*]};i++)); do
+        src_to_dst_per_line=${src_to_dst_array[i]}
+        if [ -n "$src_to_dst_per_line" ]; then
+            i_count_tmp=$i_count
+            ((i_count=i_count+1))
+
+            # src_to_dst_array_per_line=($src_to_dst_per_line)   #<=== 好像不提倡这种方式，可使用下面 read -ra 方式。
+            # IFS=" " 表示空格作为分隔符；read 后的 -r 表示不允许反斜杠来转义任何字符，-a(array) 表示把输入内容按分隔符(空格或者跳格之类)分配给数组，连续的空格也算为1个分割。
+            IFS=" " read -r -a src_to_dst_array_per_line <<< "$src_to_dst_per_line"
+            length_src_to_dst_array_per_line=${#src_to_dst_array_per_line[@]}
+
+            ...
+        fi
+    done
+EOF
+
+    # 仓库映射的总个数
+    i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
+    # 处理到第几个仓库映射了
+    i_count=0
+    echo "$SRC_TO_DST" | while read -r src_to_dst_per_line; do     # 注意，read 后的 -r：不允许反斜杠来转义任何字符。
+        if [ -n "$src_to_dst_per_line" ]; then
+            i_count_tmp=$i_count
+            ((i_count=i_count+1))
+
+            # src_to_dst_array_per_line=($src_to_dst_per_line)   #<=== 好像不提倡这种方式，可使用下面 read -ra 方式。
+            # IFS=" " 表示空格作为分隔符；read 后的 -r 表示不允许反斜杠来转义任何字符，-a(array) 表示把输入内容按分隔符(空格或者跳格之类)分配给数组，连续的空格也算为1个分割。
+            IFS=" " read -r -a src_to_dst_array_per_line <<< "$src_to_dst_per_line"
+            length_src_to_dst_array_per_line=${#src_to_dst_array_per_line[@]}
+            if (( length_src_to_dst_array_per_line == 2 )); then
+                src_repo_url=${src_to_dst_array_per_line[0]}
+                dst_repo_url=${src_to_dst_array_per_line[1]}
+            elif (( length_src_to_dst_array_per_line == 3 )); then
+                src_repo_url=${src_to_dst_array_per_line[0]}
+                dst_repo_url=${src_to_dst_array_per_line[2]}
             else
                 echo ""
                 echo_color red "(${i_count}/${i_total}) 'src_to_dst' mapping error!"
