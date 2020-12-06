@@ -488,6 +488,7 @@ entrypoint_main() {
 
     # 下面注释内容仅供参考
 :<<EOF
+    ### 使用 while read 将多行内容中的每行遍历
     # 仓库映射的总个数
     i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
     # 处理到第几个仓库映射了
@@ -506,7 +507,8 @@ entrypoint_main() {
         fi
     done
 
-    这里也可以使用另一种方式
+    ### 这里也可以使用另一种方式
+    ### 使用数组及 for 循环将多行内容中的每行遍历
     # 仓库映射的总个数
     i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
     # 处理到第几个仓库映射了
