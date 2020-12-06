@@ -24,7 +24,7 @@ on:
     - cron:  '*/15 * * * *'
 
 jobs:
-  run:
+  job1:
     name: Run test
     runs-on: ubuntu-latest
     # 在 GitHub 自动取消运行之前可让作业运行的最大分钟数。 默认值：360
@@ -47,28 +47,29 @@ jobs:
       - name: Checkout source codes
         uses: actions/checkout@v1
 
-      - name: Get repo and time
-        id: someInfo
+      - name: Get Time info
+        id: getTime
+        run: |
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d%H%M%S%N")"
+        shell: bash
+
+      - name: Get Repo info
+        id: getRepo
         uses: actions/github-script@v3
         with:
-          result-encoding: string
           script: |
-            core.setOutput('ownerRepoInfo', `${context.repo.owner}-${context.repo.repo}`);
-            core.setOutput('timeInfo', new Date(Date.now()).toISOString().replace(/[^0-9]/g, ""));
-            return context.repo.repo;
+            core.setOutput('ownerRepo', `${context.repo.owner}-${context.repo.repo}`)
       
       - name: Cache src repos with actions/cache
         uses: actions/cache@v2
         id: cacheSrcRepos
         with:
-          # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
-          path: ${{ github.workspace }}/mirror-repo-cache
-          key: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-cache-${{ steps.someInfo.outputs.timeInfo }}
-          # or
-          # key: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-${{ steps.someInfo.outputs.timeInfo }}
-          restore-keys: ${{ runner.os }}-${{ github.repository_owner }}-${{ steps.someInfo.outputs.result }}-cache-
-          # or
-          # restore-keys: ${{ runner.os }}-${{ steps.someInfo.outputs.ownerRepoInfo }}-cache-
+          # ${{ github.workspace }} 展开为: /home/runner/work/repo-sync-action/repo-sync-action
+          # ${{ github.job }} 展开为: <job_id>
+          # 运行时 path 展开为: /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
+          path: ${{ github.workspace }}/${{ github.job }}-cache
+          key: ${{ runner.os }}-${{ steps.getRepo.outputs.ownerRepo }}-${{ github.job }}-cache-${{ steps.getTime.outputs.date }}
+          restore-keys: ${{ runner.os }}-${{ steps.getRepo.outputs.ownerRepo }}-${{ github.job }}-cache-
 
       - name: Print the cache status
         if: steps.cacheSrcRepos.outputs.cache-hit == 'true'
@@ -76,7 +77,7 @@ jobs:
 
       - name: b Print post-cache path - Last time cache
         # 此时已经取回了上一次的缓存到指定的 'steps.cacheSrcRepos.with.path' 中
-        # 运行时缓存路径展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
+        # 运行时缓存路径展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
         run: |
           echo "ls -la" $PWD
           ls -la
@@ -84,8 +85,8 @@ jobs:
           echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
           echo ""
-          echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
-          ls -la ${{ github.workspace }}/mirror-repo-cache || (echo "error";exit 0)
+          echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || { echo "warning!";exit 0; }
 
       - name: Test dev
         # 终止进程之前运行该步骤的最大分钟数。
@@ -114,12 +115,12 @@ jobs:
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/mirror-repo-cache
+          cache_path: /github/workspace/${{ github.job }}-cache
 
       - name: c Print post-cache path - This time cache
         # 本次缓存（可能包含有仓库更新的内容），也就是 'steps.cacheSrcRepos.with.path' 中的所有内容，
         # 在下一次执行该工作流时，其会作为缓存。被取回到指定的 'steps.cacheSrcRepos.with.path' 中
-        # 运行时缓存路径展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/mirror-repo-cache
+        # 运行时缓存路径展开为: ls -la /home/runner/work/repo-sync-action/repo-sync-action/<job_id>-cache
         run: |
           echo "ls -la" $PWD
           ls -la
@@ -127,5 +128,5 @@ jobs:
           echo "ls -la" ${{ github.workspace }}
           ls -la ${{ github.workspace }}
           echo ""
-          echo "ls -la" ${{ github.workspace }}/mirror-repo-cache
-          ls -la ${{ github.workspace }}/mirror-repo-cache || (echo "error";exit 0)
+          echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || { echo "warning!";exit 0; }

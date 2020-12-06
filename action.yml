@@ -9,20 +9,12 @@ inputs:
     description: 'SSH URL of the source repo.'
     required: true
     default: ''
-  src_repo_url:
-    description: 'SSH URL of the source repo.'
-    required: true
-    default: ''
   src_repo_branch:
     description: "Branch name to sync from."
     default: 'refs/remotes/origin/*'
   src_repo_tag:
     description: "Tag name to sync from."
     default: 'refs/tags/*'
-  dst_repo_url:
-    description: 'SSH URL of the destination repo.'
-    required: true
-    default: ''
   dst_repo_branch:
     description: "Branch name to sync to."
     default: 'refs/heads/*'
@@ -31,7 +23,7 @@ inputs:
     default: 'refs/tags/*'
   cache_path:
     description: "The path to cache the source repos code."
-    default: '/github/workspace/mirror-repo-cache'
+    default: '/github/workspace/repo-mirror-cache'
   errexit_flag:
     description: "Exit immediately if a simple command exits with a non-zero status, must be true or false. (use 'set -e', equivalent to 'set -o errexit')"
     default: true
@@ -43,10 +35,8 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.src_to_dst }}
-    - ${{ inputs.src_repo_url }}
     - ${{ inputs.src_repo_branch }}
     - ${{ inputs.src_repo_tag }}
-    - ${{ inputs.dst_repo_url }}
     - ${{ inputs.dst_repo_branch }}
     - ${{ inputs.dst_repo_tag }}
     - ${{ inputs.cache_path }}

@@ -13,14 +13,11 @@ fi
 
 # ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
 SRC_TO_DST="${INPUT_SRC_TO_DST}"
-#SRC_REPO_URL="${INPUT_SRC_REPO_URL}"
 SRC_REPO_BRANCH="${INPUT_SRC_REPO_BRANCH}"
 SRC_REPO_TAG="${INPUT_SRC_REPO_TAG}"
-#DST_REPO_URL="${INPUT_DST_REPO_URL}"
 DST_REPO_BRANCH="${INPUT_DST_REPO_BRANCH}"
 DST_REPO_TAG="${INPUT_DST_REPO_TAG}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
-#SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL="$(basename "$SRC_REPO_URL")"
 
 # 提示语句字体颜色设置
 echo_color() {
@@ -71,9 +68,6 @@ print_var_info() {
     echo "SRC_TO_DST=$SRC_TO_DST"
     echo "ERREXIT_FLAG=$ERREXIT_FLAG"
     echo "XTRACE_DEBUG=$XTRACE_DEBUG"
-    #echo "SRC_REPO_URL=$SRC_REPO_URL"
-    #echo "DST_REPO_URL=$DST_REPO_URL"
-    #echo "SRC_REPO_DIR_OF_URL=$SRC_REPO_DIR_MAYBE_DOTGIT_OF_URL"
     echo "CACHE_PATH=$CACHE_PATH"
 }
 
@@ -578,7 +572,7 @@ EOF
             
             SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$src_repo_url")
             # 超时的时间
-            time_out=5m
+            time_out=3m
             # 使用普通克隆/推送
             if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
                 cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
