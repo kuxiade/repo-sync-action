@@ -6,7 +6,7 @@ branding:
   color: "blue"
 inputs:
   src_to_dst:
-    description: 'SSH URL of the source repo.'
+    description: "List of 'src repo url' to 'dst repo url', the repo url must be an SSH URL."
     required: true
     default: ''
   src_repo_branch:

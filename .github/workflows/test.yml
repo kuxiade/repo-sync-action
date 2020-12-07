@@ -95,6 +95,8 @@ jobs:
         env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+          GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         with:
           src_to_dst: |
             git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
