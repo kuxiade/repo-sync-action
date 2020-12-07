@@ -65,10 +65,10 @@ ssh_config() {
 
 git_config_info() {
 
-    git config user.name || echo "failed 'git config user.name'"
-    git config user.email || echo "failed 'git config user.email'"
-    # git_user_name=$(git config user.name)
-    # git_user_email=$(git config user.email)
+    # git config user.name || echo "failed 'git config user.name'"
+    # git config user.email || echo "failed 'git config user.email'"
+    git_user_name=$(git config user.name) && { echo_color cyan "user.name=$git_user_name";true; } || echo_color yellow "failed 'git config user.name'"
+    git_user_email=$(git config user.email) && { echo_color cyan "user.email=$git_user_email";true; } || echo_color yellow "failed 'git config user.email'"
 
     # echo_color cyan "user.name=$git_user_name"
     # echo_color cyan "user.email=$git_user_email"
