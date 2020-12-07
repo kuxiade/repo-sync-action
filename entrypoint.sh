@@ -57,6 +57,7 @@ ssh_config() {
         chmod 600 /root/.ssh/id_rsa
     else
         echo_color red "SSH_PRIVATE_KEY is empty!"
+        exit 1
     fi
 
     mkdir -p ~/.ssh
