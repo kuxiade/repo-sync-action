@@ -65,6 +65,7 @@ ssh_config() {
 
 git_config_info() {
 
+    cat /etc/ssh/ssh_config
     # git config user.name || echo "failed 'git config user.name'"
     # git config user.email || echo "failed 'git config user.email'"
     git_user_name=$(git config user.name) && { echo_color cyan "user.name=$git_user_name";true; } || echo_color yellow "failed 'git config user.name'"
