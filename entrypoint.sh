@@ -63,7 +63,9 @@ ssh_config() {
     cp /root/.ssh/* ~/.ssh/ 2> /dev/null || true
 }
 
-git_config_info() {
+# git 配置
+git_config() {
+    # 配置 git 用户信息
     if [ -n "$GIT_USER_NAME" ]; then
         git config --global user.name "$GIT_USER_NAME"
     else
@@ -75,25 +77,27 @@ git_config_info() {
     else
         echo_color yellow "GIT_USER_EMAIL is empty!"
     fi
+}
 
+# git 用户信息
+git_user_info() {
+    # 查看 git 用户信息
     if git_user_name=$(git config user.name); then
-        echo_color cyan "user.name=$git_user_name"
+        echo_color cyan "git.user.name=$git_user_name"
     else
         echo_color yellow "failed 'git config user.name'"
     fi
     
     if git_user_email=$(git config user.email); then
-        echo_color cyan "user.email=$git_user_email"
+        echo_color cyan "git.user.email=$git_user_email"
     else
         echo_color yellow "failed 'git config user.email'"
     fi
-    # 上面的 if-else-fi 的功能也使用下面的 A && B || C 方式实现，if-else-fi 的方式更加灵活。
+    # 上面 if-else-fi 实现的查看 git 用户信息功能也可以使用下面的 A && B || C 方式实现，if-else-fi 的方式更加灵活。
     # 在 A && B || C 方式中，当 A 为 true 且 B 为非 true 时，C 会执行，不符合要求。
     # 故，要求 B 中的命令即使报错也会继续执行(可使用 ; 来分割多条命令)且其最后一条命令返回值必须为 0(最后可使用 true 命令)。
-    #git_user_name=$(git config user.name) && { echo_color cyan "user.name=$git_user_name";true; } || echo_color yellow "failed 'git config user.name'"
-    #git_user_email=$(git config user.email) && { echo_color cyan "user.email=$git_user_email";true; } || echo_color yellow "failed 'git config user.email'"
-
-    
+    #git_user_name=$(git config user.name) && { echo_color cyan "git.user.name=$git_user_name";true; } || echo_color yellow "failed 'git config user.name'"
+    #git_user_email=$(git config user.email) && { echo_color cyan "git.user.email=$git_user_email";true; } || echo_color yellow "failed 'git config user.email'"
 }
 
 # 打印传入参数的值
@@ -498,7 +502,9 @@ entrypoint_main() {
     
     ssh_config
 
-    git_config_info
+    # git 配置。这里其实可以不用配置，不影响使用。
+    git_config
+    git_user_info
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
     #remove_cache_dir_flag="true"
