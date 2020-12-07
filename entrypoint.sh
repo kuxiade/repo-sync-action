@@ -55,20 +55,23 @@ ssh_config() {
         mkdir -p /root/.ssh
         echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
         chmod 600 /root/.ssh/id_rsa
+
+        mkdir -p ~/.ssh
+        cp /root/.ssh/* ~/.ssh/ 2> /dev/null || true
     else
         echo_color red "SSH_PRIVATE_KEY is empty!"
     fi
-
-    mkdir -p ~/.ssh
-    cp /root/.ssh/* ~/.ssh/ 2> /dev/null || true
 }
 
 git_config_info() {
-    git_user_name=$(git config user.name)
-    git_user_email=$(git config user.email)
 
-    echo_color cyan "user.name=$git_user_name"
-    echo_color cyan "user.email=$git_user_email"
+    git config user.name || echo "failed 'git config user.name'"
+    git config user.email || echo "failed 'git config user.email'"
+    # git_user_name=$(git config user.name)
+    # git_user_email=$(git config user.email)
+
+    # echo_color cyan "user.name=$git_user_name"
+    # echo_color cyan "user.email=$git_user_email"
 }
 
 # 打印传入参数的值
