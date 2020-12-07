@@ -63,6 +63,14 @@ ssh_config() {
     cp /root/.ssh/* ~/.ssh/ 2> /dev/null || true
 }
 
+git_config_info() {
+    git_user_name=$(git config user.name)
+    git_user_email=$(git config user.email)
+
+    echo_color cyan "user.name=$git_user_name"
+    echo_color cyan "user.email=$git_user_email"
+}
+
 # 打印传入参数的值
 print_var_info() {
     echo "SRC_TO_DST=$SRC_TO_DST"
@@ -464,6 +472,8 @@ entrypoint_main() {
     echo_color purple "<-------------------parameter info END--------------------->\n"
     
     ssh_config
+
+    git_config_info
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
     #remove_cache_dir_flag="true"
