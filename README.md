@@ -317,10 +317,6 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 - 官方创建 Docker Action 的参考示例：[actions/hello-world-docker-action](https://github.com/actions/hello-world-docker-action)
 
-- [巧用 Github Action 同步代码到 Gitee](./doc/巧用Github-Action同步代码到Gitee.md)
-
-  [Yikun/hub-mirror-action](https://github.com/Yikun/hub-mirror-action) 作者 Yikun 写的关于 Yikun/hub-mirror-action 的博客文章。
-
 - [复制（镜像）仓库](./doc/复制仓库.md)
 
   官方提供的复制仓库的方法。

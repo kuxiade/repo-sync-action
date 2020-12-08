@@ -3,7 +3,7 @@ name: Test repo-sync-action with cache
 on:
   # push推送时触发
   push:
-    branches: [ main-mini ]
+    branches: [ main ]
     # 匹配到该路径的文件有push时触发
     paths:
       # .github/workflows/ 目录下的文件有推送提交时，工作流触发
@@ -98,6 +98,7 @@ jobs:
           GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
           GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         with:
+          # 源端仓库链接 到 目的端仓库链接 的映射关系。
           src_to_dst: |
             git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
             git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git
