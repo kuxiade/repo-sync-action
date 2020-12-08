@@ -86,19 +86,19 @@ git_user_info() {
     if git_user_name=$(git config user.name); then
         echo_color cyan "git.user.name=$git_user_name"
     else
-        echo_color yellow "failed 'git config user.name'"
+        echo_color yellow "'git config user.name' cmd failed!"
     fi
     
     if git_user_email=$(git config user.email); then
         echo_color cyan "git.user.email=$git_user_email"
     else
-        echo_color yellow "failed 'git config user.email'"
+        echo_color yellow "'git config user.email' cmd failed!"
     fi
     # 上面 if-else-fi 实现的查看 git 用户信息功能也可以使用下面的 A && B || C 方式实现，if-else-fi 的方式更加灵活。
     # 在 A && B || C 方式中，当 A 为 true 且 B 为非 true 时，C 会执行，不符合要求。
     # 故，要求 B 中的命令即使报错也会继续执行(可使用 ; 来分割多条命令)且其最后一条命令返回值必须为 0(最后可使用 true 命令)。
-    #git_user_name=$(git config user.name) && { echo_color cyan "git.user.name=$git_user_name";true; } || echo_color yellow "failed 'git config user.name'"
-    #git_user_email=$(git config user.email) && { echo_color cyan "git.user.email=$git_user_email";true; } || echo_color yellow "failed 'git config user.email'"
+    #git_user_name=$(git config user.name) && { echo_color cyan "git.user.name=$git_user_name";true; } || echo_color yellow "'git config user.name' cmd failed!"
+    #git_user_email=$(git config user.email) && { echo_color cyan "git.user.email=$git_user_email";true; } || echo_color yellow "'git config user.email' cmd failed!"
 }
 
 # 打印传入参数的值
