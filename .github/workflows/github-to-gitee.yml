@@ -100,10 +100,11 @@ jobs:
         with:
           # 源端仓库链接 到 目的端仓库链接 的映射关系。
           src_to_dst: |
-            git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
-            git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git
-            git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
-            git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:kuxiade/doom-emacs.git
+            git@github.com:github/docs.git ---> git@gitee.com:mirror-hub/github-docs.git
+            git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
+            git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:mirror-hub/vscode-dev-containers.git
+            
+            git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:emacs-hub/doom-emacs.git
             git@github.com:manateelazycat/auto-save.git ---> git@gitee.com:emacs-hub/auto-save.git
             git@github.com:manateelazycat/aweshell.git ---> git@gitee.com:emacs-hub/aweshell.git
             git@github.com:manateelazycat/awesome-pair.git ---> git@gitee.com:emacs-hub/awesome-pair.git
