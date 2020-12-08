@@ -497,14 +497,14 @@ err_retry_cmd() {
 entrypoint_main() {
     echo -e ""
     echo_color cyan "--------> go in entrypoint_main func\n"
-    echo_color purple "<-------------------parameter info BEGIN------------------->"
+    echo_color purple "<--------parameter info BEGIN-------->"
     print_var_info
-    echo_color purple "<-------------------parameter info END--------------------->\n"
+    echo_color purple "<--------parameter info END---------->\n"
     
     ssh_config
 
     # git 配置。这里其实可以不用配置，不影响使用。
-    git_config
+    #git_config
     git_user_info
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
@@ -603,13 +603,13 @@ EOF
             #process_error_in_advance_flag="true"
             process_error_in_advance_flag=${process_error_in_advance_flag:-"false"}
             if [[ "$process_error_in_advance_flag" == "true" ]]; then
-                echo_color purple "<-------------------src_repo_url check_overall_validity_of_url BEGIN------------------->"
+                echo_color purple "<--------src_repo_url: validity BEGIN-------->"
                 check_overall_validity_of_url src_repo_url
-                echo_color purple "<-------------------src_repo_url check_overall_validity_of_url END--------------------->\n"
+                echo_color purple "<--------src_repo_url: validity END---------->\n"
 
-                echo_color purple "<-------------------dst_repo_url check_overall_validity_of_url BEGIN------------------->"
+                echo_color purple "<--------dst_repo_url: validity BEGIN-------->"
                 check_overall_validity_of_url dst_repo_url
-                echo_color purple "<-------------------dst_repo_url check_overall_validity_of_url END--------------------->\n"
+                echo_color purple "<--------dst_repo_url: validity END---------->\n"
             fi
             
             SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$src_repo_url")
@@ -618,7 +618,7 @@ EOF
             # 使用普通克隆/推送
             if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
                 cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
-                echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo BEGIN------------------->"
+                echo_color purple "<--------src_repo_url: Is dir a git repo BEGIN-------->"
 
                 validity_of_current_dir_as_git_repo=$(get_validity_of_current_dir_as_git_repo "$src_repo_url")
                 if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
@@ -640,7 +640,7 @@ EOF
                     cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
                 fi
 
-                echo_color purple "<-------------------src_repo_url check_validity_of_current_dir_as_git_repo END--------------------->\n"
+                echo_color purple "<--------src_repo_url: Is dir a git repo END---------->\n"
             else
                 echo_color yellow "no '$SRC_REPO_DIR_NO_DOTGIT_OF_URL: $src_repo_url' cache\n"
                 echo_color cyan "--------> git clone..."
