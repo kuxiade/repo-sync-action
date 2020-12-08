@@ -6,11 +6,10 @@
   - [`request_tool`(仅作参考)](#request_tool仅作参考)
   - [`process_error_in_advance_flag`(仅作参考)](#process_error_in_advance_flag仅作参考)
   - [`remove_cache_dir_flag`(仅作参考)](#remove_cache_dir_flag仅作参考)
-  - [`git_clone_type`(仅作参考)](#git_clone_type仅作参考)
+  - [`force_push_flag`(仅作参考)](#force_push_flag仅作参考)
 - [参数配置](#参数配置)
   - [`SSH_PRIVATE_KEY`(必需)](#SSH_PRIVATE_KEY必需)
-  - [`src_repo_url`(必需)](#src_repo_url必需)
-  - [`dst_repo_url`(必需)](#dst_repo_url必需)
+  - [`src_to_dst`(必需)](#src_to_dst必需)
   - [`src_repo_branch`(可选)](#src_repo_branch可选)
   - [`dst_repo_branch`(可选)](#dst_repo_branch可选)
   - [`src_repo_tag`(可选)](#src_repo_tag可选)
@@ -18,19 +17,21 @@
   - [`cache_path`(可选)](#cache_path可选)
   - [`errexit_flag`(可选)](#errexit_flag可选)
   - [`xtrace_debug`(可选)](#xtrace_debug可选)
-- [示例workflow](#示例workflow)
+- [单仓库同步-示例工作流](#单仓库同步-示例工作流)
   - [整个仓库同步](#整个仓库同步)
   - [单分支同步](#单分支同步)
   - [单标签同步](#单标签同步)
   - [删除目的端仓库上的某个分支](#删除目的端仓库上的某个分支)
   - [删除目的端仓库上的某个标签](#删除目的端仓库上的某个标签)
+- [多仓库同步-示例工作流](#多仓库同步-示例工作流)
+  - [多仓库-整个仓库同步](#多仓库-整个仓库同步)
 - [参考资料](#参考资料)
 
 ## 特别说明
 
 1. 本仓库 [action - kuxiade/repo-sync-action](https://github.com/kuxiade/repo-sync-action) 作为 Action 时，必需的核心文件实际上只有该仓库根目录下的 `Dockerfile`、`action.yml`、`entrypoint.sh` 这三个文件。其他文件与 Action 功能无关。
 
-2. 工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的 `jobs.<job_id>.runs-on` 设置为 `ubuntu-latest`，表示其虚拟环境为 `ubuntu-latest`，工作流中的操作就在该 `ubuntu-latest` 中构建执行。本 Action 为 `Docker Action`，`entrypoint.sh` 的执行实际在使用 `Dockerfile` 构建的容器内运行。其中，通过将 `ubuntu-latest` 中的文件夹设置为 Docker 容器的数据卷来存储容器中的数据（比如缓存文件），例如下面复制自示例工作流运行信息中的 `/usr/bin/docker run ... -v "/home/runner/work/repo-sync-action/repo-sync-action":"/github/workspace" ...`，挂载主机（示例工作流中为 ubuntu-latest）的本地目录 /home/runner/work/repo-sync-action/repo-sync-action 到容器的 /github/workspace 目录。
+2. 工作流文件 [github-to-gitee.yml](./.github/workflows/github-to-gitee.yml) 中的 `jobs.<job_id>.runs-on` 设置为 `ubuntu-latest`，表示其虚拟环境为 `ubuntu-latest`，工作流中的操作就在该 `ubuntu-latest` 中构建执行。本 Action 为 `Docker Action`，`entrypoint.sh` 的执行实际在使用 `Dockerfile` 构建的容器内运行。其中，通过将 `ubuntu-latest` 中的文件夹设置为 Docker 容器的数据卷来存储容器中的数据（比如缓存文件），例如下面复制自示例工作流运行信息中的 `/usr/bin/docker run ... -v "/home/runner/work/repo-sync-action/repo-sync-action":"/github/workspace" ...`，挂载主机（示例工作流中为 ubuntu-latest）的本地目录 /home/runner/work/repo-sync-action/repo-sync-action 到容器的 /github/workspace 目录。
 
     示例工作流运行信息：在虚拟环境（示例工作流中的虚拟环境为 ubuntu-latest）中 build docker image
     ```shell
@@ -70,7 +71,7 @@
 
 4. 将 SSH 公钥分别添加到源端平台（如 GitHub）和目的端平台（如 Gitee），这样，就能把 GitHub 虚拟环境作为中转站来从源端平台（如 GitHub）同步仓库到目的端平台（如 Gitee）了。
 
-5. 参照示例工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 的模式，新建用户自己的工作流文件（可直接将示例工作流文件 [repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml) 中的内容复制到用户自己的工作流文件中），将用户自己的工作流文件中的源端和目的端设置为用户所需的账号即可。
+5. 参照示例工作流文件 [github-to-gitee.yml](./.github/workflows/github-to-gitee.yml) 的模式，新建用户自己的工作流文件（可直接将示例工作流文件 [github-to-gitee.yml](./.github/workflows/github-to-gitee.yml) 中的内容复制到用户自己的工作流文件中），将用户自己的工作流文件中的源端和目的端设置为用户所需的账号即可。
 
 ## 特殊变量
 
@@ -88,9 +89,9 @@ process_error_in_advance_flag 变量位于 entrypoint_main 函数内，值为 "t
 
 remove_cache_dir_flag 变量位于 entrypoint_main 函数内，用于判断是否删除缓存目录，其值只能为 "true" 或 "false"。
 
-### `git_clone_type`(仅作参考)
+### `force_push_flag`(仅作参考)
 
-git_clone_type 变量位于 entrypoint_main 函数内，克隆时使用的方式（镜像克隆或者普通克隆），其值只能为 "mirror" 或 "normal"。
+force_push_flag 变量位于 entrypoint_main 函数内，用于是否强制推送，其值只能为 "mirror" 或 "normal"。
 
 ## 参数配置
 
@@ -114,13 +115,32 @@ git_clone_type 变量位于 entrypoint_main 函数内，克隆时使用的方式
 
 `GitHub(repository secret -> SSH private key)` --------> `虚拟机`(从 GitHub repository secret 获取到 SSH private key 并复制为自己的 SSH private key) <----(通过相对应的 SSH key 公私密钥对来相互通信)----> `Gitee(SSH public key)`
 
-### `src_repo_url`(必需)
+### `src_to_dst`(必需)
 
-需要被同步的源端仓库（必须为 SSH URLs）。
+源端仓库链接（必须为 SSH URLs）到目的端仓库链接（必须为 SSH URLs）的映射关系列表。`src repo url` 和 `src repo url`之间可以使用连续的非空白字符作为分隔符或者直接使用单个或连续的空格作为分隔符（最好在视觉上够清晰），格式如下：
 
-### `dst_repo_url`(必需)
-
-需要同步到的目的端仓库（必须为 SSH URLs）。
+$ cat .github/workflows/github-to-gitee.yml
+```yaml
+- name: Sync from Github to Gitee with repo-sync-action
+  # 终止进程之前运行该步骤的最大分钟数。
+  timeout-minutes: 30
+  # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
+  continue-on-error: true
+  uses: ./.
+  env:
+    # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+    SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+  with:
+    # 源端仓库链接 到 目的端仓库链接 的映射关系。
+    src_to_dst: |
+      git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
+      git@github.com:microsoft/vscode-dev-containers.git . git@gitee.com:kuxiade/vscode-dev-containers.git
+      git@github.com:hlissner/doom-emacs.git  git@gitee.com:kuxiade/doom-emacs.git
+      git@github.com:manateelazycat/color-rg.git <+..+--> git@gitee.com:emacs-hub/color-rg.git
+    # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
+```
 
 ### `src_repo_branch`(可选)
 
@@ -148,7 +168,7 @@ git_clone_type 变量位于 entrypoint_main 函数内，克隆时使用的方式
 
 ### `cache_path`(可选)
 
-默认值为 '/github/workspace/mirror-repo-cache'
+默认值为 '/github/workspace/repo-mirror-cache'
 
 `cache_path` 选项需要搭配 [actions/cache](https://github.com/actions/cache) 使用，配置后会对同步的仓库内容进行缓存，缩短仓库同步时间。有关缓存相关，请阅读[缓存依赖项以加快工作流程](https://docs.github.com/cn/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows)
 
@@ -165,17 +185,17 @@ git_clone_type 变量位于 entrypoint_main 函数内，克隆时使用的方式
 为 entrypoint.sh 设置 'set -x'，其值必须为 "true" 或者 "false"，默认值为 "false"。如果不知其作用，请勿设置该参数。
 
 
-## 示例workflow
+## 单仓库同步-示例工作流
 
-详细的使用示例见：[repo-sync-action-cache-test.yml](./.github/workflows/repo-sync-action-cache-test.yml)。
+详细的使用示例见：[github-to-gitee.yml](./.github/workflows/github-to-gitee.yml)。
 
 ### 整个仓库同步
 
 整个仓库同步，包含同步所有分支和所有标签
 
-$ cat .github/workflows/repo-sync-action-cache-test.yml
+$ cat .github/workflows/github-to-gitee.yml
 ```yaml
-- name: Mirror Github:github/docs to Gitee with repo-sync-action
+- name: Sync Github:github/docs to Gitee with repo-sync-action
   uses: ./.
   env:
     # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
@@ -188,7 +208,8 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # 需要同步到的目的仓库
     dst_repo_url: "git@gitee.com:kuxiade/github-docs.git"
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-    cache_path: /github/workspace/mirror-repo-cache
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
 ```
 
 ### 单分支同步
@@ -197,9 +218,9 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `csharp-update` 分支不存在的话，会自动创建 `csharp-update` 分支
 
-$ cat .github/workflows/repo-sync-action-cache-test.yml
+$ cat .github/workflows/github-to-gitee.yml
 ```yaml
-- name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
+- name: Sync Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
   # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
   continue-on-error: true
   uses: ./.
@@ -207,16 +228,14 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
     SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
   with:
-    # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-    # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-    # 需要被同步的源端仓库
-    src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
+    # 源端仓库链接 到 目的端仓库链接 的映射关系。
+    src_to_dst: |
+      git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
     src_repo_branch: "refs/remotes/origin/bowdenk7"
-    # 需要同步到的目的仓库
-    dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
     dst_repo_branch: "refs/heads/csharp-update"
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-    cache_path: /github/workspace/mirror-repo-cache
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
 ```
 
 ### 单标签同步
@@ -225,9 +244,9 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
 
 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `v0.148.0` 标签不存在的话，会自动创建 `v0.148.0` 标签
 
-$ cat .github/workflows/repo-sync-action-cache-test.yml
+$ cat .github/workflows/github-to-gitee.yml
 ```yaml
-- name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
+- name: Sync Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
   # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
   continue-on-error: true
   uses: ./.
@@ -235,27 +254,25 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
     SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
   with:
-    # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-    # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-    # 需要被同步的源端仓库
-    src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
+    # 源端仓库链接 到 目的端仓库链接 的映射关系。
+    src_to_dst: |
+      git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
     #src_repo_branch: "refs/remotes/origin/bowdenk7"
     src_repo_tag: "refs/tags/v0.150.0"
-    # 需要同步到的目的仓库
-    dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
     #dst_repo_branch: "refs/heads/csharp-update"
     dst_repo_tag: "v0.148.0"
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-    cache_path: /github/workspace/mirror-repo-cache
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
 ```
 
 ### 删除目的端仓库上的某个分支
 
 删除 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `csharp-update` 分支
 
-$ cat .github/workflows/repo-sync-action-cache-test.yml
+$ cat .github/workflows/github-to-gitee.yml
 ```yaml
-- name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
+- name: Sync Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
   # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
   continue-on-error: true
   uses: ./.
@@ -263,25 +280,23 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
     SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
   with:
-    # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-    # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-    # 需要被同步的源端仓库
-    src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
+    # 源端仓库链接 到 目的端仓库链接 的映射关系。
+    src_to_dst: |
+      git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
     src_repo_branch: ""
-    # 需要同步到的目的仓库
-    dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
     dst_repo_branch: "refs/heads/csharp-update"
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-    cache_path: /github/workspace/mirror-repo-cache
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
 ```
 
 ### 删除目的端仓库上的某个标签
 
 删除 [git@gitee.com:kuxiade/vscode-dev-containers.git](https://gitee.com/kuxiade/vscode-dev-containers) 上的 `v0.150.0` 标签
 
-$ cat .github/workflows/repo-sync-action-cache-test.yml
+$ cat .github/workflows/github-to-gitee.yml
 ```yaml
-- name: Mirror Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
+- name: Sync Github:microsoft/vscode-dev-containers to Gitee with repo-sync-action
   # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
   continue-on-error: true
   uses: ./.
@@ -289,18 +304,45 @@ $ cat .github/workflows/repo-sync-action-cache-test.yml
     # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
     SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
   with:
-    # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-    # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-    # 需要被同步的源端仓库
-    src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
+    # 源端仓库链接 到 目的端仓库链接 的映射关系。
+    src_to_dst: |
+      git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
     #src_repo_branch: "refs/remotes/origin/bowdenk7"
     src_repo_tag: ""
-    # 需要同步到的目的仓库
-    dst_repo_url: "git@gitee.com:kuxiade/vscode-dev-containers.git"
     #dst_repo_branch: "refs/heads/csharp-update"
     dst_repo_tag: "v0.150.0"
     # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-    cache_path: /github/workspace/mirror-repo-cache
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
+```
+
+## 多仓库同步-示例工作流
+
+详细的使用示例见：[github-to-gitee.yml](./.github/workflows/github-to-gitee.yml)。
+
+### 多仓库-整个仓库同步
+
+对当前 Action 而言，所有仓库都必须是整个仓库同步（包含同步所有分支和所有标签），无法为每个仓库单独指定分支或标签来同步。如果像上面那样指定分支或标签，那么就表示所有分支都如此。但是，不是所有分支都有指定的分支或标签的。故，建议需要指定分支或标签的同步请使用上面的单仓库同步的方式。
+
+$ cat .github/workflows/github-to-gitee.yml
+```yaml
+- name: Sync from Github to Gitee with repo-sync-action
+  # 终止进程之前运行该步骤的最大分钟数。
+  timeout-minutes: 30
+  # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
+  continue-on-error: true
+  uses: ./.
+  env:
+    # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
+    SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+  with:
+    # 源端仓库链接 到 目的端仓库链接 的映射关系。
+    src_to_dst: |
+      git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
+      git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
+    # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
+    # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
+    cache_path: /github/workspace/${{ github.job }}-cache
 ```
 
 ## 参考资料
