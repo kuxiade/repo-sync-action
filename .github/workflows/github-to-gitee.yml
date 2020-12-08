@@ -1,9 +1,9 @@
-name: Sync repo from Github to Gitee
+name: Test repo-sync-action with cache
 
 on:
   # push推送时触发
   push:
-    branches: [ main ]
+    branches: [ main-mini ]
     # 匹配到该路径的文件有push时触发
     paths:
       # .github/workflows/ 目录下的文件有推送提交时，工作流触发
@@ -18,16 +18,17 @@ on:
     #   - 'docs/**'
     #   - 'README.md'
   # 定时任务触发
-  #schedule:
-  #  # Runs at 04:00 UTC (12:00 AM Beijing) every day
-  #  #- cron:  '0 4 * * *'
-  #  # 每隔4小时执行一次
-  #  - cron:  '0 */4 * * *'
+  schedule:
+    # 每天北京时间9点跑
+    # Runs at 04:00 UTC (12:00 AM Beijing) every day
+    - cron:  '*/15 * * * *'
 
 jobs:
   job1:
-    name: Github to Gitee:emacs-hub
+    name: Run test
     runs-on: ubuntu-latest
+    # 在 GitHub 自动取消运行之前可让作业运行的最大分钟数。 默认值：360
+    timeout-minutes: 60
     steps:
       - name: a Print sys-release
         run: |
@@ -85,266 +86,35 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
-          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || { echo "warning!";exit 0; }
 
-      - name: Mirror docs
+      - name: Test dev
+        # 终止进程之前运行该步骤的最大分钟数。
+        timeout-minutes: 30
         uses: ./
         env:
           # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+          GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:github/docs.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:mirror-hub/github-docs.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror ohmyzsh
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:ohmyzsh/ohmyzsh.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:mirror-hub/ohmyzsh.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror vscode-dev-containers
-        # 将 continue-on-error 设置为 true，表示即使当前 step 报错，后续的 steps 也能继续执行。
-        #continue-on-error: true
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:microsoft/vscode-dev-containers.git"
-          #src_repo_branch: "refs/remotes/origin/bowdenk7"
-          #src_repo_tag: "refs/tags/v0.150.0"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:mirror-hub/vscode-dev-containers.git"
-          #dst_repo_branch: "refs/heads/csharp-update"
-          #dst_repo_tag: "v0.150.0"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror doom-emacs
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:hlissner/doom-emacs.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/doom-emacs.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: "/github/workspace/${{ github.job }}-cache"
-
-      - name: Mirror auto-save
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/auto-save.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/auto-save.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror aweshell
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/aweshell.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/aweshell.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror awesome-pair
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/awesome-pair.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/awesome-pair.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror awesome-tab
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/awesome-tab.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/awesome-tab.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror color-rg
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/color-rg.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/color-rg.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror company-english-helper
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/company-english-helper.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/company-english-helper.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror emacs-application-framework
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/emacs-application-framework.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/emacs-application-framework.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror insert-translated-name
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/insert-translated-name.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/insert-translated-name.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror nox
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/nox.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/nox.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror sdcv
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/sdcv.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/sdcv.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror snails
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/snails.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/snails.git"
-          # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
-          # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
-          cache_path: /github/workspace/${{ github.job }}-cache
-
-      - name: Mirror thing-edit
-        uses: ./
-        env:
-          # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-        with:
-          # # 用于目的端上传代码的SSH key，用于从gituhb虚拟机上传代码到目的端仓库。
-          # ssh_private_key: ${{ secrets.GITEE_PRIVATE_SSH_KEY }}
-          # 需要被同步的源端仓库
-          src_repo_url: "git@github.com:manateelazycat/thing-edit.git"
-          # 需要同步到的目的仓库
-          dst_repo_url: "git@gitee.com:emacs-hub/thing-edit.git"
+          src_to_dst: |
+            git@github.com:github/docs.git ---> git@gitee.com:kuxiade/github-docs.git
+            git@github.com:Yikun/hub-mirror-action.git ---> git@gitee.com:kuxiade/hub-mirror-action.git
+            git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:kuxiade/vscode-dev-containers.git
+            git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:kuxiade/doom-emacs.git
+            git@github.com:manateelazycat/auto-save.git ---> git@gitee.com:emacs-hub/auto-save.git
+            git@github.com:manateelazycat/aweshell.git ---> git@gitee.com:emacs-hub/aweshell.git
+            git@github.com:manateelazycat/awesome-pair.git ---> git@gitee.com:emacs-hub/awesome-pair.git
+            git@github.com:manateelazycat/awesome-tab.git ---> git@gitee.com:emacs-hub/awesome-tab.git
+            git@github.com:manateelazycat/color-rg.git ---> git@gitee.com:emacs-hub/color-rg.git
+            git@github.com:manateelazycat/company-english-helper.git ---> git@gitee.com:emacs-hub/company-english-helper.git
+            git@github.com:manateelazycat/emacs-application-framework.git ---> git@gitee.com:emacs-hub/emacs-application-framework.git
+            git@github.com:manateelazycat/insert-translated-name.git ---> git@gitee.com:emacs-hub/insert-translated-name.git
+            git@github.com:manateelazycat/nox.git ---> git@gitee.com:emacs-hub/nox.git
+            git@github.com:manateelazycat/sdcv.git ---> git@gitee.com:emacs-hub/sdcv.git
+            git@github.com:manateelazycat/snails.git  git@gitee.com:emacs-hub/snails.git
+            git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
@@ -361,4 +131,4 @@ jobs:
           ls -la ${{ github.workspace }}
           echo ""
           echo "ls -la" ${{ github.workspace }}/${{ github.job }}-cache
-          ls -la ${{ github.workspace }}/${{ github.job }}-cache || (echo "warning!";exit 0)
+          ls -la ${{ github.workspace }}/${{ github.job }}-cache || { echo "warning!";exit 0; }
