@@ -11,7 +11,7 @@ if [[ "$XTRACE_DEBUG" == "true" ]]; then
   set -x
 fi
 
-# ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY
+# ENV: GITHUB_ACCESS_TOKEN GITEE_ACCESS_TOKEN SSH_PRIVATE_KEY GIT_USER_NAME GIT_USER_EMAIL
 SRC_TO_DST="${INPUT_SRC_TO_DST}"
 SRC_REPO_BRANCH="${INPUT_SRC_REPO_BRANCH}"
 SRC_REPO_TAG="${INPUT_SRC_REPO_TAG}"
@@ -49,6 +49,7 @@ echo_color() {
     esac
 }
 
+# SSH 配置
 ssh_config() {
     if [ -n "$SSH_PRIVATE_KEY" ]; then
         echo_color cyan "Setting SSH key\n"
@@ -501,11 +502,12 @@ entrypoint_main() {
     print_var_info
     echo_color purple "<--------parameter info END---------->\n"
     
+    # SSH 配置
     ssh_config
 
     # git 配置。这里其实可以不用配置，不影响使用。
     #git_config
-    git_user_info
+    #git_user_info
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
     #remove_cache_dir_flag="true"
