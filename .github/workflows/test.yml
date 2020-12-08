@@ -115,7 +115,6 @@ jobs:
             git@github.com:manateelazycat/sdcv.git ---> git@gitee.com:emacs-hub/sdcv.git
             git@github.com:manateelazycat/snails.git  git@gitee.com:emacs-hub/snails.git
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
-            git@github.com:kuxiade/repo-sync-action.git ---> git@gitee.com:backup-hub/repo-sync-action.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
