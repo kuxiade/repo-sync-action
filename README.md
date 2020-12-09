@@ -15,6 +15,7 @@
   - [`src_repo_tag`(可选)](#src_repo_tag可选)
   - [`dst_repo_tag`(可选)](#dst_repo_tag可选)
   - [`cache_path`(可选)](#cache_path可选)
+  - [`time_out`(可选)](#time_out可选)
   - [`errexit_flag`(可选)](#errexit_flag可选)
   - [`xtrace_debug`(可选)](#xtrace_debug可选)
 - [单仓库同步-示例工作流](#单仓库同步-示例工作流)
@@ -117,7 +118,7 @@ force_push_flag 变量位于 entrypoint_main 函数内，用于是否强制推�
 
 ### `src_to_dst`(必需)
 
-源端仓库链接（必须为 SSH URLs）到目的端仓库链接（必须为 SSH URLs）的映射关系列表。`src repo url` 和 `src repo url`之间可以使用**连续的非空白字符**作为分隔符或者直接使用**单个或连续的空格**作为分隔符（最好在视觉上 url 和分隔符有区分度），格式如下：
+源端仓库链接（必须为 SSH URLs）到目的端仓库链接（必须为 SSH URLs）的映射关系列表。`src repo url` 和 `src repo url` 之间可以使用“连续的非空白字符”作为分隔符或者直接使用“单个或连续的空格”作为分隔符（最好在视觉上 url 和分隔符有区分度），格式如下：
 
 $ cat .github/workflows/github-to-gitee.yml
 ```yaml
@@ -172,9 +173,9 @@ $ cat .github/workflows/github-to-gitee.yml
 
 `cache_path` 选项需要搭配 [actions/cache](https://github.com/actions/cache) 使用，配置后会对同步的仓库内容进行缓存，缩短仓库同步时间。有关缓存相关，请阅读[缓存依赖项以加快工作流程](https://docs.github.com/cn/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows)
 
-### `request_tool`(可选)
+### `time_out`(可选)
 
-判断仓库是否存在所使用的工具，其值必须为 "git" 或者 "curl"，默认值为 "git"。由于 curl 访问 GitHub API 在单位时间内有次数限制，其功能代码仅作参考。故最好使用默认值，即不要设置该参数为 "curl"。
+`time_out` 就是 timeout 命令中的持续时间（DURATION），对 timeout 后接的 COMMAND 起作用。一旦 COMMAND 运行时间超过 DURATION，则 COMMAND 停止运行。`time_out` 的默认值为 '3m'。
 
 ### `errexit_flag`(可选)
 

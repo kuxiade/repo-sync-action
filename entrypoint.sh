@@ -18,6 +18,8 @@ SRC_REPO_TAG="${INPUT_SRC_REPO_TAG}"
 DST_REPO_BRANCH="${INPUT_DST_REPO_BRANCH}"
 DST_REPO_TAG="${INPUT_DST_REPO_TAG}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
+# timeout命令中的持续时间
+TIME_OUT="${INPUT_TIME_OUT}"
 
 # 提示语句字体颜色设置
 echo_color() {
@@ -108,6 +110,7 @@ print_var_info() {
     echo "ERREXIT_FLAG=$ERREXIT_FLAG"
     echo "XTRACE_DEBUG=$XTRACE_DEBUG"
     echo "CACHE_PATH=$CACHE_PATH"
+    echo "TIME_OUT=$TIME_OUT"
 }
 
 # 判断字符串中是否含有空格
@@ -231,6 +234,7 @@ get_reponame_from_url() {
 
 # 判断 github 上的仓库拥有者名称是否合法
 check_validity_of_repoowner_adapt_github() {
+    # 待定
     :
 }
 
@@ -615,10 +619,8 @@ EOF
             fi
             
             SRC_REPO_DIR_NO_DOTGIT_OF_URL=$(get_reponame_from_url "$src_repo_url")
-            # 超时的时间
-            time_out=3m
             # 使用普通克隆/推送
-            if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ] ; then
+            if [ -d "$SRC_REPO_DIR_NO_DOTGIT_OF_URL" ]; then
                 cd "$SRC_REPO_DIR_NO_DOTGIT_OF_URL"
                 echo_color purple "<--------src_repo_url: Is dir a git repo BEGIN-------->"
 
@@ -626,7 +628,7 @@ EOF
                 if [[ "$validity_of_current_dir_as_git_repo" == "true" ]]; then
                     echo_color green "current dir is a git repo!"
                     echo_color green "The repo url of pre-fetch matches the src repo url."
-                    err_retry_cmd timeout $time_out git pull --prune || { echo_color red "error for 'git pull --prune'";exit 1; }
+                    err_retry_cmd timeout "$TIME_OUT" git pull --prune || { echo_color red "error for 'git pull --prune'";exit 1; }
                 elif [[ "$validity_of_current_dir_as_git_repo" == "warn" ]]; then
                     echo_color green "current dir is a git repo!"
                     echo_color yellow "The repo url of pre-fetch dose not matches the src repo url."
@@ -724,14 +726,14 @@ EOF
                 echo_color yellow "remove $DST_REPO_BRANCH branch for $dst_repo_url."
             fi
             # 推送分支
-            err_retry_cmd timeout $time_out git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}" \
+            err_retry_cmd timeout "$TIME_OUT" git push origin "${SRC_REPO_BRANCH}:${DST_REPO_BRANCH}" "${git_push_branch_args[@]}" \
             || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
             echo_color cyan "--------> git push tags..."
             if [[ "$remove_tag" == "true" ]]; then
                 echo_color yellow "remove $DST_REPO_TAG tag for $dst_repo_url."
             fi
             # 推送标签
-            err_retry_cmd timeout $time_out git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
+            err_retry_cmd timeout "$TIME_OUT" git push origin "${SRC_REPO_TAG}:${DST_REPO_TAG}" "${git_push_tag_args[@]}" \
             || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
             
             echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") END========================>"
