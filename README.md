@@ -175,7 +175,7 @@ $ cat .github/workflows/github-to-gitee.yml
 
 ### `time_out`(可选)
 
-`time_out` 就是 timeout 命令中的持续时间（DURATION），对 timeout 后接的 COMMAND 起作用。一旦 COMMAND 运行时间超过 DURATION，则 COMMAND 停止运行。`time_out` 的默认值为 '3m'。
+`time_out` 就是 timeout 命令中的持续时间（DURATION），对 timeout 后接的 COMMAND 起作用。一旦 COMMAND 运行时间超过 DURATION，则 COMMAND 停止运行。`time_out` 的默认值为 '3m'，表示3分钟。timeout 涉及到的命令主要为 'git clone'，'git pull'，'git push' 等 git 克隆/拉取/推送相关的命令。
 
 ### `errexit_flag`(可选)
 

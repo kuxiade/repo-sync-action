@@ -27,6 +27,9 @@ inputs:
   time_out:
     description: "The duration of the timeout command."
     default: '3m'
+  retry_times:
+    description: "Command retries."
+    default: '2'
   errexit_flag:
     description: "Exit immediately if a simple command exits with a non-zero status, must be true or false. (use 'set -e', equivalent to 'set -o errexit')"
     default: true
@@ -44,5 +47,6 @@ runs:
     - ${{ inputs.dst_repo_tag }}
     - ${{ inputs.cache_path }}
     - ${{ inputs.time_out }}
+    - ${{ inputs.retry_times }}
     - ${{ inputs.errexit_flag }}
     - ${{ inputs.xtrace_debug }}

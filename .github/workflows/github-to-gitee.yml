@@ -120,6 +120,10 @@ jobs:
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
+          # timeout命令中的持续时间
+          time_out: '2m'
+          # 命令重试总次数
+          retry_times: 3
 
       - name: c Print post-cache path - This time cache
         # 本次缓存（可能包含有仓库更新的内容），也就是 'steps.cacheSrcRepos.with.path' 中的所有内容，

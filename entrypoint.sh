@@ -20,6 +20,8 @@ DST_REPO_TAG="${INPUT_DST_REPO_TAG}"
 CACHE_PATH="${INPUT_CACHE_PATH}"
 # timeout命令中的持续时间
 TIME_OUT="${INPUT_TIME_OUT}"
+# 命令重试总次数
+RETRY_TIMES="${INPUT_RETRY_TIMES}"
 
 # 提示语句字体颜色设置
 echo_color() {
@@ -474,8 +476,8 @@ get_validity_of_current_dir_as_git_repo() {
 
 # 命令出错或失败或超时时重试
 err_retry_cmd() {
-    # 重试总次数
-    local sum_retry=2
+    # 命令重试总次数
+    local sum_retry=$RETRY_TIMES
     # 重试计数
     local num_retry=0
     # 重试之前的等待时间，防止前次命令的进程还没有退出。
