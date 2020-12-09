@@ -113,6 +113,7 @@ print_var_info() {
     echo "XTRACE_DEBUG=$XTRACE_DEBUG"
     echo "CACHE_PATH=$CACHE_PATH"
     echo "TIME_OUT=$TIME_OUT"
+    echo "RETRY_TIMES=$RETRY_TIMES"
 }
 
 # 判断字符串中是否含有空格

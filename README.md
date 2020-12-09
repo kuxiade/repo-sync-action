@@ -16,6 +16,7 @@
   - [`dst_repo_tag`(可选)](#dst_repo_tag可选)
   - [`cache_path`(可选)](#cache_path可选)
   - [`time_out`(可选)](#time_out可选)
+  - [`retry_times`(可选)](#retry_times可选)
   - [`errexit_flag`(可选)](#errexit_flag可选)
   - [`xtrace_debug`(可选)](#xtrace_debug可选)
 - [单仓库同步-示例工作流](#单仓库同步-示例工作流)
@@ -176,6 +177,10 @@ $ cat .github/workflows/github-to-gitee.yml
 ### `time_out`(可选)
 
 `time_out` 就是 timeout 命令中的持续时间（DURATION），对 timeout 后接的 COMMAND 起作用。一旦 COMMAND 运行时间超过 DURATION，则 COMMAND 停止运行。`time_out` 的默认值为 '3m'，表示3分钟。timeout 涉及到的命令主要为 'git clone'，'git pull'，'git push' 等 git 克隆/拉取/推送相关的命令。
+
+### `retry_times`(可选)
+
+命令重试总次数，默认值为2。
 
 ### `errexit_flag`(可选)
 
