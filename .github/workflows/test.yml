@@ -1,0 +1,43 @@
+name: For testing
+
+on:
+  # push推送时触发
+  push:
+    branches: [ main ]
+    # 匹配到该路径的文件有push时触发
+    paths:
+      # .github/workflows/ 目录下的文件有推送提交时，工作流触发
+      #- '.github/workflows/**'
+      # 只有当本文件有推送提交时，才工作流触发
+      - '.github/workflows/test.yml'
+  #     - 'action.yml'
+  #     - 'Dockerfile'
+  #     - 'entrypoint.sh'
+  #   # paths-ignore 表示该路径的文件有push时忽略触发。这里使用上面的 paths 来设置更符合我的要求(只有当本文件有推送提交时，该工作流触发 )。
+  #   # paths-ignore:
+  #   #   - 'docs/**'
+  #   #   - 'README.md'
+  # # 定时任务触发
+  # schedule:
+  #   # 每天北京时间9点跑
+  #   # Runs at 04:00 UTC (12:00 AM Beijing) every day
+  #   - cron:  '*/15 * * * *'
+
+jobs:
+  job1:
+    name: Test
+    runs-on: ubuntu-latest
+    # 在 GitHub 自动取消运行之前可让作业运行的最大分钟数。 默认值：360
+    timeout-minutes: 60
+    steps:
+      - name: test internet speed
+        run: |
+          echo "Print sys-release"
+          cat /etc/*-release
+          mkdir test-temp
+          cd test-temp
+          echo "begining"
+          date -u +%T
+          git clone https://github.com/emacs-mirror/emacs.git
+          date -u +%T
+          echo "end"
