@@ -37,6 +37,7 @@ jobs:
           mkdir test-temp
           cd test-temp
           echo "begining"
+          export TZ=Asia/Shanghai
           date +%T
           git clone https://github.com/emacs-mirror/emacs.git
           date +%T
