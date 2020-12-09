@@ -37,8 +37,9 @@ jobs:
           mkdir test-temp
           cd test-temp
           echo "begining"
-          date -u +%T
+          date +%T
           git clone https://github.com/emacs-mirror/emacs.git
-          date -u +%T
+          date +%T
           echo "end"
           du -sh *
+          du -sm *
