@@ -41,3 +41,4 @@ jobs:
           git clone https://github.com/emacs-mirror/emacs.git
           date -u +%T
           echo "end"
+          du -sh *
