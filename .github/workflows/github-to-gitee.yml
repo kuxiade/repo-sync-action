@@ -103,6 +103,7 @@ jobs:
             git@github.com:github/docs.git ---> git@gitee.com:mirror-hub/github-docs.git
             git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:mirror-hub/vscode-dev-containers.git
+            git@github.com:fengyuhetao/shell.git ---> git@gitee.com:mirror-hub/shell.git
             
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:emacs-hub/doom-emacs.git
             git@github.com:manateelazycat/auto-save.git ---> git@gitee.com:emacs-hub/auto-save.git
