@@ -487,6 +487,9 @@ err_retry_cmd() {
         exit_status_code=$?
         pre_num_retry=$num_retry
         num_retry=$((num_retry + 1))
+        # 对每次重试的休眠时间做一个加权，期望加权后能解决休眠时间过短造成的失误（该失误为小概率事件，基本不会碰到，防范未然）。不一定有效，可能是多此一举，姑且一试吧。
+        sleep_time=$((sleep_time+2*pre_num_retry))
+        echo "sleep_time=$sleep_time"
         if (( num_retry <= sum_retry )); then
             echo_color yellow "Command failed! exit_status_code=$exit_status_code"
             echo_color cyan "($num_retry/$sum_retry) Retry after $sleep_time seconds..."
