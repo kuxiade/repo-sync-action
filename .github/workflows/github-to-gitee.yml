@@ -106,6 +106,7 @@ jobs:
             git@github.com:fengyuhetao/shell.git ---> git@gitee.com:mirror-hub/shell.git
             
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:emacs-hub/doom-emacs.git
+            git@github.com:syl20bnr/spacemacs.git ---> git@gitee.com:emacs-hub/spacemacs.git
             git@github.com:manateelazycat/auto-save.git ---> git@gitee.com:emacs-hub/auto-save.git
             git@github.com:manateelazycat/aweshell.git ---> git@gitee.com:emacs-hub/aweshell.git
             git@github.com:manateelazycat/awesome-pair.git ---> git@gitee.com:emacs-hub/awesome-pair.git
