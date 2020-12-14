@@ -51,7 +51,7 @@ jobs:
         id: getTime
         run: |
           export TZ=Asia/Shanghai
-          echo "::set-output name=date::$(/bin/date "+%Y%m%d%H%M%S-%N")"
+          echo "::set-output name=date::$(/bin/date "+%Y-%m-%d_%H-%M-%S-%N")"
         shell: bash
 
       - name: Get Repo info
