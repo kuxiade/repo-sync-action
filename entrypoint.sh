@@ -530,6 +530,8 @@ entrypoint_main() {
         mkdir -p "$CACHE_PATH"
     fi
     cd "$CACHE_PATH"
+    echo "ls -la" "$PWD"
+    ls -la
 
     # 下面块注释的内容仅供参考
 :<<EOF
@@ -744,6 +746,10 @@ EOF
             echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") END========================>"
         fi
     done
+
+    cd ..
+    echo "ls -la" "$PWD"
+    ls -la
 }
 
 # 入口
