@@ -50,7 +50,9 @@ jobs:
       - name: Get Time info
         id: getTime
         run: |
+          : 时区设置为 Asia/Shanghai
           export TZ=Asia/Shanghai
+          : 获取时间
           echo "::set-output name=date::$(/bin/date "+%Y-%m-%d_%H-%M-%S-%N")"
         shell: bash
 
