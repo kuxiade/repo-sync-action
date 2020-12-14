@@ -582,6 +582,7 @@ EOF
     i_total=$(echo "$SRC_TO_DST" | grep -cv "^$")
     # 处理到第几个仓库映射了
     i_count=0
+    # 注意，这里使用的是管道符号，这使得while语句在子shell中执行，这意味着while语句内部设置的变量、数组、函数等在循环外部都不再生效。
     echo "$SRC_TO_DST" | while read -r src_to_dst_per_line; do     # 注意，read 后的 -r：不允许反斜杠来转义任何字符。
         if [ -n "$src_to_dst_per_line" ]; then
             i_count_tmp=$i_count
@@ -744,6 +745,8 @@ EOF
             || { echo_color red "error for 'git push origin ${SRC_REPO_BRANCH}:${DST_REPO_BRANCH} ${git_push_branch_args[*]}'";exit 1; }
             
             echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") END========================>"
+
+            cd ..
         fi
     done
     echo "ls -la" "$PWD"
