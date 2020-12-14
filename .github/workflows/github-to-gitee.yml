@@ -50,7 +50,8 @@ jobs:
       - name: Get Time info
         id: getTime
         run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d%H%M%S%N")"
+          export TZ=Asia/Shanghai
+          echo "::set-output name=date::$(/bin/date "+%Y%m%d%H%M%S-%N")"
         shell: bash
 
       - name: Get Repo info
