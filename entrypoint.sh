@@ -746,7 +746,8 @@ EOF
             echo_color purple "<======================(${i_count}/${i_total}) $(get_reponame_from_url "$src_repo_url") END========================>"
         fi
     done
-
+    echo "ls -la" "$PWD"
+    ls -la
     cd ..
     echo "ls -la" "$PWD"
     ls -la
