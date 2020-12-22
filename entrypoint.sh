@@ -678,8 +678,8 @@ EOF
                 dst_repo_url=${src_to_dst_array_per_line[2]}
             else
                 echo ""
-                echo -e "${Red}(${i_count}/${i_total})${Color_off} '${BIRed}src_to_dst${Color_off}' ${Red}mapping error!${Color_off}"
-                echo -e "${Red}(${i_count}/${i_total})${Color_off} ${Red}The error mapping is${Color_off} '${BIRed}${src_to_dst_array_per_line[*]}${Color_off}'"
+                echo -e "${Red}(${i_count}/${i_total})${Color_off} '${BIRed}src_to_dst${Color_off}' ${Red}mapping error! the error mapping is${Color_off}"
+                echo -e "'${BIRed}${src_to_dst_array_per_line[*]}${Color_off}'"
                 exit 1
             fi
             
