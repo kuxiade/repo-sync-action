@@ -103,6 +103,7 @@ jobs:
         with:
           # 源端仓库链接 到 目的端仓库链接 的映射关系。
           src_to_dst: |
+            git@github.com:github/docs.git ---> git@gitee.com:mirror-hub/github-docs.git slldkkkf
             git@github.com:github/docs.git ---> git@gitee.com:mirror-hub/github-docs.git
             git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:mirror-hub/vscode-dev-containers.git
