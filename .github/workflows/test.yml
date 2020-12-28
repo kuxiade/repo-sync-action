@@ -35,7 +35,7 @@ jobs:
           echo "Print sys-release"
           cat /etc/*-release
           mkdir -p tmp-cache/test
-          cd test
+          cd tmp-cache/test
           echo "begining"
           export TZ=Asia/Shanghai
           date +%T
