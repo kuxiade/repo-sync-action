@@ -3,7 +3,7 @@ name: For testing
 on:
   # push推送时触发
   push:
-    branches: [ main ]
+    branches: [ feat/artifact-test ]
     # 匹配到该路径的文件有push时触发
     paths:
       # .github/workflows/ 目录下的文件有推送提交时，工作流触发
@@ -34,8 +34,8 @@ jobs:
         run: |
           echo "Print sys-release"
           cat /etc/*-release
-          mkdir test-temp
-          cd test-temp
+          mkdir -p tmp-cache/test
+          cd test
           echo "begining"
           export TZ=Asia/Shanghai
           date +%T
@@ -44,3 +44,13 @@ jobs:
           echo "end"
           du -sh *
           du -sm *
+
+      - run: mkdir -p tmp-cache/artifact
+      - run: echo "hello artifact" > tmp-cache/artifact/world.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: my-artifact
+          path: tmp-cache/artifact/world.txt
+
+      - run: echo $PWD; ls -la
+      
