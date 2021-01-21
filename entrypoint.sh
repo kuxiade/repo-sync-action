@@ -592,9 +592,9 @@ entrypoint_main() {
     # SSH 配置
     ssh_config
 
-    # git 配置。这里其实可以不用配置，不影响使用。
-    #git_config
-    #git_user_info
+    # git 配置。大部分情况下这里其实可以不用配置，不影响使用。有些特殊时候需要。
+    git_config
+    git_user_info
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
     #remove_cache_dir_flag="true"
