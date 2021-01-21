@@ -597,7 +597,7 @@ entrypoint_main() {
     git_user_info
     
     # 是否删除缓存目录，取消注释的话则会删除缓存目录
-    #remove_cache_dir_flag="true"
+    remove_cache_dir_flag="true"
     remove_cache_dir_flag=${remove_cache_dir_flag:-"false"}
     # 删除缓存目录
     if [ -d "$CACHE_PATH" ] && [[ "$remove_cache_dir_flag" == "true" ]]; then
