@@ -124,6 +124,7 @@ jobs:
             git@github.com:manateelazycat/snails.git  git@gitee.com:emacs-hub/snails.git
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
             git@github.com:magnars/s.el.git ---> git@gitee.com:emacs-hub/s.el.git
+            git@github.com:twlz0ne/multi-translate.el.git ---> git@gitee.com:emacs-hub/multi-translate.el.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
           cache_path: /github/workspace/${{ github.job }}-cache
