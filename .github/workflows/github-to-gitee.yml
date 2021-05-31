@@ -125,6 +125,7 @@ jobs:
             git@github.com:manateelazycat/sdcv.git ---> git@gitee.com:emacs-hub/sdcv.git
             git@github.com:manateelazycat/snails.git  git@gitee.com:emacs-hub/snails.git
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
+            git@github.com:manateelazycat/one-key.git ---> git@gitee.com:emacs-hub/one-key.git
             git@github.com:magnars/s.el.git ---> git@gitee.com:emacs-hub/s.el.git
             git@github.com:twlz0ne/multi-translate.el.git ---> git@gitee.com:emacs-hub/multi-translate.el.git
             git@github.com:redguardtoo/pyim-tsinghua-dict.git ---> git@gitee.com:emacs-hub/pyim-tsinghua-dict.git
