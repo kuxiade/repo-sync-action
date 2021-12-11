@@ -103,12 +103,10 @@ jobs:
         with:
           # 源端仓库链接 到 目的端仓库链接 的映射关系。
           src_to_dst: |
-            git@github.com:github/docs.git ---> git@gitee.com:mirror-hub/github-docs.git
             git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:mirror-hub/vscode-dev-containers.git
             git@github.com:fengyuhetao/shell.git ---> git@gitee.com:mirror-hub/shell.git
             git@github.com:A-BenMao/pure-bash-bible-zh_CN.git ---> git@gitee.com:mirror-hub/pure-bash-bible-zh_CN.git
-            git@github.com:git/git.git ---> git@gitee.com:mirror-hub/git.git
             
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:emacs-hub/doom-emacs.git
             git@github.com:syl20bnr/spacemacs.git ---> git@gitee.com:emacs-hub/spacemacs.git
@@ -119,7 +117,6 @@ jobs:
             git@github.com:manateelazycat/awesome-tray.git ---> git@gitee.com:emacs-hub/awesome-tray.git
             git@github.com:manateelazycat/color-rg.git ---> git@gitee.com:emacs-hub/color-rg.git
             git@github.com:manateelazycat/company-english-helper.git ---> git@gitee.com:emacs-hub/company-english-helper.git
-            git@github.com:manateelazycat/emacs-application-framework.git ---> git@gitee.com:emacs-hub/emacs-application-framework.git
             git@github.com:manateelazycat/insert-translated-name.git ---> git@gitee.com:emacs-hub/insert-translated-name.git
             git@github.com:manateelazycat/nox.git ---> git@gitee.com:emacs-hub/nox.git
             git@github.com:manateelazycat/sdcv.git ---> git@gitee.com:emacs-hub/sdcv.git
@@ -127,7 +124,6 @@ jobs:
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
             git@github.com:manateelazycat/one-key.git ---> git@gitee.com:emacs-hub/one-key.git
             git@github.com:magnars/s.el.git ---> git@gitee.com:emacs-hub/s.el.git
-            git@github.com:twlz0ne/multi-translate.el.git ---> git@gitee.com:emacs-hub/multi-translate.el.git
             git@github.com:redguardtoo/pyim-tsinghua-dict.git ---> git@gitee.com:emacs-hub/pyim-tsinghua-dict.git
           # cache_path (optional) 将代码缓存在指定目录，用于与actions/cache配合以加速镜像过程。
           # 'cache_path' 与 'steps.cacheSrcRepos.with.path' 值保持一致
