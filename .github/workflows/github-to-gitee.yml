@@ -117,6 +117,7 @@ jobs:
             git@github.com:manateelazycat/awesome-tab.git ---> git@gitee.com:emacs-hub/awesome-tab.git
             git@github.com:manateelazycat/awesome-tray.git ---> git@gitee.com:emacs-hub/awesome-tray.git
             git@github.com:manateelazycat/color-rg.git ---> git@gitee.com:emacs-hub/color-rg.git
+            git@github.com:manateelazycat/corfu-english-helper.git ---> git@gitee.com:emacs-hub/corfu-english-helper.git
             git@github.com:manateelazycat/company-english-helper.git ---> git@gitee.com:emacs-hub/company-english-helper.git
             git@github.com:manateelazycat/insert-translated-name.git ---> git@gitee.com:emacs-hub/insert-translated-name.git
             git@github.com:manateelazycat/nox.git ---> git@gitee.com:emacs-hub/nox.git
