@@ -120,7 +120,6 @@ jobs:
             git@github.com:manateelazycat/corfu-english-helper.git ---> git@gitee.com:emacs-hub/corfu-english-helper.git
             git@github.com:manateelazycat/company-english-helper.git ---> git@gitee.com:emacs-hub/company-english-helper.git
             git@github.com:manateelazycat/insert-translated-name.git ---> git@gitee.com:emacs-hub/insert-translated-name.git
-            git@github.com:manateelazycat/nox.git ---> git@gitee.com:emacs-hub/nox.git
             git@github.com:manateelazycat/sdcv.git ---> git@gitee.com:emacs-hub/sdcv.git
             git@github.com:manateelazycat/snails.git  git@gitee.com:emacs-hub/snails.git
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
