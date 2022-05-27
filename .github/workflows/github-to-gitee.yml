@@ -104,11 +104,12 @@ jobs:
           # 源端仓库链接 到 目的端仓库链接 的映射关系。
           src_to_dst: |
             git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
+            git@github.com:openocd-org/openocd.git ---> git@gitee.com:mirror-hub/openocd.git
+
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:star-hub/vscode-dev-containers.git
             git@github.com:fengyuhetao/shell.git ---> git@gitee.com:star-hub/shell.git
             git@github.com:A-BenMao/pure-bash-bible-zh_CN.git ---> git@gitee.com:star-hub/pure-bash-bible-zh_CN.git
             git@github.com:ObKo/stm32-cmake.git ---> git@gitee.com:star-hub/stm32-cmake.git
-            git@github.com:openocd-org/openocd.git ---> git@gitee.com:mirror-hub/openocd.git
             
             git@github.com:hlissner/doom-emacs.git ---> git@gitee.com:emacs-hub/doom-emacs.git
             git@github.com:syl20bnr/spacemacs.git ---> git@gitee.com:emacs-hub/spacemacs.git
@@ -121,6 +122,7 @@ jobs:
             git@github.com:manateelazycat/corfu-english-helper.git ---> git@gitee.com:emacs-hub/corfu-english-helper.git
             git@github.com:manateelazycat/company-english-helper.git ---> git@gitee.com:emacs-hub/company-english-helper.git
             git@github.com:manateelazycat/insert-translated-name.git ---> git@gitee.com:emacs-hub/insert-translated-name.git
+            git@github.com:manateelazycat/lsp-bridge.git ---> git@gitee.com:emacs-hub/lsp-bridge.git
             git@github.com:manateelazycat/sdcv.git ---> git@gitee.com:emacs-hub/sdcv.git
             git@github.com:manateelazycat/snails.git  git@gitee.com:emacs-hub/snails.git
             git@github.com:manateelazycat/thing-edit.git ---> git@gitee.com:emacs-hub/thing-edit.git
