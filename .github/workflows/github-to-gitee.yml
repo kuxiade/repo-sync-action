@@ -105,7 +105,7 @@ jobs:
           src_to_dst: |
             git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:star-hub/vscode-dev-containers.git
-            git@github.com:fengyuhetao/shell.git ---> git@gitee.com:mirror-hub/shell.git
+            git@github.com:fengyuhetao/shell.git ---> git@gitee.com:star-hub/shell.git
             git@github.com:A-BenMao/pure-bash-bible-zh_CN.git ---> git@gitee.com:star-hub/pure-bash-bible-zh_CN.git
             git@github.com:ObKo/stm32-cmake.git ---> git@gitee.com:star-hub/stm32-cmake.git
             git@github.com:openocd-org/openocd.git ---> git@gitee.com:mirror-hub/openocd.git
