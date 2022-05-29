@@ -104,6 +104,9 @@ jobs:
           # 源端仓库链接 到 目的端仓库链接 的映射关系。
           src_to_dst: |
             git@github.com:ohmyzsh/ohmyzsh.git ---> git@gitee.com:mirror-hub/ohmyzsh.git
+            git@github.com:zsh-users/zsh-autosuggestions.git ---> git@gitee.com:mirror-hub/zsh-autosuggestions.git
+            git@github.com:zsh-users/zsh-syntax-highlighting.git ---> git@gitee.com:mirror-hub/zsh-syntax-highlighting.git
+            git@github.com:zsh-users/zsh-history-substring-search.git ---> git@gitee.com:mirror-hub/zsh-history-substring-search.git
             git@github.com:openocd-org/openocd.git ---> git@gitee.com:mirror-hub/openocd.git
 
             git@github.com:microsoft/vscode-dev-containers.git ---> git@gitee.com:star-hub/vscode-dev-containers.git
